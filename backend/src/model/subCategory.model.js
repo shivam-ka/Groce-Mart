@@ -1,0 +1,26 @@
+import mongoose from "mongoose";
+
+const subCategorySchema = new mongoose.Schema({
+
+    name: {
+        type: String,
+        default: ""
+    },
+
+    image: {
+        type: String,
+        default: ""
+    },
+
+    category: [
+        {
+            type: mongoose.Schema.ObjectId,
+            ref: 'category'
+        }
+    ]
+
+}, { timestamps: ture })
+
+const SubCategoryModel = mongoose.model("Subcategory", subCategorySchema)
+
+export default SubCategoryModel
