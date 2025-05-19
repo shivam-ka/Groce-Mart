@@ -140,4 +140,44 @@ const loginUser = async (req, res) => {
             ))
     }
 }
-export { registerUser, loginUser }
+
+const verifyEmail = async (req, res) => {
+    try {
+
+        const { userId } = req.body;
+
+        const user = await userModel.findOne({ _id: userId })
+
+        if (!user) {
+            return res
+                .status(500)
+                .json(new ApiError(
+                    500,
+                    "invalid Credentials"
+                ))
+        }
+
+        user.verify_email = true
+
+        await user.save({ validateBeforeSave: false })
+
+        return res.json(new ApiResponse(
+            200,
+            {},
+            "Email Verified Successfully"
+        ))
+
+
+    } catch (error) {
+        console.log("VerifyEmail Controller Error: ", error)
+        res
+            .status(500)
+            .json(new ApiError(
+                500,
+                error.message || "Verify Email Error "
+            ))
+    }
+}
+
+
+export { registerUser, loginUser, verifyEmail }
