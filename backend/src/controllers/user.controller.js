@@ -15,7 +15,8 @@ const generateAccessAndRefereshTokens = async (userId) => {
 
 
     } catch (error) {
-        throw new Error("Something went wrong while generating referesh and access token")
+        console.log(error)
+        throw new Error("Something went wrong while generating referesh and access token", error)
     }
 }
 
@@ -68,62 +69,66 @@ const registerUser = async (req, res) => {
     }
 }
 
-// const loginUser = asyncHandler(async (req, res) => {
-//     const { email, password } = req.body;
+const loginUser = async (req, res) => {
+    try {
+        const { email, password } = req.body;
 
-//     if (!email) {
-//         return res.status(400).json(new ApiError(400, "Enter Username Or E-mail"))
-//     }
+        if (!email || !password) {
+            return res
+                .status(400)
+                .json(new ApiError(400, "Details Missing"))
+        }
 
-//     if (!password) {
-//         return res
-//             .status(400)
-//             .json(new ApiError(400, "Enter Password"))
-//     }
+        const user = await userModel.findOne({
+            email
+        })
 
-//     const user = await userModel.findOne({
-//         email
-//     })
+        if (!user) {
+            return res
+                .status(404)
+                .json(new ApiError(404, "User not Foud"))
+        }
 
-//     if (!user) {
-//         return res
-//             .status(404)
-//             .json(new ApiError(404, "User not Foud"))
-//     }
+        const isPasswordCorrect = await user.isPasswordCorrect(password)
 
-//     const isPasswordCorrect = await user.isPasswordCorrect(password)
+        if (!isPasswordCorrect) {
+            return res
+                .status(401)
+                .json(new ApiError(401, "Enter Correct Password"))
+        }
 
-//     if (!isPasswordCorrect) {
-//         return res
-//             .status(401)
-//             .json(new ApiError(401, "Enter Correct Password"))
-//     }
+        const { accessToken, refreshToken } = await generateAccessAndRefereshTokens(user._id)
 
-//     const { accessToken, refreshToken } = await generateAccessAndRefereshTokens(user._id)
+        const loggedInUser = await userModel.findById(user._id).select("-password -refreshToken")
 
-//     const loggedInUser = await userModel.findById(user._id).select("-password -refreshToken")
+        const options = {
+            httpOnly: true,
+            secure: true
+        }
 
-//     const options = {
-//         httpOnly: true,
-//         secure: true
-//     }
-
-//     return res
-//         .status(200)
-//         .cookie("accessToken", accessToken, options)
-//         .cookie("refreshToken", refreshToken, options)
-//         .json(
-//             new ApiResponse(
-//                 200,
-//                 {
-//                     loggedInUser,
-//                     accessToken,
-//                     refreshToken
-//                 },
-//                 "Loggin Successfully"
-//             )
-//         )
-
-// });
-
-export { registerUser }
+        return res
+            .status(200)
+            .cookie("accessToken", accessToken, options)
+            .cookie("refreshToken", refreshToken, options)
+            .json(
+                new ApiResponse(
+                    200,
+                    {
+                        loggedInUser,
+                        accessToken,
+                        refreshToken
+                    },
+                    "Loggin Successfully"
+                )
+            )
+    } catch (error) {
+        console.log("Login User Error: ", error)
+        res
+            .status(500)
+            .json(new ApiError(
+                500,
+                error.message || "Login Error "
+            ))
+    }
+}
+export { registerUser, loginUser }
