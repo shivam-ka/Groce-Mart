@@ -1,6 +1,8 @@
+import { sendEmail } from "../config/sendEmail.js";
 import userModel from "../model/user.model.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js"
+import { verifyEmailTemplate } from "../utils/verifyEmailTamplate.js";
 
 const generateAccessAndRefereshTokens = async (userId) => {
     try {
@@ -53,6 +55,13 @@ const registerUser = async (req, res) => {
                 .status(500)
                 .json(new ApiError(500, "Something went wrong while registering the user"))
         }
+
+        const verifyEmail = await sendEmail({
+            name,
+            sendTo: email,
+            subject: "Verify Email | Groce Mart",
+            html: verifyEmailTemplate({ name, url: '' })
+        })
 
         return res.status(201).json(
             new ApiResponse(200, createdUser, "User registered Successfully")
