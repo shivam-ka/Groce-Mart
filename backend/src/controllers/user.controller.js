@@ -1,119 +1,114 @@
 import { sendEmail } from "../config/sendEmail.js";
 import userModel from "../model/user.model.js";
 import { ApiError } from "../utils/ApiError.js";
-import { ApiResponse } from "../utils/ApiResponse.js"
+import { ApiResponse } from "../utils/ApiResponse.js";
 import { verifyEmailTemplate } from "../utils/verifyEmailTamplate.js";
 
 const generateAccessAndRefereshTokens = async (userId) => {
     try {
-        const user = await userModel.findById(userId)
-        const accessToken = user.generateAccessToken()
-        const refreshToken = user.generateRefreshToken()
+        const user = await userModel.findById(userId);
+        const accessToken = user.generateAccessToken();
+        const refreshToken = user.generateRefreshToken();
 
-        user.refreshToken = refreshToken
-        await user.save({ validateBeforeSave: false })
+        user.refreshToken = refreshToken;
+        await user.save({ validateBeforeSave: false });
 
-        return { accessToken, refreshToken }
-
-
+        return { accessToken, refreshToken };
     } catch (error) {
-        console.log(error)
-        throw new Error("Something went wrong while generating referesh and access token", error)
+        console.log(error);
+        throw new Error(
+            "Something went wrong while generating referesh and access token",
+            error
+        );
     }
-}
+};
 
 const registerUser = async (req, res) => {
     try {
         const { email, name, password } = req.body;
 
-        if (
-            [email, name, password].some((field) => field?.trim() === "")
-        ) {
-            return res.json(ApiError(400, "All fields are required"))
+        if ([email, name, password].some((field) => field?.trim() === "")) {
+            return res.json(ApiError(400, "All fields are required"));
         }
 
-        const existedUser = await userModel.findOne({ email })
+        const existedUser = await userModel.findOne({ email });
 
         if (existedUser) {
             return res
                 .status(409)
-                .json(new ApiError(409, "User with email already exists"))
+                .json(new ApiError(409, "User with email already exists"));
         }
 
         const user = await userModel.create({
             name,
             email,
             password,
-        })
+        });
 
-        const createdUser = await userModel.findById(user._id).select(
-            "-password -refreshToken"
-        )
+        const createdUser = await userModel
+            .findById(user._id)
+            .select("-password -refreshToken");
 
         if (!createdUser) {
             return res
                 .status(500)
-                .json(new ApiError(500, "Something went wrong while registering the user"))
+                .json(
+                    new ApiError(500, "Something went wrong while registering the user")
+                );
         }
 
         const verifyEmail = await sendEmail({
             name,
             sendTo: email,
             subject: "Verify Email | Groce Mart",
-            html: verifyEmailTemplate({ name, url: '' })
-        })
+            html: verifyEmailTemplate({ name, url: "" }),
+        });
 
-        return res.status(201).json(
-            new ApiResponse(200, createdUser, "User registered Successfully")
-        )
-
-
+        return res
+            .status(201)
+            .json(new ApiResponse(200, createdUser, "User registered Successfully"));
     } catch (error) {
-        console.log("Register User Error:", error)
+        console.log("Register User Error:", error);
         return res
             .status(500)
-            .json(
-                new ApiError(500, error.message || "Register user Error")
-            )
+            .json(new ApiError(500, error.message || "Register user Error"));
     }
-}
+};
 
 const loginUser = async (req, res) => {
     try {
         const { email, password } = req.body;
 
         if (!email || !password) {
-            return res
-                .status(400)
-                .json(new ApiError(400, "Details Missing"))
+            return res.status(400).json(new ApiError(400, "Details Missing"));
         }
 
         const user = await userModel.findOne({
             email
-        })
+        });
 
         if (!user) {
-            return res
-                .status(404)
-                .json(new ApiError(404, "User not Foud"))
+            return res.status(404).json(new ApiError(404, "User not Foud"));
         }
 
-        const isPasswordCorrect = await user.isPasswordCorrect(password)
+        const isPasswordCorrect = await user.isPasswordCorrect(password);
 
         if (!isPasswordCorrect) {
-            return res
-                .status(401)
-                .json(new ApiError(401, "Enter Correct Password"))
+            return res.status(401).json(new ApiError(401, "Enter Correct Password"));
         }
 
-        const { accessToken, refreshToken } = await generateAccessAndRefereshTokens(user._id)
+        const { accessToken, refreshToken } = await generateAccessAndRefereshTokens(
+            user._id
+        );
 
-        const loggedInUser = await userModel.findById(user._id).select("-password -refreshToken")
+        const loggedInUser = await userModel
+            .findById(user._id)
+            .select("-password -refreshToken");
 
         const options = {
             httpOnly: true,
-            secure: true
-        }
+            secure: true,
+        };
 
         return res
             .status(200)
@@ -125,59 +120,64 @@ const loginUser = async (req, res) => {
                     {
                         loggedInUser,
                         accessToken,
-                        refreshToken
+                        refreshToken,
                     },
                     "Loggin Successfully"
                 )
-            )
+            );
     } catch (error) {
-        console.log("Login User Error: ", error)
-        res
-            .status(500)
-            .json(new ApiError(
-                500,
-                error.message || "Login Error "
-            ))
+        console.log("Login User Error: ", error);
+        res.status(500).json(new ApiError(500, error.message || "Login Error "));
     }
-}
+};
 
 const verifyEmail = async (req, res) => {
     try {
-
         const { userId } = req.body;
 
-        const user = await userModel.findOne({ _id: userId })
+        const user = await userModel.findOne({ _id: userId });
 
         if (!user) {
-            return res
-                .status(500)
-                .json(new ApiError(
-                    500,
-                    "invalid Credentials"
-                ))
+            return res.status(500).json(new ApiError(500, "invalid Credentials"));
         }
 
-        user.verify_email = true
+        user.verify_email = true;
 
-        await user.save({ validateBeforeSave: false })
+        await user.save({ validateBeforeSave: false });
 
-        return res.json(new ApiResponse(
-            200,
-            {},
-            "Email Verified Successfully"
-        ))
-
-
+        return res.json(new ApiResponse(200, {}, "Email Verified Successfully"));
     } catch (error) {
-        console.log("VerifyEmail Controller Error: ", error)
+        console.log("VerifyEmail Controller Error: ", error);
         res
             .status(500)
-            .json(new ApiError(
-                500,
-                error.message || "Verify Email Error "
-            ))
+            .json(new ApiError(500, error.message || "Verify Email Error "));
     }
-}
+};
 
+const logoutUser = async (req, res) => {
+    try {
+        await userModel.findByIdAndUpdate(
+            req.user._id,
+            { $unset: { refreshToken: 1 } },
+            { new: true }
+        );
 
-export { registerUser, loginUser, verifyEmail }
+        const options = {
+            httpOnly: true,
+            secure: true,
+        };
+
+        return res
+            .status(200)
+            .clearCookie("accessToken", options)
+            .clearCookie("refreshToken", options)
+            .json(new ApiResponse(200, {}, "User logged Out"));
+    } catch (error) {
+        console.log("Logout Error: ", error);
+        res
+            .status(500)
+            .json(new ApiError(500, error.message || "Logout Error "));
+    }
+};
+
+export { registerUser, loginUser, verifyEmail, logoutUser };
