@@ -5,6 +5,7 @@ import { ApiResponse } from "../utils/ApiResponse.js";
 import generateOTP from "../utils/generateOtp.js";
 import otpTemplate from "../utils/otpTemplate.js";
 import { verifyEmailTemplate } from "../utils/verifyEmailTamplate.js";
+import jwt from "jsonwebtoken"
 
 const generateAccessAndRefereshTokens = async (userId) => {
     try {
@@ -219,7 +220,7 @@ const forgotPassword = async (req, res) => {
         console.log("forgot Password Error: ", error);
         res
             .status(500)
-            .json(new ApiError(500, error.message || "forgot Password Error "));
+            .json(new ApiError(500, error.message || "forgot Password Error"));
     }
 }
 
@@ -270,7 +271,7 @@ const verifyOtp = async (req, res) => {
         console.log("Verif OTP Error: ", error);
         res
             .status(500)
-            .json(new ApiError(500, error.message || "Verify OTP Error "));
+            .json(new ApiError(500, error.message || "Verify OTP Error"));
     }
 }
 
@@ -313,8 +314,71 @@ const resetPassword = async (req, res) => {
         console.log("Reset Password Error: ", error);
         res
             .status(500)
-            .json(new ApiError(500, error.message || "Reset Password Error "));
+            .json(new ApiError(500, error.message || "Reset Password Error"));
     }
 }
 
-export { registerUser, loginUser, verifyEmail, logoutUser, forgotPassword, verifyOtp, resetPassword };
+const refreshAccessToken = async (req, res) => {
+    try {
+        const incomingRefreshToken = req.cookies.refreshToken || req.body.refreshToken
+
+        if (!incomingRefreshToken) {
+            return res
+                .status(401)
+                .json(new ApiError(
+                    401,
+                    "unauthorized request"
+                ))
+        }
+
+        const decodedToken = jwt.verify(
+            incomingRefreshToken,
+            process.env.REFRESH_TOKEN_SECRET)
+
+        const user = await userModel.findById(decodedToken?._id)
+
+        if (!user) {
+            return res
+                .status(401)
+                .json(new ApiError(
+                    401,
+                    "Invalid Refresh Token"
+                ))
+        }
+
+        if (incomingRefreshToken !== user.refreshToken) {
+            return res
+                .status(401)
+                .json(new ApiError(
+                    401,
+                    "Refresh token is expired or used"
+                ))
+        }
+
+        const options = {
+            httpOnly: true,
+            secure: true
+        }
+
+        const { accessToken, refreshToken } = await generateAccessAndRefereshTokens(user._id)
+
+        return res
+            .cookie("accessToken", accessToken, options)
+            .cookie("refreshToken", refreshToken, options)
+            .json(
+                new ApiResponse(
+                    200,
+                    { accessToken, refreshToken: refreshToken },
+                    "Access token refreshed"
+                )
+            )
+
+    } catch (error) {
+        console.log("Refresh Access Token Error: ", error);
+        res
+            .status(500)
+            .json(new ApiError(500, error.message || "Refresh Access Token Error"));
+    }
+}
+
+export { registerUser, loginUser, verifyEmail, logoutUser, forgotPassword, verifyOtp, resetPassword, refreshAccessToken };
