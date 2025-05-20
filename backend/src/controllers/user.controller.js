@@ -2,6 +2,8 @@ import { sendEmail } from "../config/sendEmail.js";
 import userModel from "../model/user.model.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
+import generateOTP from "../utils/generateOtp.js";
+import otpTemplate from "../utils/otpTemplate.js";
 import { verifyEmailTemplate } from "../utils/verifyEmailTamplate.js";
 
 const generateAccessAndRefereshTokens = async (userId) => {
@@ -180,4 +182,139 @@ const logoutUser = async (req, res) => {
     }
 };
 
-export { registerUser, loginUser, verifyEmail, logoutUser };
+const forgotPassword = async (req, res) => {
+    try {
+        const { email } = req.body;
+
+        const user = await userModel.findOne({ email })
+
+        if (!user) {
+            return res
+                .status(404)
+                .json(new ApiError(404, "Email does not exist"))
+        }
+
+        const otp = generateOTP();
+
+        const expireTime = new Date() + 15 * 60 * 1000; // 15 Min
+
+        await userModel.findByIdAndUpdate(user._id, {
+            forgot_password_otp: otp,
+            forgot_password_expiry: new Date(expireTime).toISOString()
+        })
+
+        await sendEmail({
+            sendTo: email,
+            subject: "Forgot Password From Gro Mart",
+            html: otpTemplate({ name: user.name, otp })
+        })
+
+        return res.json(new ApiResponse(
+            200,
+            {},
+            "OTP Send Successfully"
+        ))
+
+    } catch (error) {
+        console.log("forgot Password Error: ", error);
+        res
+            .status(500)
+            .json(new ApiError(500, error.message || "forgot Password Error "));
+    }
+}
+
+const verifyOtp = async (req, res) => {
+    try {
+
+        const { email, otp } = req.body;
+        const user = await userModel.findOne({ email })
+
+        if (!user) {
+            return res
+                .status(404)
+                .json(new ApiError(
+                    404,
+                    "invalid Credentials"
+                ))
+        }
+
+        const currentTime = new Date().toISOString();
+
+        if (user.forgot_password_expiry > currentTime) {
+            return res
+                .status(400)
+                .json(new ApiError(400, "OTP is Expired"))
+        }
+
+        if (otp !== user.forgot_password_otp) {
+            return res
+                .status(400)
+                .json(new ApiError(400, "Invailid Otp"))
+        }
+
+        await userModel.findByIdAndUpdate(user._id, {
+            $unset: {
+                forgot_password_expiry: 1,
+                forgot_password_otp: 1
+            }
+        })
+
+        return res.json(new ApiResponse(
+            200,
+            {},
+            "OTP Veify Successfully"
+        ))
+
+
+    } catch (error) {
+        console.log("Verif OTP Error: ", error);
+        res
+            .status(500)
+            .json(new ApiError(500, error.message || "Verify OTP Error "));
+    }
+}
+
+const resetPassword = async (req, res) => {
+    try {
+
+        const { email, newPassword } = req.body;
+
+        const user = await userModel.findOne({ email })
+
+        if (!user) {
+            return res
+                .status(404)
+                .json(new ApiError(
+                    404,
+                    "invalid Credentials"
+                ))
+        }
+
+        if (!newPassword) {
+            return res
+                .status(400)
+                .json(new ApiError(
+                    400,
+                    "Enter Password"
+                ))
+        }
+
+        user.password = newPassword
+        const newuser = await user.save();
+
+        return res.json(new ApiResponse(
+            200,
+            newuser,
+            "Password Reset Successfully"
+        ))
+
+
+    } catch (error) {
+        console.log("Reset Password Error: ", error);
+        res
+            .status(500)
+            .json(new ApiError(500, error.message || "Reset Password Error "));
+    }
+}
+
+export { registerUser, loginUser, verifyEmail, logoutUser, forgotPassword, verifyOtp, resetPassword };
