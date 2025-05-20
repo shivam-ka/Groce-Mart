@@ -1,8 +1,16 @@
 import React from 'react'
+import { Footer, Navbar } from './components'
+import { Outlet } from 'react-router-dom'
 
 const App = () => {
   return (
-    <div></div>
+    <>
+      <Navbar />
+      <main>
+        <Outlet />
+      </main>
+      <Footer />
+    </>
   )
 }
 
