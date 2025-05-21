@@ -2,11 +2,11 @@ import React from 'react'
 
 const Footer = () => {
   return (
-    <footer className="bg-gray-900 text-gray-300 pt-12 pb-8">
+    <footer className="bg-gray-900 text-gray-300 pt-12 pb-8 border-t border-yellow-700">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-          
-          {/* Brand Section */}
+
+
           <div>
             <h2 className="text-2xl font-bold text-yellow-500 mb-4">Groce Mart</h2>
             <p>Your one-stop destination for fresh groceries delivered fast and fresh to your doorstep.</p>
@@ -23,7 +23,7 @@ const Footer = () => {
             </div>
           </div>
 
-          {/* Useful Links */}
+
           <div>
             <h3 className="text-xl font-semibold text-yellow-500 mb-4">Useful Links</h3>
             <ul className="space-y-2">
@@ -34,7 +34,7 @@ const Footer = () => {
             </ul>
           </div>
 
-          {/* Customer Service */}
+
           <div>
             <h3 className="text-xl font-semibold text-yellow-500 mb-4">Customer Support</h3>
             <ul className="space-y-2">
@@ -45,7 +45,7 @@ const Footer = () => {
             </ul>
           </div>
 
-          {/* Newsletter Signup */}
+
           <div>
             <h3 className="text-xl font-semibold text-yellow-500 mb-4">Newsletter</h3>
             <p>Subscribe to get the latest offers and updates directly in your inbox.</p>
@@ -66,7 +66,7 @@ const Footer = () => {
 
         </div>
 
-        {/* Bottom Bar */}
+
         <div className="mt-10 border-t border-gray-700 pt-6 text-center text-sm text-gray-500">
           © {new Date().getFullYear()} Groce Mart. All rights reserved.
         </div>

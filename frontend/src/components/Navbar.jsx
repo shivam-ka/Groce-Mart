@@ -6,7 +6,7 @@ import {
 } from 'react-icons/fi';
 import { MdOutlineShoppingCart } from "react-icons/md";
 import { asstes } from '../assets/assets';
-import { Link } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
 
 const Nav = () => {
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
@@ -14,6 +14,7 @@ const Nav = () => {
   const [windowWidth, setWindowWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 1024);
   const profileMenuRef = useRef(null);
   const searchInputRef = useRef(null);
+  const navigate = useNavigate()
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -69,12 +70,12 @@ const Nav = () => {
                 ref={searchInputRef}
                 type="text"
                 placeholder="Search"
-                className="w-full py-2 px-4 placeholder:text-black border border-gray-700 rounded-l-full focus:outline-none focus:border-yellow-700"
+                className="w-full py-2 px-4 placeholder:text-black border border-gray-700 rounded-l-full focus:outline-none focus:border-purple-700"
                 onFocus={() => windowWidth < 640 && setIsSearchExpanded(true)}
                 onBlur={() => windowWidth < 640 && !searchInputRef.current.value && setIsSearchExpanded(false)}
               />
-              <button title='Search' className="cursor-pointer bg-yellow-400 hover:bg-yellow-500 px-5 py-2.5 border border-l-0 border-gray-700 rounded-r-full">
-                <FiSearch className="h-5 w-5 text-gray-800" />
+              <button title='Search' className="cursor-pointer bg-[#6945c5] hover:bg-[#54389c] px-5 py-2.5 border border-l-0 border-gray-700 rounded-r-full">
+                <FiSearch className="h-5 w-5 text-white" />
               </button>
             </div>
           </motion.div>
@@ -96,31 +97,32 @@ const Nav = () => {
             <div className="relative" ref={profileMenuRef}>
               <button
                 onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
-                className="cursor-pointer flex items-center justify-center p-1.5 rounded-full bg-yellow-400 text-white hover:bg-yellow-500"
+                className="cursor-pointer flex items-center justify-center p-1.5 rounded-full bg-[#6945c5] text-white hover:bg-[#54389c]"
               >
-                <FiUser className="h-6 w-6 text-black" />
+                <FiUser className="h-6 w-6 text-white" />
               </button>
 
               <AnimatePresence>
                 {isProfileMenuOpen && (
-                  <motion.div
+                  <motion.ul
                     initial={{ opacity: 0, scale: 0.95 }}
                     animate={{ opacity: 1, scale: 1 }}
                     exit={{ opacity: 0, scale: 0.95 }}
                     transition={{ duration: 0.2 }}
                     className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg p-1 z-50 border border-gray-600 font-semibold"
                   >
-                    <a href="" className='flex rounded-md items-center px-4 py-2 text-sm text-black hover:bg-yellow-500 hover:text-black active:bg-yellow-600 '  >
+
+                    <li onClick={() => (setIsProfileMenuOpen(false), navigate('/register'))} className='cursor-pointer flex rounded-md items-center px-4 py-2 text-sm duration-200 text-black hover:bg-[#6945c5] hover:text-white active:bg-[#4b318c] '>
                       <FiLogIn className='mr-3' />
-                      Register
-                    </a>
+                      <p className='tracking-wide' >Register</p>
+                    </li>
 
-                    <a href="" className='flex rounded-md items-center px-4 py-2 text-sm text-black hover:bg-yellow-500 hover:text-black active:bg-yellow-600 '  >
+                    <li onClick={() => (setIsProfileMenuOpen(false), navigate('/login'))} className='cursor-pointer flex rounded-md items-center px-4 py-2 text-sm duration-200 text-black hover:bg-[#6945c5] hover:text-white active:bg-[#4b318c]'>
                       <FiLogOut className='mr-3' />
-                      Login
-                    </a>
+                      <p className='tracking-wide' >Login</p>
+                    </li>
 
-                  </motion.div>
+                  </motion.ul>
                 )}
               </AnimatePresence>
             </div>

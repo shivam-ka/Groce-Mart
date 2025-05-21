@@ -4,3 +4,7 @@
 body {
     font-family: "Outfit", sans-serif;
 }
+
+button:disabled{
+    cursor: no-drop;
+}
