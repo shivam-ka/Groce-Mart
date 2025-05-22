@@ -187,7 +187,7 @@ const forgotPassword = async (req, res) => {
     try {
         const { email } = req.body;
 
-        const user = await userModel.findOne({ email })
+        const user = await userModel.findOne(email)
 
         if (!user) {
             return res
@@ -205,7 +205,7 @@ const forgotPassword = async (req, res) => {
         })
 
         await sendEmail({
-            sendTo: email,
+            sendTo: user.email,
             subject: "Forgot Password From Gro Mart",
             html: otpTemplate({ name: user.name, otp })
         })
@@ -215,7 +215,6 @@ const forgotPassword = async (req, res) => {
             {},
             "OTP Send Successfully"
         ))
-
     } catch (error) {
         console.log("forgot Password Error: ", error);
         res
@@ -228,6 +227,7 @@ const verifyOtp = async (req, res) => {
     try {
 
         const { email, otp } = req.body;
+        console.log(email, otp)
         const user = await userModel.findOne({ email })
 
         if (!user) {
@@ -280,7 +280,7 @@ const resetPassword = async (req, res) => {
 
         const { email, newPassword } = req.body;
 
-        const user = await userModel.findOne({ email })
+        const user = await userModel.findOne({email})
 
         if (!user) {
             return res

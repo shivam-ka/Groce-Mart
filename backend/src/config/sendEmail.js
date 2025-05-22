@@ -23,11 +23,11 @@ const sendEmail = async ({ name, sendTo, subject, html }) => {
         console.log("data", data)
 
         if (error) {
-            return console.error({ error })
+            return console.error("Send Email Error", { error })
         }
 
     } catch (error) {
-        console.error({ error });
+        console.error("Send Email Error", { error });
     }
 }
 
