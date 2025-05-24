@@ -280,7 +280,7 @@ const resetPassword = async (req, res) => {
 
         const { email, newPassword } = req.body;
 
-        const user = await userModel.findOne({email})
+        const user = await userModel.findOne({ email })
 
         if (!user) {
             return res
@@ -317,6 +317,16 @@ const resetPassword = async (req, res) => {
             .json(new ApiError(500, error.message || "Reset Password Error"));
     }
 }
+
+const getCurrentUser = async (req, res) => {
+    return res
+        .json(new ApiResponse(
+            200,
+            req.user,
+            "User fetched successfully"
+        ))
+}
+
 
 const refreshAccessToken = async (req, res) => {
     try {
@@ -381,4 +391,8 @@ const refreshAccessToken = async (req, res) => {
     }
 }
 
-export { registerUser, loginUser, verifyEmail, logoutUser, forgotPassword, verifyOtp, resetPassword, refreshAccessToken };
+export {
+    registerUser, loginUser, verifyEmail,
+    logoutUser, forgotPassword, verifyOtp, resetPassword,
+    getCurrentUser, refreshAccessToken
+};
