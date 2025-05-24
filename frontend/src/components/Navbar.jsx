@@ -7,6 +7,7 @@ import {
 import { MdOutlineShoppingCart } from "react-icons/md";
 import { asstes } from '../assets/assets';
 import { Link, useNavigate } from "react-router-dom"
+import { useSelector } from 'react-redux';
 
 const Nav = () => {
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
@@ -14,7 +15,11 @@ const Nav = () => {
   const [windowWidth, setWindowWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 1024);
   const profileMenuRef = useRef(null);
   const searchInputRef = useRef(null);
-  const navigate = useNavigate()
+  const navigate = useNavigate();
+
+  const user = useSelector((state) => state.user)
+  console.log(user);
+  
 
   useEffect(() => {
     const handleClickOutside = (event) => {
