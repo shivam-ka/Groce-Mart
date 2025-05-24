@@ -4,6 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 import Axios from "../Utils/Axios";
 import summarApi from "../common/SummaryApi";
 import toast from "react-hot-toast"
+import { IoMdCloseCircle } from "react-icons/io";
 
 const Login = () => {
     const [formData, setFormData] = useState({
@@ -62,15 +63,17 @@ const Login = () => {
         if (validate()) {
             setIsSubmitting(true);
             try {
-                console.log(formData)
-                const response = await Axios({ ...summarApi.login, data: formData })
 
-                navigate('/')
+                const response = await Axios({ ...summarApi.login, data: formData })
+                if (response.data.success) {
+                    navigate('/')
+                }
+
             } catch (error) {
-                console.log(error)
+                console.log(error.response.data.message)
                 toast(error.response.data.message,
                     {
-                        icon: '👏', style: {
+                        icon: <IoMdCloseCircle className="text-red-500 text-2xl" />, style: {
                             borderRadius: '10px',
                             background: '#333',
                             color: '#fff',

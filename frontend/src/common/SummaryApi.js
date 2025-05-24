@@ -21,6 +21,10 @@ const summarApi = {
         url: '/api/v1/users/reset-password',
         method: 'put'
     },
+    refreshAccessToken: {
+        url: '/api/v1/user/refresh-access-token',
+        method: 'post'
+    }
 }
 
 export default summarApi
