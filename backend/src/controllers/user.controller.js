@@ -391,8 +391,46 @@ const refreshAccessToken = async (req, res) => {
     }
 }
 
+const updateProfile = async (req, res) => {
+    try {
+
+        const { name, mobile } = req.body;
+
+        if (!name || !mobile) {
+            return res.json(ApiError(400, "All fields are required"));
+        }
+
+        const user = await userModel.findByIdAndUpdate(
+            req.user?._id,
+            {
+                $set: {
+                    name,
+                    mobile
+                }
+            },
+            {
+                new: true
+            }
+
+        ).select("-password")
+
+        return res.json(new ApiResponse(
+            200,
+            user,
+            "Account details updated successfully"
+        ))
+
+
+    } catch (error) {
+        console.log("Update Profile Controller Error: ", error);
+        res
+            .status(500)
+            .json(new ApiError(500, error.message || "Update Profile Error"));
+    }
+}
+
 export {
     registerUser, loginUser, verifyEmail,
     logoutUser, forgotPassword, verifyOtp, resetPassword,
-    getCurrentUser, refreshAccessToken
+    getCurrentUser, refreshAccessToken, updateProfile
 };
