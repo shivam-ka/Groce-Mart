@@ -2,6 +2,9 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FiUser, FiMail, FiPhone, FiEdit2, FiSave, FiX, FiShoppingBag, FiStar, FiClock } from 'react-icons/fi';
 import { useSelector } from "react-redux"
+import Axios from "../../Utils/Axios"
+import summarApi from '../../common/SummaryApi';
+import toast from "react-hot-toast"
 
 const UserDashboard = () => {
   const primaryColor = '#6945c5';
@@ -10,9 +13,13 @@ const UserDashboard = () => {
   const userData = useSelector((state) => state.user)
 
   const [editMode, setEditMode] = useState(false);
-  const [tempData, setTempData] = useState(userData.name, userData.email);
+  const [tempData, setTempData] = useState(userData);
   const [isSubmiting, setIsSubmiting] = useState(false)
-  const [successMessage, setSuccessMessage] = useState('');
+  const [message, setMessage] = useState({
+    color: '',
+    message: '',
+    icons: ''
+  });
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -51,19 +58,25 @@ const UserDashboard = () => {
     setTempData(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmiting(true);
 
+    try {
+      const response = await Axios({
+        ...summarApi.updateProfile, data: ({ name: tempData.name, mobile: tempData.mobile })
+      })
+      if (response.data.success) {
+        setEditMode(false);
+        setMessage({ message: response.data.message, icons: 'FiSave', color: 'green' });
+      }
 
-    setTimeout(() => {
-      setEditMode(false);
-      setIsSubmiting(false);
-      setSuccessMessage('Profile updated successfully!');
-      const data = { name: tempData.name, phone: tempData.phone }
+    } catch (error) {
+      toast.error(error.response.data.message)
+      setMessage({ message: error.response.data.message, icons: 'FiSave', color: 'red' });
+    }
 
-      setTimeout(() => setSuccessMessage(''), 3000);
-    }, 1000);
+    setIsSubmiting(false);
   };
 
   return (
@@ -115,7 +128,7 @@ const UserDashboard = () => {
           {/* Dashboard Content */}
           <div className="p-6 px-4 md:p-8">
             <AnimatePresence>
-              {successMessage && (
+              {message.message && (
                 <motion.div
                   className="mb-6 p-4 rounded-lg flex items-center"
                   style={{ backgroundColor: primaryLight }}
@@ -123,10 +136,10 @@ const UserDashboard = () => {
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -10 }}
                 >
-                  <div className="w-8 h-8 rounded-full flex items-center justify-center mr-3" style={{ backgroundColor: primaryColor }}>
+                  <div className="w-8 h-8 rounded-full flex items-center justify-center mr-3" style={{ backgroundColor: message.color }}>
                     <FiSave className="text-white" />
                   </div>
-                  <span style={{ color: primaryColor }}>{successMessage}</span>
+                  <span style={{ color: primaryColor }}>{message.message}</span>
                 </motion.div>
               )}
             </AnimatePresence>
@@ -159,7 +172,7 @@ const UserDashboard = () => {
 
                     <motion.div className="mb-8" variants={itemVariants}>
                       <div className="text-gray-500 text-sm mb-1">Phone Number</div>
-                      <div className="text-lg font-medium">{userData.phone}</div>
+                      <div className="text-lg font-medium">{userData.mobile}</div>
                     </motion.div>
 
                     <motion.button
@@ -201,11 +214,13 @@ const UserDashboard = () => {
                     </motion.div>
 
                     <motion.div className="mb-8" variants={itemVariants}>
-                      <label className="block text-gray-500 text-sm mb-2">Phone Number</label>
+                      <label className="block text-gray-500 text-sm mb-2">Mobile Number</label>
                       <input
-                        type="tel"
-                        name="phone"
-                        value={tempData.phone}
+                        type="number"
+                        maxLength={10}
+                        minLength={10}
+                        name="mobile"
+                        value={tempData.mobile}
                         onChange={handleChange}
                         className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
                         style={{ borderColor: primaryLight }}

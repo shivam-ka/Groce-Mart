@@ -13,7 +13,7 @@ userRouter.put('/verify-otp', verifyOtp)
 userRouter.put('/reset-password', resetPassword)
 userRouter.get('/get-current-user', authUser, getCurrentUser)
 userRouter.post('/refresh-access-token', refreshAccessToken)
-userRouter.post('/update-profile', authUser, updateProfile)
+userRouter.put('/update-profile', authUser, updateProfile)
 
 
 export default userRouter

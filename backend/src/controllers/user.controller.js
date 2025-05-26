@@ -397,7 +397,9 @@ const updateProfile = async (req, res) => {
         const { name, mobile } = req.body;
 
         if (!name || !mobile) {
-            return res.json(ApiError(400, "All fields are required"));
+            return res
+                .status(400)
+                .json(new ApiError(400, "All fields are required"));
         }
 
         const user = await userModel.findByIdAndUpdate(

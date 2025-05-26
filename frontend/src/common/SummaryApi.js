@@ -32,7 +32,11 @@ const summarApi = {
     logOut: {
         url: '/api/v1/users/logout',
         method: 'get'
-    }
+    },
+    updateProfile: {
+        url: '/api/v1/users/update-profile',
+        method: 'put'
+    },
 }
 
 export default summarApi
