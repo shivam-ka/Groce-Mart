@@ -150,7 +150,7 @@ const Nav = () => {
 
                     {user._id ?
                       <>
-                        <li onClick={() => profileMenuHandler('/register')} className='cursor-pointer flex rounded-md items-center px-4 py-2 text-sm duration-200 text-black hover:bg-[#6945c5] hover:text-white active:bg-[#4b318c] '>
+                        <li onClick={() => profileMenuHandler('/dashboard')} className='cursor-pointer flex rounded-md items-center px-4 py-2 text-sm duration-200 text-black hover:bg-[#6945c5] hover:text-white active:bg-[#4b318c] '>
                           <FaUser className='mr-3' />
                           <p className='tracking-wide' >My Profile</p>
                         </li>

@@ -13,7 +13,6 @@ const App = () => {
 
   const fetchUserHandler = async () => {
     const userData = await fetchUser()
-    console.log(userData.data.data);
     dispatch(setUserDetails(userData.data.data))
   }
 

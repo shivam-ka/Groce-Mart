@@ -5,6 +5,11 @@ body {
     font-family: "Outfit", sans-serif;
 }
 
-button:disabled {
+button:disabled, input:disabled {
     cursor: no-drop;
+}
+
+::selection {
+    background: #f8791f;
+    color: white;
 }
