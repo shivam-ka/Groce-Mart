@@ -4,6 +4,7 @@ import toast from "react-hot-toast";
 import { Link, useNavigate } from "react-router-dom";
 import Axios from "../Utils/Axios";
 import summarApi from "../common/SummaryApi";
+import { useSelector } from "react-redux";
 
 const Register = () => {
     const [formData, setFormData] = useState({
@@ -15,6 +16,7 @@ const Register = () => {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [currentMessageIndex, setCurrentMessageIndex] = useState(0);
     const navigate = useNavigate()
+    const user = useSelector((state) => state.user)
 
     const messages = [
         "By continuing, you agree to our Terms of Service",

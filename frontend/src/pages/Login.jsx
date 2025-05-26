@@ -5,6 +5,7 @@ import Axios from "../Utils/Axios";
 import summarApi from "../common/SummaryApi";
 import toast from "react-hot-toast"
 import { IoMdCloseCircle } from "react-icons/io";
+import { useSelector } from "react-redux";
 
 const Login = () => {
     const [formData, setFormData] = useState({
@@ -15,6 +16,7 @@ const Login = () => {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [currentMessageIndex, setCurrentMessageIndex] = useState(0);
     const navigate = useNavigate()
+    const user = useSelector((state) => state.user)
 
     const messages = [
         "By continuing, you agree to our Terms of Service",
@@ -66,7 +68,9 @@ const Login = () => {
 
                 const response = await Axios({ ...summarApi.login, data: formData })
                 if (response.data.success) {
-                    navigate('/')
+                    window.location.href = '/'
+                    localStorage.setItem('accessToken', response.data.data.accessToken)
+                    localStorage.setItem('refreshToken', response.data.data.refreshToken)
                 }
 
             } catch (error) {
@@ -86,6 +90,10 @@ const Login = () => {
             setIsSubmitting(false)
         }
     };
+
+    if (user._id) {
+        return navigate('/')
+    }
 
     return (
         <div className=" bg-gradient-to-br from-gray-900 to-gray-800 flex items-center justify-center px-4 py-6">

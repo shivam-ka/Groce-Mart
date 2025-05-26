@@ -27,7 +27,7 @@ Axios.interceptors.request.use(
     async (error) => {
         let originalRequest = error.config
 
-        if (error.response.statu === 401 && !originalRequest.retry) {
+        if (error.response.status === 401 && !originalRequest.retry) {
             originalRequest = true
 
             const refreshToken = localStorage.getItem('refreshToken')
@@ -36,7 +36,7 @@ Axios.interceptors.request.use(
                 const { newAccessToken, newRefreshToken } = refreshTokenAcessToken()
 
                 if (newAccessToken) {
-                    originalRequest.headers.Authorization =  `Bearer ${newRefreshToken}`
+                    originalRequest.headers.Authorization = `Bearer ${newRefreshToken}`
                     return Axios(originalRequest)
                 }
             }
@@ -56,7 +56,7 @@ const refreshTokenAcessToken = async (refreshToken) => {
             }
         })
 
-        const { newAccessToken: accessToken, newRefreshToken: refreshToken } = response.data.data;
+        const { newAccessToken, newRefreshToken } = response.data.data;
         localStorage.setItem('accessToken', newAccessToken)
         localStorage.setItem('refreshToken', newRefreshToken)
         return { newAccessToken, newRefreshToken }

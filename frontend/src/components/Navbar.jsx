@@ -1,13 +1,23 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  FiMenu, FiSearch, FiMic, FiVideo, FiGrid, FiBell,
-  FiUser, FiLogIn, FiLogOut, FiSettings, FiHelpCircle
+  FiSearch,
+  FiUser, FiLogIn, FiLogOut,
 } from 'react-icons/fi';
+import {
+  FaUser,
+  FaMapMarkerAlt,
+  FaClipboardList,
+  FaSignOutAlt,
+  FaShoppingCart
+} from 'react-icons/fa'
+
 import { MdOutlineShoppingCart } from "react-icons/md";
 import { asstes } from '../assets/assets';
 import { Link, useNavigate } from "react-router-dom"
 import { useSelector } from 'react-redux';
+import Axios from '../Utils/Axios';
+import summarApi from '../common/SummaryApi';
 
 const Nav = () => {
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
@@ -16,10 +26,31 @@ const Nav = () => {
   const profileMenuRef = useRef(null);
   const searchInputRef = useRef(null);
   const navigate = useNavigate();
-
   const user = useSelector((state) => state.user)
-  console.log(user);
-  
+
+  const handleLogout = async (navigateTo) => {
+    try {
+      setIsProfileMenuOpen(false)
+      const response = await Axios({
+        ...summarApi.logOut
+      })
+
+      if (response.data.success) {
+        window.location.href = navigateTo
+        localStorage.removeItem('accessToken')
+        localStorage.removeItem('refreshToken')
+      }
+
+    } catch (error) {
+      console.log(error.message);
+    }
+  };
+
+  const profileMenuHandler = (navigateTo) => {
+    setIsProfileMenuOpen(false)
+    navigate(navigateTo)
+  }
+
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -117,15 +148,45 @@ const Nav = () => {
                     className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg p-1 z-50 border border-gray-600 font-semibold"
                   >
 
-                    <li onClick={() => (setIsProfileMenuOpen(false), navigate('/register'))} className='cursor-pointer flex rounded-md items-center px-4 py-2 text-sm duration-200 text-black hover:bg-[#6945c5] hover:text-white active:bg-[#4b318c] '>
-                      <FiLogIn className='mr-3' />
-                      <p className='tracking-wide' >Register</p>
-                    </li>
+                    {user._id ?
+                      <>
+                        <li onClick={() => profileMenuHandler('/register')} className='cursor-pointer flex rounded-md items-center px-4 py-2 text-sm duration-200 text-black hover:bg-[#6945c5] hover:text-white active:bg-[#4b318c] '>
+                          <FaUser className='mr-3' />
+                          <p className='tracking-wide' >My Profile</p>
+                        </li>
+                        <li onClick={() => profileMenuHandler('/register')} className='cursor-pointer flex rounded-md items-center px-4 py-2 text-sm duration-200 text-black hover:bg-[#6945c5] hover:text-white active:bg-[#4b318c] '>
+                          <FaMapMarkerAlt className='mr-3' />
+                          <p className='tracking-wide' >Address</p>
+                        </li>
+                        <li onClick={() => profileMenuHandler('/register')} className='cursor-pointer flex rounded-md items-center px-4 py-2 text-sm duration-200 text-black hover:bg-[#6945c5] hover:text-white active:bg-[#4b318c] '>
+                          <FaClipboardList className='mr-3' />
+                          <p className='tracking-wide' >Orders</p>
+                        </li>
+                        <li onClick={() => profileMenuHandler('/register')} className='cursor-pointer flex rounded-md items-center px-4 py-2 text-sm duration-200 text-black hover:bg-[#6945c5] hover:text-white active:bg-[#4b318c] '>
+                          < FaShoppingCart className='mr-3' />
+                          <p className='tracking-wide' >Go To Cart</p>
+                        </li>
 
-                    <li onClick={() => (setIsProfileMenuOpen(false), navigate('/login'))} className='cursor-pointer flex rounded-md items-center px-4 py-2 text-sm duration-200 text-black hover:bg-[#6945c5] hover:text-white active:bg-[#4b318c]'>
-                      <FiLogOut className='mr-3' />
-                      <p className='tracking-wide' >Login</p>
-                    </li>
+                        <hr className='mx-1.5 my-1 text-gray-500' />
+
+                        <li onClick={() => handleLogout('/login')} className='cursor-pointer flex rounded-md items-center px-4 py-2 text-sm duration-200 text-black hover:bg-[#6945c5] hover:text-white active:bg-[#4b318c] '>
+                          <FaSignOutAlt className='mr-3' />
+                          <p className='tracking-wide' >Logout</p>
+                        </li>
+                      </>
+                      :
+                      <>
+                        <li onClick={() => profileMenuHandler('/register')} className='cursor-pointer flex rounded-md items-center px-4 py-2 text-sm duration-200 text-black hover:bg-[#6945c5] hover:text-white active:bg-[#4b318c] '>
+                          <FiLogIn className='mr-3' />
+                          <p className='tracking-wide' >Register</p>
+                        </li>
+
+                        <li onClick={() => profileMenuHandler('/login')} className='cursor-pointer flex rounded-md items-center px-4 py-2 text-sm duration-200 text-black hover:bg-[#6945c5] hover:text-white active:bg-[#4b318c]'>
+                          <FiLogOut className='mr-3' />
+                          <p className='tracking-wide' >Login</p>
+                        </li>
+                      </>
+                    }
 
                   </motion.ul>
                 )}

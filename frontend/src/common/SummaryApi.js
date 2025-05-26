@@ -22,8 +22,16 @@ const summarApi = {
         method: 'put'
     },
     refreshAccessToken: {
-        url: '/api/v1/user/refresh-access-token',
+        url: '/api/v1/users/refresh-access-token',
         method: 'post'
+    },
+    getCurrentUser: {
+        url: '/api/v1/users/get-current-user',
+        method: 'get'
+    },
+    logOut: {
+        url: '/api/v1/users/logout',
+        method: 'get'
     }
 }
 
