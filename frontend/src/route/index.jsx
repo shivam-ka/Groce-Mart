@@ -1,6 +1,6 @@
 import { createBrowserRouter } from "react-router-dom"
 import App from "../App"
-import { ErrorPage, ForgotPassword, Home, Login, Register, UserDashboard, Address } from "../pages"
+import { ErrorPage, ForgotPassword, Home, Login, Register, UserDashboard, Address, Category, SubCategory, UploadProduct, Product } from "../pages"
 
 
 const router = createBrowserRouter([
@@ -34,7 +34,23 @@ const router = createBrowserRouter([
                     {
                         path: 'address',
                         element: <Address />
-                    }
+                    },
+                    {
+                        path: 'category',
+                        element: <Category />
+                    },
+                    {
+                        path: 'sub-category',
+                        element: <SubCategory />
+                    },
+                    {
+                        path: 'upload-product',
+                        element: <UploadProduct />
+                    },
+                    {
+                        path: 'product',
+                        element: <Product />
+                    },
                 ]
             }
         ],

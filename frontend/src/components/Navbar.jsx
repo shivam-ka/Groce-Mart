@@ -3,16 +3,25 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   FiSearch,
   FiUser, FiLogIn, FiLogOut,
+
 } from 'react-icons/fi';
 import {
   FaUser,
   FaMapMarkerAlt,
   FaClipboardList,
   FaSignOutAlt,
-  FaShoppingCart
+  FaShoppingCart,
+  FaLayerGroup,
+  FaUpload,
+  FaBox
 } from 'react-icons/fa'
 
-import { MdOutlineShoppingCart } from "react-icons/md";
+import {
+  MdOutlineShoppingCart
+} from "react-icons/md";
+
+import { BiSolidCategory } from "react-icons/bi";
+
 import { asstes } from '../assets/assets';
 import { Link, useNavigate } from "react-router-dom"
 import { useSelector } from 'react-redux';
@@ -149,31 +158,62 @@ const Nav = () => {
                   >
 
                     {user._id ?
-                      <>
-                        <li onClick={() => profileMenuHandler('/dashboard')} className='cursor-pointer flex rounded-md items-center px-4 py-2 text-sm duration-200 text-black hover:bg-[#6945c5] hover:text-white active:bg-[#4b318c] '>
-                          <FaUser className='mr-3' />
-                          <p className='tracking-wide' >My Profile</p>
-                        </li>
-                        <li onClick={() => profileMenuHandler('/register')} className='cursor-pointer flex rounded-md items-center px-4 py-2 text-sm duration-200 text-black hover:bg-[#6945c5] hover:text-white active:bg-[#4b318c] '>
-                          <FaMapMarkerAlt className='mr-3' />
-                          <p className='tracking-wide' >Address</p>
-                        </li>
-                        <li onClick={() => profileMenuHandler('/register')} className='cursor-pointer flex rounded-md items-center px-4 py-2 text-sm duration-200 text-black hover:bg-[#6945c5] hover:text-white active:bg-[#4b318c] '>
-                          <FaClipboardList className='mr-3' />
-                          <p className='tracking-wide' >Orders</p>
-                        </li>
-                        <li onClick={() => profileMenuHandler('/register')} className='cursor-pointer flex rounded-md items-center px-4 py-2 text-sm duration-200 text-black hover:bg-[#6945c5] hover:text-white active:bg-[#4b318c] '>
-                          < FaShoppingCart className='mr-3' />
-                          <p className='tracking-wide' >Go To Cart</p>
-                        </li>
+                      (user.role === "ADMIN" ?
+                        <>
+                          <li onClick={() => profileMenuHandler('/dashboard/category')} className='cursor-pointer flex rounded-md items-center px-4 py-2 text-sm duration-200 text-black hover:bg-[#6945c5] hover:text-white active:bg-[#4b318c] '>
+                            <BiSolidCategory className='mr-3' />
+                            <p className='tracking-wide' >Category</p>
+                          </li>
+                          <li onClick={() => profileMenuHandler('/dashboard/sub-category')} className='cursor-pointer flex rounded-md items-center px-4 py-2 text-sm duration-200 text-black hover:bg-[#6945c5] hover:text-white active:bg-[#4b318c] '>
+                            <FaLayerGroup className='mr-3' />
+                            <p className='tracking-wide' >Subcategory</p>
+                          </li>
+                          <li onClick={() => profileMenuHandler('/dashboard/upload-product')} className='cursor-pointer flex rounded-md items-center px-4 py-2 text-sm duration-200 text-black hover:bg-[#6945c5] hover:text-white active:bg-[#4b318c] '>
+                            <FaUpload className='mr-3' />
+                            <p className='tracking-wide' >Upload Product</p>
+                          </li>
+                          <li onClick={() => profileMenuHandler('/dashboard/product')} className='cursor-pointer flex rounded-md items-center px-4 py-2 text-sm duration-200 text-black hover:bg-[#6945c5] hover:text-white active:bg-[#4b318c] '>
+                            <FaBox className='mr-3' />
+                            <p className='tracking-wide' >Product</p>
+                          </li>
+                          <li onClick={() => profileMenuHandler('/dashboard/orders')} className='cursor-pointer flex rounded-md items-center px-4 py-2 text-sm duration-200 text-black hover:bg-[#6945c5] hover:text-white active:bg-[#4b318c] '>
+                            <FaClipboardList className='mr-3' />
+                            <p className='tracking-wide' >My Orders</p>
+                          </li>
 
-                        <hr className='mx-1.5 my-1 text-gray-500' />
+                          <hr className='mx-1.5 my-1 text-gray-500' />
 
-                        <li onClick={() => handleLogout('/login')} className='cursor-pointer flex rounded-md items-center px-4 py-2 text-sm duration-200 text-black hover:bg-[#6945c5] hover:text-white active:bg-[#4b318c] '>
-                          <FaSignOutAlt className='mr-3' />
-                          <p className='tracking-wide' >Logout</p>
-                        </li>
-                      </>
+                          <li onClick={() => handleLogout('/login')} className='cursor-pointer flex rounded-md items-center px-4 py-2 text-sm duration-200 text-black hover:bg-[#6945c5] hover:text-white active:bg-[#4b318c] '>
+                            <FaSignOutAlt className='mr-3' />
+                            <p className='tracking-wide' >Logout</p>
+                          </li>
+                        </>
+                        :
+                        <>
+                          <li onClick={() => profileMenuHandler('/dashboard')} className='cursor-pointer flex rounded-md items-center px-4 py-2 text-sm duration-200 text-black hover:bg-[#6945c5] hover:text-white active:bg-[#4b318c] '>
+                            <FaUser className='mr-3' />
+                            <p className='tracking-wide' >My Profile</p>
+                          </li>
+                          <li onClick={() => profileMenuHandler('/register')} className='cursor-pointer flex rounded-md items-center px-4 py-2 text-sm duration-200 text-black hover:bg-[#6945c5] hover:text-white active:bg-[#4b318c] '>
+                            <FaMapMarkerAlt className='mr-3' />
+                            <p className='tracking-wide' >Address</p>
+                          </li>
+                          <li onClick={() => profileMenuHandler('/register')} className='cursor-pointer flex rounded-md items-center px-4 py-2 text-sm duration-200 text-black hover:bg-[#6945c5] hover:text-white active:bg-[#4b318c] '>
+                            <FaClipboardList className='mr-3' />
+                            <p className='tracking-wide' >Orders</p>
+                          </li>
+                          <li onClick={() => profileMenuHandler('/register')} className='cursor-pointer flex rounded-md items-center px-4 py-2 text-sm duration-200 text-black hover:bg-[#6945c5] hover:text-white active:bg-[#4b318c] '>
+                            < FaShoppingCart className='mr-3' />
+                            <p className='tracking-wide' >Go To Cart</p>
+                          </li>
+
+                          <hr className='mx-1.5 my-1 text-gray-500' />
+
+                          <li onClick={() => handleLogout('/login')} className='cursor-pointer flex rounded-md items-center px-4 py-2 text-sm duration-200 text-black hover:bg-[#6945c5] hover:text-white active:bg-[#4b318c] '>
+                            <FaSignOutAlt className='mr-3' />
+                            <p className='tracking-wide' >Logout</p>
+                          </li>
+                        </>)
                       :
                       <>
                         <li onClick={() => profileMenuHandler('/register')} className='cursor-pointer flex rounded-md items-center px-4 py-2 text-sm duration-200 text-black hover:bg-[#6945c5] hover:text-white active:bg-[#4b318c] '>

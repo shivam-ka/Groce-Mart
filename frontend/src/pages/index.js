@@ -5,5 +5,22 @@ import Register from "./Register";
 import ForgotPassword from "./ForgotPassword";
 import UserDashboard from "./Dashboard/UserDashboard";
 import Address from "./Dashboard/Address";
+import Category from "./Admin/Category";
+import Product from "./Admin/Products"
+import SubCategory from "./Admin/SubCategory"
+import UploadProduct from "./Admin/UploadProducts"
 
-export { ErrorPage, Home, Login, Register, ForgotPassword, UserDashboard, Address }
+
+export {
+    ErrorPage,
+    Home,
+    Login,
+    Register,
+    ForgotPassword,
+    UserDashboard,
+    Address,
+    Category,
+    Product,
+    SubCategory,
+    UploadProduct
+}
