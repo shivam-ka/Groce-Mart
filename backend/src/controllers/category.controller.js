@@ -3,11 +3,11 @@ import { ApiError } from "../utils/ApiError.js"
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { uploadOnCloudinary } from "../utils/Cloudinary.js"
 
-const uploadCategory = async (req, res) => {
+const addCategory = async (req, res) => {
     try {
 
-        const { name } = req.body
-        const image = req.file
+        const { name } = req.body;
+        const image = req.file;
 
         if (!name || !image) {
             return res
@@ -15,7 +15,7 @@ const uploadCategory = async (req, res) => {
                 .json(new ApiError(400, "name and image are required"))
         }
 
-        const uploadedImage = await uploadOnCloudinary(image?.path)
+        const uploadedImage = await uploadOnCloudinary(image?.path);
 
         if (!uploadedImage.secure_url) {
             return res
@@ -23,7 +23,7 @@ const uploadCategory = async (req, res) => {
                 .ApiError(500, "something went wrong while uploading image on server")
         }
 
-        const addCategory = new CategoryModel({ name, image: uploadedImage.secure_url })
+        const addCategory = new CategoryModel({ name, image: uploadedImage.secure_url });
         const saveCategory = await addCategory.save();
 
         return res
@@ -42,4 +42,4 @@ const uploadCategory = async (req, res) => {
     }
 }
 
-export { uploadCategory }
+export { addCategory }
