@@ -1,7 +1,7 @@
 import CategoryModel from "../model/category.model.js"
 import { ApiError } from "../utils/ApiError.js"
 import { ApiResponse } from "../utils/ApiResponse.js";
-import { uploadOnCloudinary } from "../utils/Cloudinary.js"
+import { deleteOnCloudinary, uploadOnCloudinary } from "../utils/Cloudinary.js"
 
 const addCategory = async (req, res) => {
     try {
@@ -42,4 +42,111 @@ const addCategory = async (req, res) => {
     }
 }
 
-export { addCategory }
+const getAllCategory = async (_, res) => {
+    try {
+        const category = await CategoryModel.find()
+
+        return res.json(
+            new ApiResponse(
+                200,
+                category,
+                "All Category Fetched Successfully"
+            )
+        )
+
+    } catch (error) {
+        console.log("Get All Category Error: ", error)
+        return res
+            .status(500)
+            .json(new ApiError(500, error.message || "Get All Category Error"))
+    }
+}
+
+const updateCategory = async (req, res) => {
+    try {
+
+        const { categoryId, name } = req.body;
+        const image = req.file;
+
+        if (!categoryId) {
+            return res
+                .status(400)
+                .json(new ApiError(
+                    400,
+                    "invalid Credentials"
+                ))
+        }
+
+        const category = await CategoryModel.findById(categoryId);
+
+        if (image) {
+            const publicId = category.image.match(/\/upload\/(?:v\d+\/)?([^\.\/]+)(?=\.\w+$)/)[1]
+            await deleteOnCloudinary(publicId)
+
+            const uploadedImage = await uploadOnCloudinary(image.path)
+
+            category.name = name
+            category.image = uploadedImage.secure_url
+
+            const updatedCategory = await category.save({ validateBeforeSave: false })
+
+            return res.json(new ApiResponse(
+                200,
+                updatedCategory,
+                "Category Update Successfully"
+            ))
+        }
+
+        category.name = name
+        const updatedCategory = await category.save({ validateBeforeSave: false })
+
+        return res.json(new ApiResponse(
+            200,
+            updatedCategory,
+            "Category Update Successfully"
+        ))
+
+
+    } catch (error) {
+        console.log("Update Category Error: ", error)
+        return res
+            .status(500)
+            .json(new ApiError(500, error.message || "Update Category Error"))
+    }
+}
+
+const removeCategory = async (req, res) => {
+    try {
+        const { categoryId } = req.body;
+
+        if (!categoryId) {
+            return res
+                .status(400)
+                .json(new ApiError(
+                    400,
+                    "invalid Credentials"
+                ))
+        }
+
+        const category = await CategoryModel.findById(categoryId)
+
+        const publicId = category.image.match(/\/upload\/(?:v\d+\/)?([^\.\/]+)(?=\.\w+$)/)[1]
+        await deleteOnCloudinary(publicId)
+
+        await CategoryModel.findByIdAndDelete(category._id)
+
+        return res.json(new ApiResponse(
+            200,
+            {},
+            "Category Remove Successfully"
+        ))
+
+    } catch (error) {
+        console.log("Update Remove Error: ", error)
+        return res
+            .status(500)
+            .json(new ApiError(500, error.message || "Update Remove Error"))
+    }
+}
+
+export { addCategory, getAllCategory, updateCategory, removeCategory }
