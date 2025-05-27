@@ -6,7 +6,7 @@ const authUser = async (req, res, next) => {
   try {
     const token =
       req.cookies?.accessToken ||
-      req.header("Authorization")?.replace("Bearer ", "");
+      req.headers.authorization?.replace("Bearer ", "");
 
     if (!token) {
       return res.status(401).json(new ApiError(401, "Unauthorized request"));

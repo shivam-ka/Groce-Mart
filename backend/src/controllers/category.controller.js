@@ -9,8 +9,6 @@ const uploadCategory = async (req, res) => {
         const { name } = req.body
         const image = req.file
 
-        console.log(image.path)
-
         if (!name || !image) {
             return res
                 .status(400)
@@ -26,9 +24,7 @@ const uploadCategory = async (req, res) => {
         }
 
         const addCategory = new CategoryModel({ name, image: uploadedImage.secure_url })
-
         const saveCategory = await addCategory.save();
-
 
         return res
             .status(201)
@@ -37,7 +33,6 @@ const uploadCategory = async (req, res) => {
                 saveCategory,
                 "Category Added Successfully"
             ))
-
 
     } catch (error) {
         console.log("Upload Category Error: ", error)
