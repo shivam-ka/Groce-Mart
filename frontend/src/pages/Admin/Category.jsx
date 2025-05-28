@@ -1,22 +1,17 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaPlus, FaTimes, FaUpload, FaImage, FaTrash, FaEdit, FaCheck, FaBan } from 'react-icons/fa';
 import { MdCategory } from 'react-icons/md';
-
-
-const initialCategories = [
-  { id: 1, name: 'Fruits', image: 'https://via.placeholder.com/150/6945c5/FFFFFF?text=Fruits' },
-  { id: 2, name: 'Vegetables', image: 'https://via.placeholder.com/150/6945c5/FFFFFF?text=Veggies' },
-  { id: 3, name: 'Dairy', image: 'https://via.placeholder.com/150/6945c5/FFFFFF?text=Dairy' },
-  { id: 4, name: 'Bakery', image: 'https://via.placeholder.com/150/6945c5/FFFFFF?text=Bakery' },
-];
+import Axios from '../../Utils/Axios';
+import summarApi from '../../common/SummaryApi';
+import toast from 'react-hot-toast';
 
 const Category = () => {
-  const [categories, setCategories] = useState(initialCategories);
+  const [categories, setCategories] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
-  const [currentCategoryId, setCurrentCategoryId] = useState(null);
   const [newCategory, setNewCategory] = useState({
+    id: '',
     name: '',
     image: null,
     preview: null,
@@ -25,35 +20,47 @@ const Category = () => {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [categoryToDelete, setCategoryToDelete] = useState(null);
 
-  const handleAddCategory = () => {
-    if (!newCategory.name || !newCategory.image) return;
+  const fetchCategories = async () => {
+    try {
+      const response = await Axios({
+        ...summarApi.category.getAllCategory
+      })
+      if (response.data.success) {
+        setCategories(response.data.data)
+      }
+    } catch (error) {
+      console.log(error)
+      toast.error(error.response.data.message)
+    }
+  }
 
-    if (isEditMode) {
+  const handleAddCategory = async () => {
+    if (!newCategory.name || !newCategory.image) toast.error("Enter Name and Image");
 
-      setCategories(categories.map(cat =>
-        cat.id === currentCategoryId ? {
-          ...cat,
-          name: newCategory.name,
-          image: newCategory.preview || cat.image
-        } : cat
-      ));
-    } else {
+    const formData = new FormData
+    formData.append('name', newCategory.name)
+    formData.append('image', newCategory.image)
 
-      const newCat = {
-        id: categories.length + 1,
-        name: newCategory.name,
-        image: newCategory.preview,
-      };
-      setCategories([...categories, newCat]);
+    try {
+      const response = await Axios({
+        ...summarApi.category.addCategory, data: formData
+      })
+      if (response.data.success) {
+        fetchCategories()
+        toast.success(response.data.message)
+      }
+    } catch (error) {
+      console.log(error)
+      toast.error(error.response.data.message)
     }
 
     resetForm();
   };
 
-  const handleEditCategory = (category) => {
+  const handleEditCategory = async (category) => {
     setIsEditMode(true);
-    setCurrentCategoryId(category.id);
     setNewCategory({
+      id: category._id,
       name: category.name,
       image: null,
       preview: category.image
@@ -61,11 +68,34 @@ const Category = () => {
     setIsModalOpen(true);
   };
 
+  const handleUpdateCategory = async () => {
+
+    const formData = new FormData
+    formData.append('name', newCategory.name)
+    formData.append('image', newCategory.image)
+    formData.append('categoryId', newCategory.id)
+
+    try {
+      const response = await Axios({
+        ...summarApi.category.updateCategory, data: formData
+      })
+      if (response.data.success) {
+        toast.success(response.data.message)
+        fetchCategories()
+        setIsEditMode(false)
+        setIsModalOpen(false)
+
+      }
+    } catch (error) {
+      console.log(error)
+      toast.error(error.response.data.message)
+    }
+  }
+
   const resetForm = () => {
     setNewCategory({ name: '', image: null, preview: null });
     setIsModalOpen(false);
     setIsEditMode(false);
-    setCurrentCategoryId(null);
   };
 
   const handleImageUpload = (e) => {
@@ -125,6 +155,11 @@ const Category = () => {
     setCategoryToDelete(null);
   };
 
+  useEffect(() => {
+    fetchCategories()
+  }, [])
+
+
   return (
     <div className="min-h-screen bg-gray-50 p-4 md:p-6">
       <div className="max-w-6xl mx-auto">
@@ -148,7 +183,7 @@ const Category = () => {
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
           {categories.map((category) => (
             <motion.div
-              key={category.id}
+              key={category._id}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.3 }}
@@ -283,27 +318,26 @@ const Category = () => {
                   >
                     Cancel
                   </button>
-                  <button
-                    onClick={handleAddCategory}
-                    disabled={!newCategory.name || !newCategory.image}
-                    className={`cursor-pointer px-4 py-2 rounded-lg text-white font-medium flex items-center ${!newCategory.name || !newCategory.image
-                      ? 'bg-gray-400 cursor-not-allowed'
-                      : 'hover:bg-purple-700'
-                      }`}
-                    style={{ backgroundColor: '#6945c5' }}
-                  >
-                    {isEditMode ? (
-                      <>
-                        <FaCheck className="mr-2" />
-                        Update Category
-                      </>
-                    ) : (
-                      <>
-                        <FaUpload className="mr-2" />
-                        Upload Category
-                      </>
-                    )}
-                  </button>
+                  {!isEditMode ?
+                    <button
+                      onClick={handleAddCategory}
+                      disabled={!newCategory.name || !newCategory.image}
+                      className='cursor-pointer px-4 py-2 rounded-lg text-white font-medium flex items-center bg-purple-600  hover:bg-purple-700'
+                      style={{ backgroundColor: '#6945c5' }}
+                    >
+                      <FaUpload className="mr-2" />
+                      Upload Category
+                    </button>
+                    :
+                    <button
+                      onClick={handleUpdateCategory}
+                      disabled={!newCategory.name}
+                      className='cursor-pointer px-4 py-2 rounded-lg text-white font-medium flex items-center bg-purple-600  hover:bg-purple-700'
+                      style={{ backgroundColor: '#6945c5' }}>
+                      <FaCheck className="mr-2" />
+                      Update Category
+                    </button>
+                  }
                 </div>
               </motion.div>
             </motion.div>

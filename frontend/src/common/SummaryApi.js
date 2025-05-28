@@ -37,6 +37,20 @@ const summarApi = {
         url: '/api/v1/users/update-profile',
         method: 'put'
     },
+    category: {
+        getAllCategory: {
+            url: '/api/v1/category/get-all-category',
+            method: 'get'
+        },
+        addCategory: {
+            url: '/api/v1/category/add-category',
+            method: 'post'
+        },
+        updateCategory: {
+            url: '/api/v1/category/update-category',
+            method: 'put'
+        }
+    }
 }
 
 export default summarApi
