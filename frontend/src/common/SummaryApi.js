@@ -49,6 +49,10 @@ const summarApi = {
         updateCategory: {
             url: '/api/v1/category/update-category',
             method: 'put'
+        },
+        deleteCategory: {
+            url: '/api/v1/category/remove-category',
+            method: 'delete'
         }
     }
 }
