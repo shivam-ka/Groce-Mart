@@ -1,4 +1,6 @@
 import CategoryModel from "../model/category.model.js"
+import ProductModel from "../model/product.model.js";
+import SubCategoryModel from "../model/subCategory.model.js";
 import { ApiError } from "../utils/ApiError.js"
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { deleteOnCloudinary, uploadOnCloudinary } from "../utils/Cloudinary.js"
@@ -126,6 +128,26 @@ const removeCategory = async (req, res) => {
                     400,
                     "invalid Credentials"
                 ))
+        }
+
+        // Checking category is available in subcategory or not
+        const checkSubCategory = await SubCategoryModel.find({
+            category: {
+                "$in": [{ _id: categoryId }]
+            }
+        }).countDocuments();
+
+        // Checking category is available in product or not
+        const checkProduct = await ProductModel.find({
+            category: {
+                "$in": [{ _id: categoryId }]
+            }
+        }).countDocuments();
+
+        if (checkSubCategory > 0 || checkProduct > 0) {
+            return res
+                .status(500)
+                .json(new ApiError(500, "This category already in use you can't delete"))
         }
 
         const category = await CategoryModel.findById(categoryId)
