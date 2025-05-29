@@ -247,7 +247,7 @@ const Category = () => {
                   />
                 </div>
                 <div className="px-2 md:px-2.5 py-3 flex flex-col gap-2">
-                  <h3 className="ml-1 md:ml-2 text-[13px] md:text-lg font-semibold text-gray-800">{category.name}</h3>
+                  <h3 className="ml-1 md:ml-1.5 text-[13px] md:text-base font-semibold text-gray-800">{category.name}</h3>
 
                   <button
                     onClick={() => handleEditCategory(category)}
