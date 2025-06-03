@@ -6,6 +6,7 @@ import Axios from '../../Utils/Axios';
 import summarApi from '../../common/SummaryApi';
 import toast from 'react-hot-toast';
 import { ButtonLoading } from '../../components';
+import { useSelector } from 'react-redux';
 
 const Category = () => {
   const [isLoading, setIsLoading] = useState(false)
@@ -27,22 +28,30 @@ const Category = () => {
     image: null,
     preview: null,
   });
-
-  const fetchCategories = async () => {
+  const allCategory = useSelector(state => state.product.allCategory)
+  useEffect(() => {
     setIsPageLoading(true)
-    try {
-      const response = await Axios({
-        ...summarApi.category.getAllCategory
-      })
-      if (response.data.success) {
-        setCategories(response.data.data)
-      }
-    } catch (error) {
-      console.log(error)
-      toast.error(error.response.data.message)
-    }
+    setCategories(allCategory)
     setIsPageLoading(false)
-  }
+  }, [allCategory])
+
+
+  // const fetchCategories = async () => {
+  //   setIsPageLoading(true)
+  //   setCategories(allCategory)
+  //   // try {
+  //   //   const response = await Axios({
+  //   //     ...summarApi.category.getAllCategory
+  //   //   })
+  //   //   if (response.data.success) {
+  //   //     setCategories(response.data.data)
+  //   //   }
+  //   // } catch (error) {
+  //   //   console.log(error)
+  //   //   toast.error(error.response.data.message)
+  //   // }
+  //   setIsPageLoading(false)
+  // }
 
   const handleAddCategory = async () => {
     if (!newCategory.name || !newCategory.image) toast.error("Enter Name and Image");
@@ -58,7 +67,7 @@ const Category = () => {
         ...summarApi.category.addCategory, data: formData
       })
       if (response.data.success) {
-        fetchCategories()
+        // fetchCategories()
         toast.success(response.data.message)
       }
     } catch (error) {
@@ -94,7 +103,9 @@ const Category = () => {
       })
       if (response.data.success) {
         toast.success(response.data.message)
-        fetchCategories()
+        // fetchCategories()
+        const allCategory = useSelector(state => state.product.categories)
+        setCategories(allCategory)
         setIsEditMode(false)
         setIsModalOpen(false)
 
@@ -171,7 +182,7 @@ const Category = () => {
       if (response) {
         console.log(response)
         toast.success(response.data.message)
-        fetchCategories()
+
       }
     } catch (error) {
       console.log(error)
@@ -187,17 +198,12 @@ const Category = () => {
     setCategoryToDelete(null);
   };
 
-  useEffect(() => {
-    fetchCategories()
-  }, [])
-
-
   return (
-    isPageLoading ?
+    categories.length == 0 ?
       <div className="min-h-[90vh] p-4 md:py-10 md:px-14 lg:px-30">
         <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 md:gap-6">
-          {Array(8).fill(null).map((index) => (
-            <div className='flex flex-col gap-2 rounded-xl'>
+          {Array(8).fill(null).map((item, index) => (
+            <div key={index} className='flex flex-col gap-2 rounded-xl'>
               <div className='animate-pulse rounded-sm h-32 md:h-40 bg-gray-300'></div>
               <div className='animate-pulse rounded-sm h-4 md:h-5 bg-gray-300 w-1/2'></div>
               <div className='animate-pulse rounded-sm h-7 md:min-h-10 bg-gray-300'></div>

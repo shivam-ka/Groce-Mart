@@ -94,11 +94,12 @@ const Nav = () => {
 
   return (
     <nav className="bg-white  shadow-md sticky border border-gray-500 top-0 z-50">
-      <div className="mx-auto lg:px-16 px-4 py-2">
+      <div className="mx-auto lg:px-16 px-4 py-2 bg-linear-to-b from-white to-purple-100">
         <div className="flex gap-2 justify-between items-center ">
           <Link title='Groce Mart Home' to='/' className='flex items-center gap-2'>
             <img className='w-12 md:w-16' src={asstes.logo} alt="" />
             <h1 className='hidden lg:block text-2xl font-bold' >Groce Mart</h1>
+            <p title='Adimin Panel' className='text-purple-700 font-bold' > {user.role === "ADMIN" ? "(" + user.role + ")" : ""}</p>
           </Link>
 
           <motion.div
@@ -127,8 +128,8 @@ const Nav = () => {
 
           <div className="flex items-center space-x-3">
             {windowWidth < 640 && !isSearchExpanded && (
-              <button onClick={toggleSearch} className="p-2 rounded-full hover:bg-yellow-400">
-                <FiSearch className="h-5 w-5 text-black" />
+              <button onClick={toggleSearch} className="p-2 rounded-full hover:bg-[#6945c5] text-black hover:text-white">
+                <FiSearch className="h-5 w-5 " />
               </button>
             )}
 

@@ -19,7 +19,7 @@ const subCategorySchema = new mongoose.Schema({
         }
     ]
 
-}, { timestamps: ture })
+}, { timestamps: true })
 
 const SubCategoryModel = mongoose.model("Subcategory", subCategorySchema)
 
