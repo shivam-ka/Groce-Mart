@@ -52,10 +52,21 @@ const SubCategory = () => {
   };
 
   const resetForm = () => {
-    setNewSubCategory({ name: '', image: null, preview: null, category: [] });
+    setNewSubCategory({ name: '', image: null, preview: null, categories: [] });
     setIsModalOpen(false);
     setIsEditMode(false);
   };
+
+  const handleSelect = (item) => {
+    if (newSubCategory.categories?.find(cat => cat._id === item._id)) {
+      handleRemoveCategory(item._id)
+    }
+    else {
+      setNewSubCategory({ ...newSubCategory, categories: [...newSubCategory?.categories, item] })
+    }
+
+    setIsOpen(false)
+  }
 
   const handleImageUpload = (e) => {
     const file = e.target.files[0];
@@ -72,31 +83,36 @@ const SubCategory = () => {
     }
   };
 
-  const handleAddSubCategory = async () => {
-    // if (!newSubCategory.name || !newSubCategory.image) toast.error("Enter Name and Image");
+  const handleAddSubCategory = async (e) => {
+    e.preventDefault()
+    if (!newSubCategory.name || !newSubCategory.image) toast.error("Enter Name and Image");
+    if (!newSubCategory.categories[0]) toast.error("Enter Name and Image");
 
+    setIsLoading(true)
+    const categoryId = newSubCategory.categories.map(cat => cat._id)
 
     const formData = new FormData
     formData.append('name', newSubCategory.name)
     formData.append('image', newSubCategory.image)
+    categoryId.forEach(category => {
+      formData.append('category', category);
+    });
 
+    try {
+      const response = await Axios({
+        ...summarApi.subCategory.addSubCategory, data: formData
+      })
+      if (response.data.success) {
+        toast.success(response.data.message)
+      }
+    } catch (error) {
+      console.log(error)
+      toast.error(error.response.data.message)
+    }
 
-    setIsLoading(true)
-    console.log(newSubCategory)
     setIsLoading(false)
     resetForm();
   };
-
-  const handleSelect = (item) => {
-    if (newSubCategory.categories?.find(cat => cat._id === item._id)) {
-      handleRemoveCategory(item._id)
-    }
-    else {
-      setNewSubCategory({ ...newSubCategory, categories: [...newSubCategory.categories, item] })
-    }
-
-    setIsOpen(false)
-  }
 
   const handleRemoveCategory = (id) => {
     console.log(id)
@@ -105,12 +121,10 @@ const SubCategory = () => {
     setNewSubCategory({ ...newSubCategory, categories: [...newArray] })
   }
 
-
   const allCategory = useSelector(state => state.product.allCategory);
 
   useEffect(() => {
     setCategories(allCategory)
-    console.log(categories)
   }, [allCategory])
 
   return (
@@ -230,9 +244,10 @@ const SubCategory = () => {
               <div className=' flex gap-2 flex-wrap py-2'>
                 {newSubCategory.categories?.map((item) => (
                   <motion.div
-                    initial={{ y: -10 }}
+                    initial={{ y: 10 }}
                     animate={{ y: 0 }}
-                    exit={{ y: -10 }}
+                    exit={{ opacity: 0, y: 20 }}
+                    transition={{ duration: 0.2, type: 'spring', bounce: 30 }}
                     key={item._id}
                     className='relative'>
                     <p

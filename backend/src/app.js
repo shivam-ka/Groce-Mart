@@ -23,8 +23,10 @@ app.use(morgan());
 // import router 
 import userRouter from "./routes/user.routes.js"
 import categoryRouter from "./routes/category.routes.js"
+import subCategoryRouter from "./routes/subCategory.routes.js"
 
 app.use('/api/v1/users', userRouter)
 app.use('/api/v1/category', categoryRouter)
+app.use('/api/v1/subcategory', subCategoryRouter)
 
 export { app }
