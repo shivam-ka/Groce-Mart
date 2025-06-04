@@ -4,7 +4,6 @@ import { ApiError } from "./../utils/ApiError.js"
 import { uploadOnCloudinary } from "../utils/Cloudinary.js";
 
 
-
 const addSubCategory = async (req, res) => {
     try {
 
@@ -33,15 +32,34 @@ const addSubCategory = async (req, res) => {
             .json(new ApiResponse(
                 200,
                 saveSubCategory,
-                "Category Added Successfully"
+                "SubCategory Added Successfully"
             ))
 
     } catch (error) {
-        console.log("Upload Category Error: ", error)
+        console.log("Upload Sub Category Error: ", error)
         return res
             .status(500)
-            .json(new ApiError(500, error.message || "Upload Category Error"))
+            .json(new ApiError(500, error.message || "Upload Sub Category Error"))
     }
 }
 
-export { addSubCategory }
+const getAllSubCategory = async (req, res) => {
+    try {
+        const allSubCategory = await SubCategoryModel.find()
+
+        return res.json(
+            new ApiResponse(
+                200,
+                allSubCategory,
+                "All Sub Category Fetched Successfully"
+            )
+        )
+    } catch (error) {
+        console.log("get All Sub Category Error: ", error)
+        return res
+            .status(500)
+            .json(new ApiError(500, error.message || "get All Sub Category Error"))
+    }
+}
+
+export { addSubCategory, getAllSubCategory }
