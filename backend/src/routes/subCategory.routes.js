@@ -1,11 +1,12 @@
 import { Router } from "express";
 import upload from "../middlewares/multer.middleware.js";
 import { authUser } from "../middlewares/auth.middleware.js";
-import { addSubCategory, getAllSubCategory } from "../controllers/subCategory.controller.js";
+import { addSubCategory, getAllSubCategory, updateSubCategory } from "../controllers/subCategory.controller.js";
 
 const subCategoryRouter = Router();
 
 subCategoryRouter.post('/add-subcategory', authUser, upload.single('image'), addSubCategory)
 subCategoryRouter.post('/get-allsubcategory', authUser, getAllSubCategory)
+subCategoryRouter.put('/update-subcategory', authUser, upload.single('image'), updateSubCategory)
 
 export default subCategoryRouter

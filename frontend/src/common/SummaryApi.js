@@ -63,6 +63,10 @@ const summarApi = {
         getAllSubCategory: {
             url: '/api/v1/subcategory/get-allsubcategory',
             method: 'post'
+        },
+        updateSubCategory: {
+            url: '/api/v1/subcategory/update-subcategory',
+            method: 'put'
         }
     }
 }

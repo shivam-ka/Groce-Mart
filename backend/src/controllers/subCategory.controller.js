@@ -1,7 +1,7 @@
 import SubCategoryModel from "../model/subCategory.model.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { ApiError } from "./../utils/ApiError.js"
-import { uploadOnCloudinary } from "../utils/Cloudinary.js";
+import { deleteOnCloudinary, uploadOnCloudinary } from "../utils/Cloudinary.js";
 
 
 const addSubCategory = async (req, res) => {
@@ -55,11 +55,67 @@ const getAllSubCategory = async (req, res) => {
             )
         )
     } catch (error) {
-        console.log("get All Sub Category Error: ", error)
+        console.log("get All SubCategory Error: ", error)
         return res
             .status(500)
-            .json(new ApiError(500, error.message || "get All Sub Category Error"))
+            .json(new ApiError(500, error.message || "get All SubCategory Error"))
     }
 }
 
-export { addSubCategory, getAllSubCategory }
+const updateSubCategory = async (req, res) => {
+    try {
+
+        const { _id, name, category } = req.body;
+        const image = req.file;
+
+        const subCategory = await SubCategoryModel.findById(_id)
+
+        if (!subCategory) {
+            return res
+                .status(400)
+                .json(new ApiError(
+                    400,
+                    "invalid Credentials"
+                ))
+        }
+
+        if (image) {
+            const publicId = subCategory.image.match(/\/upload\/(?:v\d+\/)?([^\.\/]+)(?=\.\w+$)/)[1]
+            await deleteOnCloudinary(publicId)
+
+            const uploadedImage = await uploadOnCloudinary(image.path)
+
+            subCategory.name = name
+            subCategory.category = category
+            subCategory.image = uploadedImage.secure_url
+
+            const updatedsubCategory = await subCategory.save({ validateBeforeSave: false })
+
+            return res.json(new ApiResponse(
+                200,
+                updatedsubCategory,
+                "Category Update Successfully"
+            ))
+        }
+
+        subCategory.name = name
+        subCategory.category = category
+
+        const updatedsubCategory = await subCategory.save({ validateBeforeSave: false })
+
+        return res.json(new ApiResponse(
+            200,
+            updatedsubCategory,
+            "Category Update Successfully"
+        ))
+
+
+    } catch (error) {
+        console.log("Update SubCategory Error: ", error)
+        return res
+            .status(500)
+            .json(new ApiError(500, error.message || "Update SubCategory Error"))
+    }
+}
+
+export { addSubCategory, getAllSubCategory, updateSubCategory }

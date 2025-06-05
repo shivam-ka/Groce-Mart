@@ -9,7 +9,7 @@ import summarApi from '../../common/SummaryApi';
 import { useSelector } from 'react-redux';
 import { FiCheck, FiChevronDown, FiChevronUp } from 'react-icons/fi';
 import { MdEdit } from "react-icons/md";
-import {PreSubCategory} from '../../components';
+import { PreSubCategory } from '../../components';
 
 const SubCategory = () => {
   const dropdownRef = useRef(null);
@@ -142,8 +142,36 @@ const SubCategory = () => {
     setIsModalOpen(true)
   }
 
-  const handleUpdateCategory = () => {
+  const handleUpdateCategory = async () => {
 
+    if (!newSubCategory.name) toast.error("Enter Name and Image");
+    if (!newSubCategory.categories[0]) toast.error("Enter Name and Image");
+
+    setIsLoading(true)
+
+    const categoryId = newSubCategory.categories.map(cat => cat._id)
+    const formData = new FormData
+    formData.append('_id', newSubCategory.id)
+    formData.append('name', newSubCategory.name)
+    formData.append('image', newSubCategory.image)
+    categoryId.forEach(category => {
+      formData.append('category', category);
+    });
+
+    try {
+      const response = await Axios({
+        ...summarApi.subCategory.updateSubCategory, data: formData
+      })
+      if (response.data.success) {
+        toast.success(response.data.message)
+      }
+    } catch (error) {
+      console.log(error)
+      toast.error(error.response.data.message)
+    }
+
+    setIsLoading(false)
+    resetForm();
   }
 
   const handleRemoveCategory = (id) => {
@@ -221,7 +249,7 @@ const SubCategory = () => {
               <thead className="bg-purple-200 border">
                 <tr>
                   <th className="py-3 px-4 text-left text-sm sm:text-base font-semibold text-black w-40">Image</th>
-                  <th className="py-3 px-4 text-left text-sm sm:text-base font-semibold text-black w-52">Name</th>
+                  <th className="py-3 px-4 text-left text-sm sm:text-base font-semibold text-black text-center min-w-52">Name</th>
                   <th className="py-3 px-4 text-left text-sm sm:text-base font-semibold text-black min-w-60 flex flex-wrap">Categories</th>
                   <th className="py-3 px-4 text-left text-sm sm:text-base font-semibold text-black max-w-32 sm:min-w-60">Actions</th>
                 </tr>
