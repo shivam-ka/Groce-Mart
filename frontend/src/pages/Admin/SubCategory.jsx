@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { MdCategory } from 'react-icons/md'
 import { AnimatePresence, motion, removeItem } from "framer-motion";
-import { FaCheck, FaEdit, FaImage, FaPlus, FaTimes, FaTrash, FaUpload } from 'react-icons/fa';
+import { FaBan, FaCheck, FaEdit, FaImage, FaPlus, FaTimes, FaTrash, FaUpload } from 'react-icons/fa';
 import { ButtonLoading } from '../../components';
 import toast from 'react-hot-toast';
 import Axios from '../../Utils/Axios';
@@ -15,7 +15,8 @@ const SubCategory = () => {
   const dropdownRef = useRef(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
-  const [isOpen, setIsOpen] = useState(false)
+  const [isOpen, setIsOpen] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [subCategories, setSubCategories] = useState([]);
@@ -32,7 +33,13 @@ const SubCategory = () => {
     url: null,
     x: 0,
     y: 0
-  })
+  });
+  const [subCategoryToDelete, setSubCategoryToDelete] = useState({
+    id: '',
+    name: '',
+    image: null,
+    preview: null,
+  });
 
   const handleDragOver = (e) => {
     e.preventDefault();
@@ -174,12 +181,39 @@ const SubCategory = () => {
     resetForm();
   }
 
-  const handleRemoveCategory = (id) => {
-    console.log(id)
-    let newArray = newSubCategory.categories.filter((item) => item._id !== id)
-    console.log(newArray)
-    setNewSubCategory({ ...newSubCategory, categories: [...newArray] })
-  }
+  const confirmDelete = (subCategory) => {
+    setSubCategoryToDelete({
+      id: subCategory._id,
+      name: subCategory.name,
+      preview: subCategory.image
+    });
+    setShowDeleteConfirm(true);
+  };
+
+  const handleDelete = async () => {
+    setIsLoading(true)
+    try {
+      const response = await Axios({
+        ...summarApi.subCategory.removeSubCategory, data: ({ 'subCategoryId': subCategoryToDelete.id })
+      })
+      if (response) {
+        console.log(response)
+        toast.success(response.data.message)
+
+      }
+    } catch (error) {
+      console.log(error)
+      toast.error(error.response.data.message)
+    }
+    setIsLoading(false)
+    setShowDeleteConfirm(false);
+    subCategoryToDelete(null);
+  };
+
+  const cancelDelete = () => {
+    setShowDeleteConfirm(false);
+    subCategoryToDelete(null);
+  };
 
   const handleGetCategoryDetails = (id) => {
     const category = categories.find((item) => item._id === id)
@@ -249,7 +283,7 @@ const SubCategory = () => {
               <thead className="bg-purple-200 border">
                 <tr>
                   <th className="py-3 px-4 text-left text-sm sm:text-base font-semibold text-black w-40">Image</th>
-                  <th className="py-3 px-4 text-left text-sm sm:text-base font-semibold text-black text-center min-w-52">Name</th>
+                  <th className="py-3 px-4 text-left text-sm sm:text-base font-semibold text-black min-w-52">Name</th>
                   <th className="py-3 px-4 text-left text-sm sm:text-base font-semibold text-black min-w-60 flex flex-wrap">Categories</th>
                   <th className="py-3 px-4 text-left text-sm sm:text-base font-semibold text-black max-w-32 sm:min-w-60">Actions</th>
                 </tr>
@@ -576,6 +610,62 @@ const SubCategory = () => {
             </motion.div>
           )}
         </AnimatePresence>
+
+        <AnimatePresence>
+          {showDeleteConfirm && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 backdrop-blur-md bg-opacity-50 flex items-center justify-center p-4 z-50"
+            >
+              <motion.div
+                initial={{ scale: 0.9 }}
+                animate={{ scale: 1 }}
+                exit={{ scale: 0.9 }}
+                className="bg-white rounded-xl border p-6 w-full max-w-md"
+              >
+                <div className="text-center">
+                  <div className='py-3 border rounded-sm border-dashed' >
+                    <img src={subCategoryToDelete.preview} className='w-32 m-auto' alt="" />
+                    <p>{subCategoryToDelete.name}</p>
+                  </div>
+
+                  <h3 className="text-xl font-bold text-gray-800 my-2">Delete Category</h3>
+                  <p className="text-gray-600 mb-6">Are you sure you want to delete this category? <span className='text-red-500'>This action cannot be undone.</span> </p>
+
+                  <div className="flex justify-center space-x-4">
+                    <button
+                      onClick={cancelDelete}
+                      className="cursor-pointer px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 flex items-center"
+                    >
+                      <FaBan className="mr-2" />
+                      Cancel
+                    </button>
+                    <button
+                      disabled={isLoading}
+                      onClick={handleDelete}
+                      className="cursor-pointer px-6 py-2 rounded-lg text-white font-medium flex items-center bg-red-500 hover:bg-red-600"
+                    >
+                      {isLoading ?
+                        <>
+                          <ButtonLoading />
+                          removing...
+                        </>
+                        :
+                        <>
+                          <FaTrash className="mr-2" />
+                          Delete
+                        </>}
+
+                    </button>
+                  </div>
+                </div>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
       </div>
 
 

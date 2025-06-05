@@ -118,4 +118,38 @@ const updateSubCategory = async (req, res) => {
     }
 }
 
-export { addSubCategory, getAllSubCategory, updateSubCategory }
+const removeSubCategory = async (req, res) => {
+    try {
+        const { subCategoryId } = req.body;
+
+        if (!subCategoryId) {
+            return res
+                .status(400)
+                .json(new ApiError(
+                    400,
+                    "invalid Credentials"
+                ))
+        }
+
+        const subCategory = await SubCategoryModel.findById(subCategoryId)
+
+        const publicId = subCategory.image.match(/\/upload\/(?:v\d+\/)?([^\.\/]+)(?=\.\w+$)/)[1]
+        await deleteOnCloudinary(publicId)
+
+        await SubCategoryModel.findByIdAndDelete(subCategory._id)
+
+        return res.json(new ApiResponse(
+            200,
+            {},
+            "Sub Category Remove Successfully"
+        ))
+
+    } catch (error) {
+        console.log("Remove SubCategory Error: ", error)
+        return res
+            .status(500)
+            .json(new ApiError(500, error.message || "Remove SubCategory Error"))
+    }
+}
+
+export { addSubCategory, getAllSubCategory, updateSubCategory, removeSubCategory }

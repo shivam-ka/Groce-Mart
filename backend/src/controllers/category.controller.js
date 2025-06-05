@@ -164,10 +164,10 @@ const removeCategory = async (req, res) => {
         ))
 
     } catch (error) {
-        console.log("Update Remove Error: ", error)
+        console.log("Remove Category Error: ", error)
         return res
             .status(500)
-            .json(new ApiError(500, error.message || "Update Remove Error"))
+            .json(new ApiError(500, error.message || "Remove Category Error"))
     }
 }
 
