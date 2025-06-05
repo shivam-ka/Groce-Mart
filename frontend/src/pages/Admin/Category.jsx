@@ -5,7 +5,7 @@ import { MdCategory } from 'react-icons/md';
 import Axios from '../../Utils/Axios';
 import summarApi from '../../common/SummaryApi';
 import toast from 'react-hot-toast';
-import { ButtonLoading } from '../../components';
+import { ButtonLoading, PreCategory } from '../../components';
 import { useSelector } from 'react-redux';
 
 const Category = () => {
@@ -199,43 +199,28 @@ const Category = () => {
   };
 
   return (
-    categories.length == 0 ?
-      <div className="min-h-[90vh] p-4 md:py-10 md:px-14 lg:px-30">
-        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 md:gap-6">
-          {Array(8).fill(null).map((item, index) => (
-            <div key={index} className='flex flex-col gap-2 rounded-xl'>
-              <div className='animate-pulse rounded-sm h-32 md:h-40 bg-gray-300'></div>
-              <div className='animate-pulse rounded-sm h-4 md:h-5 bg-gray-300 w-1/2'></div>
-              <div className='animate-pulse rounded-sm h-7 md:min-h-10 bg-gray-300'></div>
-            </div>
-          ))
-
-          }
+    <div className="min-h-screen bg-gray-50 p-4 md:p-6">
+      <div className="max-w-6xl mx-auto">
+        <div className="flex justify-between items-center mb-8">
+          <h1 className=" text-base md:text-2xl font-bold text-gray-800 flex items-center">
+            <MdCategory className="mr-2" style={{ color: '#6945c5' }} />
+            Product Categories
+          </h1>
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={() => setIsModalOpen(true)}
+            className="cursor-pointer flex items-center px-4 py-2 rounded-lg text-white text-xs md:text-sm font-medium"
+            style={{ backgroundColor: '#6945c5' }}
+          >
+            <FaPlus className="mr-2" />
+            Add Category
+          </motion.button>
         </div>
 
-
-      </div>
-
-      :
-      <div className="min-h-screen bg-gray-50 p-4 md:p-6">
-        <div className="max-w-6xl mx-auto">
-          <div className="flex justify-between items-center mb-8">
-            <h1 className=" text-base md:text-2xl font-bold text-gray-800 flex items-center">
-              <MdCategory className="mr-2" style={{ color: '#6945c5' }} />
-              Product Categories
-            </h1>
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={() => setIsModalOpen(true)}
-              className="cursor-pointer flex items-center px-4 py-2 rounded-lg text-white text-xs md:text-sm font-medium"
-              style={{ backgroundColor: '#6945c5' }}
-            >
-              <FaPlus className="mr-2" />
-              Add Category
-            </motion.button>
-          </div>
-
+        {categories.length == 0 ?
+          <PreCategory />
+          :
           <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
             {categories.map((category) => (
               <motion.div
@@ -277,203 +262,203 @@ const Category = () => {
               </motion.div>
             ))}
           </div>
+        }
 
-          {/* Add/Edit Category Modal */}
-          <AnimatePresence>
-            {isModalOpen && (
+        {/* Add/Edit Category Modal */}
+        <AnimatePresence>
+          {isModalOpen && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 backdrop-blur-md bg-opacity-50 flex items-center justify-center p-4 z-50"
+              onClick={() => resetForm()}
+            >
               <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                className="fixed inset-0 backdrop-blur-md bg-opacity-50 flex items-center justify-center p-4 z-50"
-                onClick={() => resetForm()}
+                initial={{ scale: 0.9, y: 20 }}
+                animate={{ scale: 1, y: 0 }}
+                exit={{ scale: 0.9, y: 20 }}
+                className="bg-white border rounded-xl p-6 w-full max-w-md"
+                onClick={(e) => e.stopPropagation()}
               >
-                <motion.div
-                  initial={{ scale: 0.9, y: 20 }}
-                  animate={{ scale: 1, y: 0 }}
-                  exit={{ scale: 0.9, y: 20 }}
-                  className="bg-white border rounded-xl p-6 w-full max-w-md"
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  <div className="flex justify-between items-center mb-4">
-                    <h2 className="text-xl font-bold text-gray-800">
-                      {isEditMode ? 'Edit Category' : 'Add New Category'}
-                    </h2>
-                    <button
-                      onClick={() => resetForm()}
-                      className="cursor-pointer text-gray-500 hover:text-gray-700"
-                    >
-                      <FaTimes />
-                    </button>
-                  </div>
+                <div className="flex justify-between items-center mb-4">
+                  <h2 className="text-xl font-bold text-gray-800">
+                    {isEditMode ? 'Edit Category' : 'Add New Category'}
+                  </h2>
+                  <button
+                    onClick={() => resetForm()}
+                    className="cursor-pointer text-gray-500 hover:text-gray-700"
+                  >
+                    <FaTimes />
+                  </button>
+                </div>
 
-                  <div className="mb-4">
-                    <label className="block text-gray-700 mb-2">Category Name</label>
+                <div className="mb-4">
+                  <label className="block text-gray-700 mb-2">Category Name</label>
+                  <input
+                    type="text"
+                    value={newCategory.name}
+                    onChange={(e) => setNewCategory({ ...newCategory, name: e.target.value })}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2"
+                    style={{ focusBorderColor: '#6945c5', focusRingColor: '#6945c5' }}
+                    placeholder="e.g. Fruits, Vegetables"
+                  />
+                </div>
+
+                <div className="mb-6">
+                  <label className="block text-gray-700 mb-2">Category Image</label>
+                  <div
+                    onDragOver={handleDragOver}
+                    onDragLeave={handleDragLeave}
+                    onDrop={handleDrop}
+                    className={`border-2 border-dashed rounded-lg p-6 text-center cursor-pointer transition-colors ${isDragging ? 'border-purple-500 bg-purple-50' : 'border-gray-300 hover:border-purple-400'
+                      }`}
+                    onClick={() => document.getElementById('file-upload').click()}
+                  >
+                    {newCategory.preview ? (
+                      <div className="relative">
+                        <img
+                          src={newCategory.preview}
+                          alt="Preview"
+                          className="mx-auto max-h-40 rounded-md"
+                        />
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setNewCategory({ ...newCategory, image: null, preview: null });
+                          }}
+                          className="cursor-pointer absolute top-0 right-0 bg-red-500 text-white p-1 rounded-full hover:bg-red-600 -mt-2 -mr-2"
+                        >
+                          <FaTimes size={12} />
+                        </button>
+                      </div>
+                    ) : (
+                      <div>
+                        <FaImage
+                          className="mx-auto text-gray-400 mb-2"
+                          size={48}
+                          style={{ color: isDragging ? '#6945c5' : '#9CA3AF' }}
+                        />
+                        <p className="text-gray-500">
+                          {isDragging ? 'Drop image here' : 'Click to upload or drag and drop'}
+                        </p>
+                        <p className="text-sm text-gray-400 mt-1">PNG, JPG up to 5MB</p>
+                      </div>
+                    )}
                     <input
-                      type="text"
-                      value={newCategory.name}
-                      onChange={(e) => setNewCategory({ ...newCategory, name: e.target.value })}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2"
-                      style={{ focusBorderColor: '#6945c5', focusRingColor: '#6945c5' }}
-                      placeholder="e.g. Fruits, Vegetables"
+                      id="file-upload"
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={handleImageUpload}
                     />
                   </div>
+                </div>
 
-                  <div className="mb-6">
-                    <label className="block text-gray-700 mb-2">Category Image</label>
-                    <div
-                      onDragOver={handleDragOver}
-                      onDragLeave={handleDragLeave}
-                      onDrop={handleDrop}
-                      className={`border-2 border-dashed rounded-lg p-6 text-center cursor-pointer transition-colors ${isDragging ? 'border-purple-500 bg-purple-50' : 'border-gray-300 hover:border-purple-400'
-                        }`}
-                      onClick={() => document.getElementById('file-upload').click()}
+                <div className="flex justify-end space-x-3">
+                  <button
+                    onClick={() => resetForm()}
+                    className="cursor-pointer px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"
+                  >
+                    Cancel
+                  </button>
+                  {!isEditMode ?
+                    <button
+                      onClick={handleAddCategory}
+                      disabled={isLoading}
+                      className='cursor-pointer px-4 py-2 rounded-lg text-white font-medium flex items-center bg-purple-600  hover:bg-purple-700'
+                      style={{ backgroundColor: '#6945c5' }}
                     >
-                      {newCategory.preview ? (
-                        <div className="relative">
-                          <img
-                            src={newCategory.preview}
-                            alt="Preview"
-                            className="mx-auto max-h-40 rounded-md"
-                          />
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setNewCategory({ ...newCategory, image: null, preview: null });
-                            }}
-                            className="cursor-pointer absolute top-0 right-0 bg-red-500 text-white p-1 rounded-full hover:bg-red-600 -mt-2 -mr-2"
-                          >
-                            <FaTimes size={12} />
-                          </button>
-                        </div>
-                      ) : (
-                        <div>
-                          <FaImage
-                            className="mx-auto text-gray-400 mb-2"
-                            size={48}
-                            style={{ color: isDragging ? '#6945c5' : '#9CA3AF' }}
-                          />
-                          <p className="text-gray-500">
-                            {isDragging ? 'Drop image here' : 'Click to upload or drag and drop'}
-                          </p>
-                          <p className="text-sm text-gray-400 mt-1">PNG, JPG up to 5MB</p>
-                        </div>
-                      )}
-                      <input
-                        id="file-upload"
-                        type="file"
-                        accept="image/*"
-                        className="hidden"
-                        onChange={handleImageUpload}
-                      />
-                    </div>
+                      {isLoading ?
+                        <>
+                          <ButtonLoading />
+                          Uploading...
+                        </>
+                        :
+                        <> <FaUpload className="mr-2" />
+                          Upload Category
+                        </>}
+                    </button>
+                    :
+                    <button
+                      onClick={handleUpdateCategory}
+                      disabled={!newCategory.name}
+                      className='cursor-pointer px-4 py-2 rounded-lg text-white font-medium flex items-center bg-purple-600  hover:bg-purple-700'
+                      style={{ backgroundColor: '#6945c5' }}>
+                      {isLoading ?
+                        <>
+                          <ButtonLoading />
+                          Updating...
+                        </> :
+                        <>
+                          <FaCheck className="mr-2" />
+                          Update Category
+                        </>}
+
+                    </button>
+                  }
+                </div>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        <AnimatePresence>
+          {showDeleteConfirm && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 backdrop-blur-md bg-opacity-50 flex items-center justify-center p-4 z-50"
+            >
+              <motion.div
+                initial={{ scale: 0.9 }}
+                animate={{ scale: 1 }}
+                exit={{ scale: 0.9 }}
+                className="bg-white rounded-xl border p-6 w-full max-w-md"
+              >
+                <div className="text-center">
+                  <div className='py-3 border rounded-sm border-dashed' >
+                    <img src={categoryToDelete.preview} className='w-32 m-auto' alt="" />
+                    <p>{categoryToDelete.name}</p>
                   </div>
 
-                  <div className="flex justify-end space-x-3">
+                  <h3 className="text-xl font-bold text-gray-800 my-2">Delete Category</h3>
+                  <p className="text-gray-600 mb-6">Are you sure you want to delete this category? <span className='text-red-500'>This action cannot be undone.</span> </p>
+
+                  <div className="flex justify-center space-x-4">
                     <button
-                      onClick={() => resetForm()}
-                      className="cursor-pointer px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"
+                      onClick={cancelDelete}
+                      className="cursor-pointer px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 flex items-center"
                     >
+                      <FaBan className="mr-2" />
                       Cancel
                     </button>
-                    {!isEditMode ?
-                      <button
-                        onClick={handleAddCategory}
-                        disabled={isLoading}
-                        className='cursor-pointer px-4 py-2 rounded-lg text-white font-medium flex items-center bg-purple-600  hover:bg-purple-700'
-                        style={{ backgroundColor: '#6945c5' }}
-                      >
-                        {isLoading ?
-                          <>
-                            <ButtonLoading />
-                            Uploading...
-                          </>
-                          :
-                          <> <FaUpload className="mr-2" />
-                            Upload Category
-                          </>}
-                      </button>
-                      :
-                      <button
-                        onClick={handleUpdateCategory}
-                        disabled={!newCategory.name}
-                        className='cursor-pointer px-4 py-2 rounded-lg text-white font-medium flex items-center bg-purple-600  hover:bg-purple-700'
-                        style={{ backgroundColor: '#6945c5' }}>
-                        {isLoading ?
-                          <>
-                            <ButtonLoading />
-                            Updating...
-                          </> :
-                          <>
-                            <FaCheck className="mr-2" />
-                            Update Category
-                          </>}
+                    <button
+                      disabled={isLoading}
+                      onClick={handleDelete}
+                      className="cursor-pointer px-6 py-2 rounded-lg text-white font-medium flex items-center bg-red-500 hover:bg-red-600"
+                    >
+                      {isLoading ?
+                        <>
+                          <ButtonLoading />
+                          removing...
+                        </>
+                        :
+                        <>
+                          <FaTrash className="mr-2" />
+                          Delete
+                        </>}
 
-                      </button>
-                    }
+                    </button>
                   </div>
-                </motion.div>
+                </div>
               </motion.div>
-            )}
-          </AnimatePresence>
-
-
-          <AnimatePresence>
-            {showDeleteConfirm && (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                className="fixed inset-0 backdrop-blur-md bg-opacity-50 flex items-center justify-center p-4 z-50"
-              >
-                <motion.div
-                  initial={{ scale: 0.9 }}
-                  animate={{ scale: 1 }}
-                  exit={{ scale: 0.9 }}
-                  className="bg-white rounded-xl border p-6 w-full max-w-md"
-                >
-                  <div className="text-center">
-                    <div className='py-3 border rounded-sm border-dashed' >
-                      <img src={categoryToDelete.preview} className='w-32 m-auto' alt="" />
-                      <p>{categoryToDelete.name}</p>
-                    </div>
-
-                    <h3 className="text-xl font-bold text-gray-800 my-2">Delete Category</h3>
-                    <p className="text-gray-600 mb-6">Are you sure you want to delete this category? <span className='text-red-500'>This action cannot be undone.</span> </p>
-
-                    <div className="flex justify-center space-x-4">
-                      <button
-                        onClick={cancelDelete}
-                        className="cursor-pointer px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 flex items-center"
-                      >
-                        <FaBan className="mr-2" />
-                        Cancel
-                      </button>
-                      <button
-                        disabled={isLoading}
-                        onClick={handleDelete}
-                        className="cursor-pointer px-6 py-2 rounded-lg text-white font-medium flex items-center bg-red-500 hover:bg-red-600"
-                      >
-                        {isLoading ?
-                          <>
-                            <ButtonLoading />
-                            removing...
-                          </>
-                          :
-                          <>
-                            <FaTrash className="mr-2" />
-                            Delete
-                          </>}
-
-                      </button>
-                    </div>
-                  </div>
-                </motion.div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
+    </div>
   );
 };
 
