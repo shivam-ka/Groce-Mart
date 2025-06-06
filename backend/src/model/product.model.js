@@ -4,11 +4,13 @@ const productSchema = new mongoose.Schema({
 
     name: {
         type: String,
+        required: true
     },
 
     images: {
         type: Array,
-        default: []
+        default: [],
+        required: true
     },
 
     category: [
@@ -26,17 +28,25 @@ const productSchema = new mongoose.Schema({
     ],
     unit: {
         type: String,
-        default: ""
+        default: "",
+        required: true
+    },
+    unit_quantity: {
+        type: String,
+        default: "",
+        required: true
     },
 
     stock: {
         type: Number,
-        default: null
+        default: null,
+        required: true
     },
 
     price: {
         type: Number,
-        default: null
+        default: null,
+        required: true
     },
 
     discount: {
@@ -49,14 +59,10 @@ const productSchema = new mongoose.Schema({
         default: ""
     },
 
-    more_details: {
-        type: Object,
-        default: {}
-    },
-
     publish: {
         type: Boolean,
-        default: true
+        default: true,
+        required: true
     }
 
 
