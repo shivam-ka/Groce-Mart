@@ -57,4 +57,47 @@ const addProduct = async (req, res) => {
     }
 }
 
-export { addProduct }
+const getProduct = async (req, res) => {
+    try {
+
+        const search = req.body?.search;
+        const page = req.query?.page || 1;
+        const limit = req.query?.limit || 10;
+
+        const skip = (page - 1) * limit;
+
+        const query = search ? {
+            $text: {
+                $search: search
+            }
+        } : {}
+
+        const [data, totalCount] = await Promise.all([
+            ProductModel
+                .find(query).sort({ createdAt: -1 })
+                .skip(skip)
+                .limit(limit),
+            ProductModel.countDocuments(query)
+
+        ])
+
+        return res.json(new ApiResponse(
+            200,
+            {
+                totalCount,
+                totalNoPage: Math.ceil(totalCount / limit),
+                data
+            },
+            "Product Fetched Successfully"
+        ))
+
+    } catch (error) {
+        console.log("get all Product Error: ", error)
+        return res
+            .status(500)
+            .json(new ApiError(500, error.message || "get all Product Error"))
+    }
+}
+
+
+export { addProduct, getProduct }
