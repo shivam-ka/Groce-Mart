@@ -7,6 +7,7 @@ import { useSelector } from "react-redux";
 import toast from "react-hot-toast";
 import Axios from "../../Utils/Axios";
 import summarApi from "../../common/SummaryApi";
+import ButtonLoading from "../../components/ButtonLoading";
 
 const UploadProducts = () => {
   const primaryColor = '#6945c5'
@@ -29,6 +30,7 @@ const UploadProducts = () => {
     category: [],
     subCategory: [],
     unit: '',
+    unit_quantity: '',
     stock: '',
     price: '',
     discount: '',
@@ -135,6 +137,7 @@ const UploadProducts = () => {
     const formData = new FormData
     formData.append('name', newProduct.name)
     formData.append('unit', newProduct.unit)
+    formData.append('unit_quantity', newProduct.unit_quantity)
     formData.append('stock', newProduct.stock)
     formData.append('price', newProduct.price)
     formData.append('discount', newProduct.discount)
@@ -161,6 +164,8 @@ const UploadProducts = () => {
 
       if (response.data.success) {
         toast.success(response.data.message)
+        resetForm()
+        setIsModalOpen(false)
       }
 
     } catch (error) {
@@ -510,40 +515,65 @@ const UploadProducts = () => {
                   </div>
                 </div>
 
+                {newProduct.unit &&
+                  <div>
+                    <label htmlFor="unit_quantity" className="block text-gray-700 mb-2">Quantity in {newProduct.unit}</label>
+                    <input
+                      id="unit_quantity"
+                      type="number"
+                      value={newProduct.unit_quantity}
+                      onChange={(e) => setNewProduct({ ...newProduct, unit_quantity: e.target.value })}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                      placeholder={`Quantity in ${newProduct.unit}`}
+                      required
+                      disabled={isLoading}
+                    />
+                  </div>}
+
                 {/* Stock, Price, Discount */}
                 <div className="grid grid-cols-3 gap-4">
                   <div>
-                    <label className="block text-gray-700 mb-2">Stock</label>
+                    <label htmlFor="stock" className="block text-gray-700 mb-2">Stock</label>
                     <input
+                      id="stock"
                       type="number"
                       value={newProduct.stock}
                       onChange={(e) => setNewProduct({ ...newProduct, stock: e.target.value })}
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
                       placeholder="Quantity"
+                      required
+                      disabled={isLoading}
                     />
                   </div>
                   <div>
-                    <label className="block text-gray-700 mb-2">Price</label>
+                    <label htmlFor="price" className="block text-gray-700 mb-2">Price</label>
                     <input
+                      id="price"
                       type="number"
                       value={newProduct.price}
                       onChange={(e) => setNewProduct({ ...newProduct, price: e.target.value })}
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
                       placeholder="₹0.00"
+                      required
+                      disabled={isLoading}
                     />
                   </div>
                   <div>
-                    <label className="block text-gray-700 mb-2">Discount</label>
+                    <label htmlFor="discount" className="block text-gray-700 mb-2">Discount</label>
                     <input
+                      id="discount"
                       type="number"
                       value={newProduct.discount}
                       onChange={(e) => setNewProduct({ ...newProduct, discount: e.target.value })}
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
                       placeholder="0%"
                       max="100"
+                      required
+                      disabled={isLoading}
                     />
                   </div>
                 </div>
+
 
                 {/* Description */}
                 <div>
@@ -584,12 +614,12 @@ const UploadProducts = () => {
                     type="submit"
                     onClick={handleAddProduct}
                     disabled={isLoading}
-                    className="px-4 py-2 rounded-lg text-white font-medium flex items-center bg-purple-600 hover:bg-purple-700 disabled:opacity-70"
+                    className="cursor-pointer px-4 py-2 rounded-lg text-white font-medium flex items-center bg-purple-700 hover:bg-purple-700 disabled:opacity-70"
                   >
                     {isLoading ? (
                       <>
-                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                        Processing...
+                        <ButtonLoading />
+                        Please Wait...
                       </>
                     ) : (
                       <>
