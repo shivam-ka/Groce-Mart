@@ -142,6 +142,7 @@ const Nav = () => {
 
             <div className="relative" ref={profileMenuRef}>
               <button
+                title='Open Profile Menu'
                 onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
                 className="cursor-pointer flex items-center justify-center p-1.5 rounded-full bg-[#6945c5] text-white hover:bg-[#54389c]"
               >
@@ -167,7 +168,7 @@ const Nav = () => {
                           </li>
                           <li onClick={() => profileMenuHandler('/dashboard/sub-category')} className='cursor-pointer flex rounded-md items-center px-4 py-2 text-sm duration-200 text-black hover:bg-[#6945c5] hover:text-white active:bg-[#4b318c] '>
                             <FaLayerGroup className='mr-3' />
-                            <p className='tracking-wide' >Subcategory</p>
+                            <p className='tracking-wide' >Sub category</p>
                           </li>
                           <li onClick={() => profileMenuHandler('/dashboard/upload-product')} className='cursor-pointer flex rounded-md items-center px-4 py-2 text-sm duration-200 text-black hover:bg-[#6945c5] hover:text-white active:bg-[#4b318c] '>
                             <FaUpload className='mr-3' />

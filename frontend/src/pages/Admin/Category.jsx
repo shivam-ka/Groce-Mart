@@ -7,10 +7,10 @@ import summarApi from '../../common/SummaryApi';
 import toast from 'react-hot-toast';
 import { ButtonLoading, PreCategory } from '../../components';
 import { useSelector } from 'react-redux';
+import { BiSolidCategory } from 'react-icons/bi';
 
 const Category = () => {
   const [isLoading, setIsLoading] = useState(false)
-  const [isPageLoading, setIsPageLoading] = useState(false)
   const [categories, setCategories] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
@@ -28,30 +28,7 @@ const Category = () => {
     image: null,
     preview: null,
   });
-  const allCategory = useSelector(state => state.product.allCategory)
-  useEffect(() => {
-    setIsPageLoading(true)
-    setCategories(allCategory)
-    setIsPageLoading(false)
-  }, [allCategory])
 
-
-  // const fetchCategories = async () => {
-  //   setIsPageLoading(true)
-  //   setCategories(allCategory)
-  //   // try {
-  //   //   const response = await Axios({
-  //   //     ...summarApi.category.getAllCategory
-  //   //   })
-  //   //   if (response.data.success) {
-  //   //     setCategories(response.data.data)
-  //   //   }
-  //   // } catch (error) {
-  //   //   console.log(error)
-  //   //   toast.error(error.response.data.message)
-  //   // }
-  //   setIsPageLoading(false)
-  // }
 
   const handleAddCategory = async () => {
     if (!newCategory.name || !newCategory.image) toast.error("Enter Name and Image");
@@ -198,12 +175,26 @@ const Category = () => {
     setCategoryToDelete(null);
   };
 
+  const allCategory = useSelector(state => state.product.allCategory)
+
+  useEffect(() => {
+    setCategories(allCategory)
+  }, [allCategory])
+
+  useEffect(() => {
+    if (isModalOpen) {
+      document.querySelector('body').style.overflowY = 'hidden'
+    } else {
+      document.querySelector('body').style.overflowY = 'scroll'
+    }
+  }, [isModalOpen])
+
   return (
     <div className="min-h-screen bg-gray-50 p-4 md:p-6">
-      <div className="max-w-6xl mx-auto">
+      <div className=" mx-auto">
         <div className="flex justify-between items-center mb-8">
           <h1 className=" text-base md:text-2xl font-bold text-gray-800 flex items-center">
-            <MdCategory className="mr-2" style={{ color: '#6945c5' }} />
+            <BiSolidCategory className="mr-2" style={{ color: '#6945c5' }} />
             Product Categories
           </h1>
           <motion.button
@@ -221,7 +212,7 @@ const Category = () => {
         {categories.length == 0 ?
           <PreCategory />
           :
-          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 2xl:grid-cols-6 gap-4">
             {categories.map((category) => (
               <motion.div
                 key={category._id}

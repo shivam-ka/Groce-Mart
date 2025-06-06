@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { MdCategory } from 'react-icons/md'
 import { AnimatePresence, motion } from "framer-motion";
-import { FaBan, FaCheck, FaEdit, FaImage, FaPlus, FaTimes, FaTrash, FaUpload } from 'react-icons/fa';
+import { FaBan, FaCheck, FaEdit, FaImage, FaLayerGroup, FaPlus, FaTimes, FaTrash, FaUpload } from 'react-icons/fa';
 import { ButtonLoading } from '../../components';
 import toast from 'react-hot-toast';
 import Axios from '../../Utils/Axios';
@@ -255,7 +255,7 @@ const SubCategory = () => {
       <div className=" mx-auto">
         <div className="flex justify-between items-center mb-8">
           <h1 className=" text-base md:text-2xl font-bold text-gray-800 flex items-center">
-            <MdCategory className="mr-2" style={{ color: '#6945c5' }} />
+            <FaLayerGroup className="mr-2" style={{ color: '#6945c5' }} />
             Product Sub Categories
           </h1>
           <motion.button

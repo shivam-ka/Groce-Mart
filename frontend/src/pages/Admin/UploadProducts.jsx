@@ -204,11 +204,12 @@ const UploadProducts = () => {
           Upload Product
         </h1>
         <motion.button
+          title="Add New Product"
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
           onClick={() => setIsModalOpen(true)}
           style={{ background: primaryColor }}
-          className="cursor-pointer flex items-center px-4 py-2 rounded-lg text-white hover:bg-purple-700"
+          className="cursor-pointer flex items-center px-4 py-2 rounded-lg text-white text-xs md:text-sm font-medium"
         >
           <FaPlus className="mr-2" />
           Add Product
