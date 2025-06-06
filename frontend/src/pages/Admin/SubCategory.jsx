@@ -109,9 +109,10 @@ const SubCategory = () => {
     const formData = new FormData
     formData.append('name', newSubCategory.name)
     formData.append('image', newSubCategory.image)
-    categoryId.forEach(category => {
-      formData.append('category', category);
-    });
+
+    categoryId.forEach(category => { formData.append('category', category); });
+
+
 
     try {
       const response = await Axios({
@@ -231,23 +232,12 @@ const SubCategory = () => {
     setCategories(allCategory)
   }, [allCategory])
 
-  const fetchAllSubCategory = async () => {
-    try {
-      const response = await Axios({
-        ...summarApi.subCategory.getAllSubCategory
-      })
-      if (response.data.success) {
-        setSubCategories([...response.data.data])
-      }
 
-    } catch (error) {
-      console.log(error)
-    }
-  }
+  const allSubCategory = useSelector(state => state.product.allSubCategory);
 
   useEffect(() => {
-    fetchAllSubCategory()
-  }, [subCategories])
+    setSubCategories(allSubCategory)
+  }, [allSubCategory])
 
   useEffect(() => {
     if (isModalOpen) {

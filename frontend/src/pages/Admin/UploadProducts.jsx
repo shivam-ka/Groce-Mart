@@ -4,6 +4,9 @@ import { AnimatePresence, motion } from "framer-motion";
 import { FaCheck, FaImage, FaPlus, FaTimes, FaUpload } from 'react-icons/fa';
 import { FiCheck, FiChevronDown, FiChevronUp } from "react-icons/fi";
 import { useSelector } from "react-redux";
+import toast from "react-hot-toast";
+import Axios from "../../Utils/Axios";
+import summarApi from "../../common/SummaryApi";
 
 const UploadProducts = () => {
   const primaryColor = '#6945c5'
@@ -95,7 +98,6 @@ const UploadProducts = () => {
     setIsEditMode(false);
   };
 
-
   const handleSelect = (item) => {
     if (newProduct.category?.find(cat => cat._id === item._id)) {
       handleRemoveCategory(item._id)
@@ -127,15 +129,47 @@ const UploadProducts = () => {
     setNewProduct({ ...newProduct, subCategory: subCategory })
   };
 
-
-  const handleAddProduct = (e) => {
+  const handleAddProduct = async (e) => {
     e.preventDefault();
-    setIsLoading(true);
-    console.log(newProduct)
-    setTimeout(() => {
-      setIsLoading(false);
-      resetForm();
-    }, 1500);
+    setIsLoading(true)
+    const formData = new FormData
+    formData.append('name', newProduct.name)
+    formData.append('unit', newProduct.unit)
+    formData.append('stock', newProduct.stock)
+    formData.append('price', newProduct.price)
+    formData.append('discount', newProduct.discount)
+    formData.append('publish', newProduct.publish)
+
+    const images = newProduct.images.map((item, index) => { return item.file })
+    images.forEach((img, index) => { formData.append(`image${index + 1}`, img) });
+
+    // Category Id and formData
+    const categoryId = newProduct.category.map((item) => item._id)
+    categoryId.forEach(cat => { formData.append('category', cat) });
+
+    // Sub Category Id and formData
+    const SubCategoryId = newProduct.subCategory.map((item) => item._id)
+    SubCategoryId.forEach(subCat => { formData.append('subCategory', subCat) });
+
+
+    try {
+
+      const response = await Axios({
+        ...summarApi.product.addProduct, data: formData
+      })
+      console.log(response)
+
+      if (response.data.success) {
+        toast.success(response.data.message)
+      }
+
+    } catch (error) {
+      console.log(error)
+      toast.error(error.response.data.message)
+    }
+
+    setIsLoading(false)
+
   };
 
   const allCategory = useSelector(state => state.product.allCategory);
