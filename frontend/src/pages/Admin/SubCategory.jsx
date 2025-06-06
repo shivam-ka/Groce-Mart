@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { MdCategory } from 'react-icons/md'
-import { AnimatePresence, motion, removeItem } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import { FaBan, FaCheck, FaEdit, FaImage, FaPlus, FaTimes, FaTrash, FaUpload } from 'react-icons/fa';
 import { ButtonLoading } from '../../components';
 import toast from 'react-hot-toast';
@@ -208,6 +208,11 @@ const SubCategory = () => {
     setIsLoading(false)
     setShowDeleteConfirm(false);
     subCategoryToDelete(null);
+  };
+
+  const handleRemoveCategory = (id) => {
+    const category = newSubCategory.categories.filter((item) => item._id !== id)
+    setNewSubCategory({ ...newSubCategory, categories: category })
   };
 
   const cancelDelete = () => {
