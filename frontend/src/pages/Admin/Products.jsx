@@ -5,6 +5,7 @@ import { useState, useEffect } from 'react'
 import { PreCategory } from '../../components'
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
+import ErrorPage from "../ErrorPage"
 
 // Icons
 import { BiSolidCategory } from 'react-icons/bi'
@@ -64,13 +65,21 @@ const Products = () => {
     getCuurentPage()
   }, [searchParams])
 
+  const pageNumber = Number(searchParams.get('page') || 1)
+
   const getCuurentPage = () => {
-    const pageNumber = Number(searchParams.get('page') || 1)
-    if (pageNumber <= totalPages && pageNumber !== 0) {
+    if (pageNumber && pageNumber !== 0) {
       setCurrentPage(pageNumber)
-    } else {
+    }
+    else {
       navigate('?page=1')
     }
+  }
+
+  if (pageNumber > totalPages) {
+    return <div>
+      <ErrorPage navigateTo="?page=1" />
+    </div>
   }
 
   return (
@@ -139,7 +148,7 @@ const Products = () => {
       }
 
       {/* current page and next page */}
-      <div className="flex items-center text-purple-700 justify-center gap-4 sm:gap-6 p-4">
+      <div className="flex items-center p-4 pb-0 text-purple-700 justify-center gap-4 sm:gap-6 ">
         {currentPage === 1 ?
           <div
             className='cursor-no-drop flex gap-1 items-center px-2 py-1 text-gray-700 duration-300 rounded-lg border border-white' >
