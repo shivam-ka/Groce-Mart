@@ -78,6 +78,10 @@ const summarApi = {
             url: '/api/v1/product/add-product',
             method: 'post'
         },
+        getPorduct: {
+            url: '/api/v1/product/get-product',
+            method: 'post'
+        }
     }
 }
 

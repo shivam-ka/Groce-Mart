@@ -1,19 +1,24 @@
-import React, { useEffect, useRef, useState } from 'react'
-import { MdCategory } from 'react-icons/md'
+import { useEffect, useRef, useState } from 'react'
 import { AnimatePresence, motion } from "framer-motion";
-import { FaBan, FaCheck, FaEdit, FaImage, FaLayerGroup, FaPlus, FaTimes, FaTrash, FaUpload } from 'react-icons/fa';
-import { ButtonLoading } from '../../components';
 import toast from 'react-hot-toast';
 import Axios from '../../Utils/Axios';
 import summarApi from '../../common/SummaryApi';
 import { useSelector } from 'react-redux';
+
+// Loading Animation
+import { ButtonLoading } from '../../components';
+import { PreSubCategory } from '../../components';
+
+// Icons
+import { FaBan, FaCheck, FaImage, FaLayerGroup, FaPlus, FaTimes, FaTrash, FaUpload } from 'react-icons/fa';
 import { FiCheck, FiChevronDown, FiChevronUp } from 'react-icons/fi';
 import { MdEdit } from "react-icons/md";
-import { PreSubCategory } from '../../components';
+
 
 const SubCategory = () => {
   const dropdownRef = useRef(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isPageLoading, setIsPageLoading] = useState(false)
   const [isEditMode, setIsEditMode] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
@@ -41,6 +46,7 @@ const SubCategory = () => {
     preview: null,
   });
 
+  // All Form Handler
   const handleDragOver = (e) => {
     e.preventDefault();
     setIsDragging(true);
@@ -73,17 +79,6 @@ const SubCategory = () => {
     setIsEditMode(false);
   };
 
-  const handleSelect = (item) => {
-    if (newSubCategory.categories?.find(cat => cat._id === item._id)) {
-      handleRemoveCategory(item._id)
-    }
-    else {
-      setNewSubCategory({ ...newSubCategory, categories: [...newSubCategory?.categories, item] })
-    }
-
-    setIsOpen(false)
-  }
-
   const handleImageUpload = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -99,6 +94,63 @@ const SubCategory = () => {
     }
   };
 
+  const handleEditSubCategory = async (subCategory) => {
+
+    // get categories details
+    const categories = []
+    subCategory.category.map(item => {
+      const response = handleGetCategoryDetails(item)
+      categories.push(response)
+    })
+
+    setNewSubCategory({
+      id: subCategory._id,
+      name: subCategory.name,
+      image: null,
+      preview: subCategory.image,
+      categories: categories
+    })
+    setIsEditMode(true);
+    setIsModalOpen(true)
+  }
+
+  const confirmDelete = (subCategory) => {
+    setSubCategoryToDelete({
+      id: subCategory._id,
+      name: subCategory.name,
+      preview: subCategory.image
+    });
+    setShowDeleteConfirm(true);
+  };
+
+  const cancelDelete = () => {
+    setShowDeleteConfirm(false);
+    subCategoryToDelete(null);
+  };
+
+  // category Selection
+  const handleSelect = (item) => {
+    if (newSubCategory.categories?.find(cat => cat._id === item._id)) {
+      handleRemoveCategory(item._id)
+    }
+    else {
+      setNewSubCategory({ ...newSubCategory, categories: [...newSubCategory?.categories, item] })
+    }
+
+    setIsOpen(false)
+  }
+
+  const handleRemoveCategory = (id) => {
+    const category = newSubCategory.categories.filter((item) => item._id !== id)
+    setNewSubCategory({ ...newSubCategory, categories: category })
+  };
+
+  const handleGetCategoryDetails = (id) => {
+    const category = categories.find((item) => item._id === id)
+    return category
+  }
+
+  // Sub Category Handler
   const handleAddSubCategory = async (e) => {
     e.preventDefault()
     if (!newSubCategory.name || !newSubCategory.image) toast.error("Enter Name and Image");
@@ -120,6 +172,7 @@ const SubCategory = () => {
       })
       if (response.data.success) {
         toast.success(response.data.message)
+        fetchSubCategories()
       }
     } catch (error) {
       console.log(error)
@@ -129,26 +182,6 @@ const SubCategory = () => {
     setIsLoading(false)
     resetForm();
   };
-
-  const handleEditCategory = async (subCategory) => {
-
-    // get categories details
-    const categories = []
-    subCategory.category.map(item => {
-      const response = handleGetCategoryDetails(item)
-      categories.push(response)
-    })
-
-    setNewSubCategory({
-      id: subCategory._id,
-      name: subCategory.name,
-      image: null,
-      preview: subCategory.image,
-      categories: categories
-    })
-    setIsEditMode(true);
-    setIsModalOpen(true)
-  }
 
   const handleUpdateCategory = async () => {
 
@@ -171,6 +204,7 @@ const SubCategory = () => {
         ...summarApi.subCategory.updateSubCategory, data: formData
       })
       if (response.data.success) {
+        fetchSubCategories()
         toast.success(response.data.message)
       }
     } catch (error) {
@@ -182,15 +216,6 @@ const SubCategory = () => {
     resetForm();
   }
 
-  const confirmDelete = (subCategory) => {
-    setSubCategoryToDelete({
-      id: subCategory._id,
-      name: subCategory.name,
-      preview: subCategory.image
-    });
-    setShowDeleteConfirm(true);
-  };
-
   const handleDelete = async () => {
     setIsLoading(true)
     try {
@@ -198,7 +223,7 @@ const SubCategory = () => {
         ...summarApi.subCategory.removeSubCategory, data: ({ 'subCategoryId': subCategoryToDelete.id })
       })
       if (response) {
-        console.log(response)
+        fetchSubCategories()
         toast.success(response.data.message)
 
       }
@@ -211,19 +236,21 @@ const SubCategory = () => {
     subCategoryToDelete(null);
   };
 
-  const handleRemoveCategory = (id) => {
-    const category = newSubCategory.categories.filter((item) => item._id !== id)
-    setNewSubCategory({ ...newSubCategory, categories: category })
-  };
-
-  const cancelDelete = () => {
-    setShowDeleteConfirm(false);
-    subCategoryToDelete(null);
-  };
-
-  const handleGetCategoryDetails = (id) => {
-    const category = categories.find((item) => item._id === id)
-    return category
+  // Fetch Sub Category and Category
+  const fetchSubCategories = async () => {
+    setIsPageLoading(true)
+    try {
+      const response = await Axios({
+        ...summarApi.subCategory.getAllSubCategory
+      })
+      if (response.data.success) {
+        setSubCategories(response.data.data)
+      }
+    } catch (error) {
+      console.log(error)
+      toast.error(error.response.data.message)
+    }
+    setIsPageLoading(false)
   }
 
   const allCategory = useSelector(state => state.product.allCategory);
@@ -233,11 +260,9 @@ const SubCategory = () => {
   }, [allCategory])
 
 
-  const allSubCategory = useSelector(state => state.product.allSubCategory);
-
   useEffect(() => {
-    setSubCategories(allSubCategory)
-  }, [allSubCategory])
+    fetchSubCategories()
+  }, [])
 
   useEffect(() => {
     if (isModalOpen) {
@@ -270,7 +295,7 @@ const SubCategory = () => {
           </motion.button>
         </div>
 
-        {subCategories.length == 0 ?
+        {isPageLoading ?
           <PreSubCategory />
           :
           <div className="overflow-x-auto ">
@@ -333,7 +358,7 @@ const SubCategory = () => {
                     <td className="py-4 px-4 w-24">
                       <div className="flex items-center justify-center space-x-3">
                         <button
-                          onClick={() => handleEditCategory(category)}
+                          onClick={() => handleEditSubCategory(category)}
                           className="cursor-pointer p-2.5 text-xl text-purple-800 bg-purple-100 rounded-full hover:bg-purple-200 transition-colors border"
                           title="Edit Sub Category"
                         >

@@ -10,6 +10,7 @@ import { useSelector } from 'react-redux';
 import { BiSolidCategory } from 'react-icons/bi';
 
 const Category = () => {
+  const [isPageLoading, setIsPageLoading] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [categories, setCategories] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -44,7 +45,7 @@ const Category = () => {
         ...summarApi.category.addCategory, data: formData
       })
       if (response.data.success) {
-        // fetchCategories()
+        fetchCategories()
         toast.success(response.data.message)
       }
     } catch (error) {
@@ -80,9 +81,7 @@ const Category = () => {
       })
       if (response.data.success) {
         toast.success(response.data.message)
-        // fetchCategories()
-        const allCategory = useSelector(state => state.product.categories)
-        setCategories(allCategory)
+        fetchCategories()
         setIsEditMode(false)
         setIsModalOpen(false)
 
@@ -153,14 +152,15 @@ const Category = () => {
   const handleDelete = async () => {
     setIsLoading(true)
     try {
+
       const response = await Axios({
         ...summarApi.category.deleteCategory, data: ({ 'categoryId': categoryToDelete.id })
       })
-      if (response) {
-        console.log(response)
+      if (response.data.success) {
+        fetchCategories()
         toast.success(response.data.message)
-
       }
+
     } catch (error) {
       console.log(error)
       toast.error(error.response.data.message)
@@ -175,11 +175,28 @@ const Category = () => {
     setCategoryToDelete(null);
   };
 
-  const allCategory = useSelector(state => state.product.allCategory)
+  const fetchCategories = async () => {
+
+    setIsPageLoading(true)
+    try {
+      const response = await Axios({
+        ...summarApi.category.getAllCategory
+      })
+      if (response.data.success) {
+        setCategories(response.data.data)
+      }
+    } catch (error) {
+      console.log(error)
+      toast.error(error.response.data.message)
+    }
+    setIsPageLoading(false)
+
+  }
+
 
   useEffect(() => {
-    setCategories(allCategory)
-  }, [allCategory])
+    fetchCategories()
+  }, [])
 
   useEffect(() => {
     if (isModalOpen) {
@@ -209,7 +226,7 @@ const Category = () => {
           </motion.button>
         </div>
 
-        {categories.length == 0 ?
+        {isPageLoading ?
           <PreCategory />
           :
           <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 2xl:grid-cols-6 gap-4">

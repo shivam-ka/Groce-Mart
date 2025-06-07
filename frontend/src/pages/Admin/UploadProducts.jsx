@@ -8,6 +8,7 @@ import toast from "react-hot-toast";
 import Axios from "../../Utils/Axios";
 import summarApi from "../../common/SummaryApi";
 import ButtonLoading from "../../components/ButtonLoading";
+import CustomToast from "../../components/Toast/CustomToast";
 
 const UploadProducts = () => {
   const primaryColor = '#6945c5'
@@ -37,6 +38,7 @@ const UploadProducts = () => {
     description: "",
     publish: true
   });
+
 
 
   // All Form Handler 
@@ -131,7 +133,60 @@ const UploadProducts = () => {
     setNewProduct({ ...newProduct, subCategory: subCategory })
   };
 
+  // Validate Product Before adding
+  const validateProduct = () => {
+    let isValid = true;
+
+    if (!newProduct.name.trim() || newProduct.name.length < 3) {
+      return toast.error("Enter Valid Product Name"),
+        isValid = false;
+
+    }
+
+    if (!newProduct.images.some(img => img.file !== null)) {
+      return toast.error('Select At least one image'),
+        isValid = false;
+    }
+
+    if (newProduct.category.length === 0) {
+      return toast.error('Select at least one category'),
+        isValid = false;
+    }
+
+    if (!newProduct.unit) {
+      return toast.error('Select Product Unit'),
+        isValid = false;
+    }
+
+    if (!newProduct.unit_quantity) {
+      return toast.error('Enter Product Unit Quantity'),
+        isValid = false;
+    }
+
+    if (!newProduct.price || isNaN(newProduct.price)) {
+      return toast.error('Enter Product Price'),
+        isValid = false;
+    }
+    else if (Number(newProduct.price) <= 0) {
+      return toast.error('Enter Valid Product Price'),
+        isValid = false;
+    }
+
+    if (newProduct.discount && isNaN(newProduct.discount)) {
+      return toast.error('Discount must be a number'),
+        isValid = false;
+    }
+    else if (newProduct.discount && Number(newProduct.discount) < 0) {
+      return toast.error('Enter Valid Product Discount'),
+        isValid = false;
+    }
+
+    return isValid;
+  };
+
+  // Product Handler
   const handleAddProduct = async (e) => {
+
     e.preventDefault();
     setIsLoading(true)
     const formData = new FormData
@@ -154,19 +209,24 @@ const UploadProducts = () => {
     const SubCategoryId = newProduct.subCategory.map((item) => item._id)
     SubCategoryId.forEach(subCat => { formData.append('subCategory', subCat) });
 
+    const validate = validateProduct();
+    console.log(validate)
 
     try {
 
-      const response = await Axios({
-        ...summarApi.product.addProduct, data: formData
-      })
-      console.log(response)
+      if (validate) {
+        const response = await Axios({
+          ...summarApi.product.addProduct, data: formData
+        })
+        console.log(response)
 
-      if (response.data.success) {
-        toast.success(response.data.message)
-        resetForm()
-        setIsModalOpen(false)
+        if (response.data.success) {
+          toast.success(response.data.message)
+          resetForm()
+          setIsModalOpen(false)
+        }
       }
+
 
     } catch (error) {
       console.log(error)
@@ -215,6 +275,8 @@ const UploadProducts = () => {
           Add Product
         </motion.button>
       </div>
+      <button onClick={() => CustomToast.error('Your action was completed successfully!')}>Show Toast</button>
+
 
       <AnimatePresence>
         {isModalOpen && (

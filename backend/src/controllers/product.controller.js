@@ -72,7 +72,7 @@ const getProduct = async (req, res) => {
             }
         } : {}
 
-        const [data, totalCount] = await Promise.all([
+        const [productData, totalProductCount] = await Promise.all([
             ProductModel
                 .find(query).sort({ createdAt: -1 })
                 .skip(skip)
@@ -84,9 +84,9 @@ const getProduct = async (req, res) => {
         return res.json(new ApiResponse(
             200,
             {
-                totalCount,
-                totalNoPage: Math.ceil(totalCount / limit),
-                data
+                totalProductCount,
+                totalPages: Math.ceil(totalProductCount / limit),
+                productData
             },
             "Product Fetched Successfully"
         ))

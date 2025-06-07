@@ -58,7 +58,7 @@ const App = () => {
 
   return (
     <>
-      <Toaster />
+      <Toaster position='top-right' />
       <Navbar />
       <main>
         <Outlet />
