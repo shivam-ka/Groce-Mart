@@ -4,9 +4,8 @@ import summarApi from '../../common/SummaryApi'
 import { useState, useEffect } from 'react'
 import { PreCategory } from '../../components'
 import { motion, AnimatePresence } from 'framer-motion';
-import { data, Link, useNavigate, useSearchParams } from 'react-router-dom'
+import {  Link, useNavigate, useSearchParams } from 'react-router-dom'
 import ErrorPage from "../ErrorPage"
-
 
 // Icons
 import { FiSearch } from 'react-icons/fi'
@@ -14,6 +13,7 @@ import { BiSolidCategory } from 'react-icons/bi'
 import { FaEdit, FaTrash } from 'react-icons/fa'
 import { IoIosArrowBack, IoIosArrowForward, IoMdArrowDropright } from "react-icons/io";
 import { GiBroom } from "react-icons/gi";
+import { MdSearchOff } from "react-icons/md"
 
 const Products = () => {
 
@@ -60,7 +60,6 @@ const Products = () => {
       setCurrentPage(prev => prev - 1)
     }
   }
-
 
   const pageNumber = Number(searchParams.get('page') || 1)
   const urlSearchQuery = searchParams.get('query')
@@ -112,6 +111,8 @@ const Products = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 p-4 md:p-6">
+
+      {/* producr header  */}
       <div className="flex flex-col sm:flex-row gap-3 mb-6 justify-between items">
 
         <div className="flex items-center gap-2">
@@ -130,15 +131,12 @@ const Products = () => {
                 className="cursor-pointer flex items-center gap-1 bg-purple-600 hover:bg-purple-700 text-white font-semibold py-1.5 px-4 rounded shadow duration-100 active:scale-95"
               >
                 Clear Search
-                <GiBroom/>
+                <GiBroom />
               </button>
             </>
           }
 
         </div>
-
-
-
 
         <div className="relative flex">
           <input
@@ -160,67 +158,85 @@ const Products = () => {
 
         </div>
 
-
       </div>
 
       {isPageLoading ?
         <PreCategory />
         :
-        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 2xl:grid-cols-6 gap-4">
-          {productData.map((pro) => (
-            <motion.div
-              key={pro._id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3 }}
-              className="relative bg-white border border-gray-400 rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300 flex flex-col h-full"
+        (searchQuery && !productData[0] ?
+          <div className="flex flex-col items-center justify-center min-h-[60vh] text-center px-4">
+            <MdSearchOff className="text-purple-500 text-7xl mb-4" />
+            <h2 className="text-2xl font-semibold text-gray-800 mb-2">No Products Found</h2>
+            <p className="text-black max-w-md">
+              We couldn't find any products that match your search. Try adjusting your filters or search terms.
+            </p>
+            <button
+              title="Clear Search"
+              onClick={() => handleClearSearch()}
+              className="cursor-pointer flex items-center mt-4 gap-1 bg-purple-600 hover:bg-purple-700 text-white font-semibold py-1.5 px-4 rounded shadow duration-100 active:scale-95"
             >
-              {/* Image container with fixed height */}
-              <div className="relative h-48 w-full overflow-hidden border-b border-gray-400 bg-gradient-to-b from-white to-purple-100 flex items-center justify-center">
-                <img
-                  src={pro.images[0]}
-                  alt={pro.name}
-                  className="max-h-full max-w-full object-contain duration-200 hover:scale-105"
-                />
-              </div>
+              Clear Search
+              <GiBroom />
+            </button>
 
-              {/* Content container with consistent padding and flex-grow */}
-              <div className="px-2 md:px-2.5 py-3 flex flex-col gap-2 flex-grow">
-                <h3 className="ml-1 md:ml-1.5 text-[13px] md:text-base font-semibold text-gray-800 line-clamp-2">
-                  {pro.name}
-                </h3>
+          </div>
+          :
+          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 2xl:grid-cols-6 gap-4">
+            {productData.map((pro) => (
+              <motion.div
+                key={pro._id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3 }}
+                className="relative bg-white border border-gray-400 rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300 flex flex-col h-full"
+              >
+                {/* Image container with fixed height */}
+                <div className="relative h-48 w-full overflow-hidden border-b border-gray-400 bg-gradient-to-b from-white to-purple-100 flex items-center justify-center">
+                  <img
+                    src={pro.images[0]}
+                    alt={pro.name}
+                    className="max-h-full max-w-full object-contain duration-200 hover:scale-105"
+                  />
+                </div>
 
-                <div className='flex flex-col gap-0'>
-                  <p className="ml-1 md:ml-1.5 text-xs md:text-base font-semibold text-gray-700">
-                    {pro.unit_quantity} {pro.unit}
-                  </p>
-                  <p className="ml-1 md:ml-1.5 text-xs md:text-base font-semibold text-gray-700">
-                    Stock-{pro.stock}
-                  </p>
+                {/* Content container with consistent padding and flex-grow */}
+                <div className="px-2 md:px-2.5 py-3 flex flex-col gap-2 flex-grow">
+                  <h3 className="ml-1 md:ml-1.5 text-[13px] md:text-base font-semibold text-gray-800 line-clamp-2">
+                    {pro.name}
+                  </h3>
+
+                  <div className='flex flex-col gap-0'>
+                    <p className="ml-1 md:ml-1.5 text-xs md:text-base font-semibold text-gray-700">
+                      {pro.unit_quantity} {pro.unit}
+                    </p>
+                    <p className="ml-1 md:ml-1.5 text-xs md:text-base font-semibold text-gray-700">
+                      Stock-{pro.stock}
+                    </p>
+                  </div>
+
+                  <button
+                    className='cursor-pointer text-[13px] w-full md:px-6 py-2 rounded-sm text-purple-800 font-medium flex items-center justify-center bg-purple-100 border border-purple-950 hover:bg-purple-200 mt-auto'
+                    title="Edit category"
+                  >
+                    <FaEdit size={16} className='mr-1.5' />
+                    Edit Category
+                  </button>
                 </div>
 
                 <button
-                  className='cursor-pointer text-[13px] w-full md:px-6 py-2 rounded-sm text-purple-800 font-medium flex items-center justify-center bg-purple-100 border border-purple-950 hover:bg-purple-200 mt-auto'
-                  title="Edit category"
+                  title='Remove Category'
+                  className="cursor-pointer absolute top-0 text-[13px] md:text-sm right-0 px-3 md:px-6 py-2 rounded-b-xs text-white font-medium flex items-center bg-red-500 hover:bg-red-600"
                 >
-                  <FaEdit size={16} className='mr-1.5' />
-                  Edit Category
+                  <FaTrash className='mr-1.5' />
                 </button>
-              </div>
-
-              <button
-                title='Remove Category'
-                className="cursor-pointer absolute top-0 text-[13px] md:text-sm right-0 px-3 md:px-6 py-2 rounded-b-xs text-white font-medium flex items-center bg-red-500 hover:bg-red-600"
-              >
-                <FaTrash className='mr-1.5' />
-              </button>
-            </motion.div>
-          ))}
-        </div>
+              </motion.div>
+            ))}
+          </div>
+        )
       }
 
       {/* current page and next page */}
-      <div className="flex items-center p-4 pb-0 text-purple-700 justify-center gap-4 sm:gap-6 ">
+      {productData[0] && <div className="flex items-center p-4 pb-0 text-purple-700 justify-center gap-4 sm:gap-6 ">
         {currentPage === 1 ?
           <div
             className='cursor-no-drop flex gap-1 items-center px-2 py-1 text-gray-700 duration-300 rounded-lg border border-white' >
@@ -258,7 +274,7 @@ const Products = () => {
           </Link>
         }
 
-      </div>
+      </div>}
 
     </div>
   )
