@@ -13,3 +13,7 @@ button:disabled, input:disabled {
     background: #f8791f;
     color: white;
 }
+
+.scrollbar-hide::-webkit-scrollbar{
+    display: none;
+}

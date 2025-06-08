@@ -5,13 +5,12 @@ import toast, { Toaster } from "react-hot-toast"
 import fetchUser from './Utils/fetchUser'
 import { useDispatch } from 'react-redux'
 import { setUserDetails } from '../store/userSlice'
-import { setAllCategory, setAllSubCategory } from '../store/productSlice'
+import { setAllCategory, setAllSubCategory, setIsCategoryLoading } from '../store/productSlice'
 import summarApi from './common/SummaryApi'
 import Axios from './Utils/Axios'
 
 const App = () => {
-
-  const dispatch = useDispatch()
+  const dispatch = useDispatch(setIsCategoryLoading(true))
 
   const fetchUserHandler = async () => {
     const userData = await fetchUser()
@@ -19,7 +18,7 @@ const App = () => {
   }
 
   const fetchCategories = async () => {
-
+    dispatch(setIsCategoryLoading(true))
     try {
       const response = await Axios({
         ...summarApi.category.getAllCategory
@@ -31,7 +30,7 @@ const App = () => {
       console.log(error)
       toast.error(error.response.data.message)
     }
-
+    dispatch(setIsCategoryLoading(false))
   }
 
   const fetchSubCategories = async () => {
