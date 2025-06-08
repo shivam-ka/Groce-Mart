@@ -64,19 +64,21 @@ const getProduct = async (req, res) => {
         const page = req.query?.page || 1;
         const limit = req.query?.limit || 10;
 
-        const skip = (page - 1) * limit;
-
         const query = search ? {
             $text: {
                 $search: search
             }
         } : {}
 
+        const skip = (page - 1) * limit;
+
         const [productData, totalProductCount] = await Promise.all([
             ProductModel
-                .find(query).sort({ createdAt: -1 })
+                .find(query)
+                .sort({ createdAt: -1 })
                 .skip(skip)
-                .limit(limit),
+                .limit(limit)
+                .populate('category subCategory'),
             ProductModel.countDocuments(query)
 
         ])

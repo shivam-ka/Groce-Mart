@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Footer, Navbar } from './components'
 import { Outlet } from 'react-router-dom'
 import toast, { Toaster } from "react-hot-toast"

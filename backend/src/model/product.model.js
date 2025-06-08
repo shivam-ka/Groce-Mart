@@ -16,14 +16,14 @@ const productSchema = new mongoose.Schema({
     category: [
         {
             type: mongoose.Schema.ObjectId,
-            ref: 'category'
+            ref: 'Category'
         }
     ],
 
     subCategory: [
         {
             type: mongoose.Schema.ObjectId,
-            ref: 'subCategory'
+            ref: 'Subcategory'
         }
     ],
     unit: {

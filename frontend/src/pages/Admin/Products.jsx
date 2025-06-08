@@ -4,13 +4,16 @@ import summarApi from '../../common/SummaryApi'
 import { useState, useEffect } from 'react'
 import { PreCategory } from '../../components'
 import { motion, AnimatePresence } from 'framer-motion';
-import { Link, useNavigate, useSearchParams } from 'react-router-dom'
+import { data, Link, useNavigate, useSearchParams } from 'react-router-dom'
 import ErrorPage from "../ErrorPage"
 
+
 // Icons
+import { FiSearch } from 'react-icons/fi'
 import { BiSolidCategory } from 'react-icons/bi'
 import { FaEdit, FaTrash } from 'react-icons/fa'
 import { IoIosArrowBack, IoIosArrowForward, IoMdArrowDropright } from "react-icons/io";
+import { GiBroom } from "react-icons/gi";
 
 const Products = () => {
 
@@ -21,6 +24,7 @@ const Products = () => {
   const [isPageLoading, setIsPageLoading] = useState(false)
   const [totalPages, setTotalPages] = useState(1)
 
+  const [searchQuery, setSearchQuery] = useState('')
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
 
@@ -29,7 +33,7 @@ const Products = () => {
     try {
       const response = await Axios({
         url: summarApi.product.getPorduct.url + `?page=${currentPage}&limit=${limit}`,
-        method: summarApi.product.getPorduct.method
+        method: summarApi.product.getPorduct.method, data: { search: urlSearchQuery ? urlSearchQuery : searchQuery }
       })
 
       if (response.data.success) {
@@ -57,15 +61,9 @@ const Products = () => {
     }
   }
 
-  useEffect(() => {
-    fetchProductData()
-  }, [currentPage])
-
-  useEffect(() => {
-    getCuurentPage()
-  }, [searchParams])
 
   const pageNumber = Number(searchParams.get('page') || 1)
+  const urlSearchQuery = searchParams.get('query')
 
   const getCuurentPage = () => {
     if (pageNumber && pageNumber !== 0) {
@@ -76,7 +74,37 @@ const Products = () => {
     }
   }
 
-  if (pageNumber > totalPages) {
+  const getSearchQuery = () => {
+    if (urlSearchQuery && urlSearchQuery.trim() !== '') {
+      setSearchQuery(urlSearchQuery)
+    }
+  }
+
+  const handleSearch = () => {
+    if (searchQuery.trim() === '') {
+      navigate(`?page=${currentPage}`)
+    } else {
+      window.location.href = `?page=${currentPage}&query=${searchQuery}`
+    }
+    fetchProductData()
+  }
+
+  const handleClearSearch = () => {
+    setSearchQuery('')
+    window.location.href = `?page=${currentPage}`
+    fetchProductData()
+  }
+
+  useEffect(() => {
+    fetchProductData()
+  }, [currentPage])
+
+  useEffect(() => {
+    getCuurentPage()
+    getSearchQuery()
+  }, [searchParams])
+
+  if (pageNumber && totalPages && pageNumber > totalPages) {
     return <div>
       <ErrorPage navigateTo="?page=1" />
     </div>
@@ -84,11 +112,55 @@ const Products = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 p-4 md:p-6">
-      <div className=" mx-auto">
-        <h1 className=" text-base mb-8 md:text-2xl font-bold text-gray-800 flex items-center">
-          <BiSolidCategory className="mr-2" style={{ color: '#6945c5' }} />
-          Total Products <IoMdArrowDropright className="text-purple-600" /> {totalProductCount}
-        </h1>
+      <div className="flex flex-col sm:flex-row gap-3 mb-6 justify-between items">
+
+        <div className="flex items-center gap-2">
+
+          <h1 className="text-base md:text-2xl font-bold text-gray-800 flex items-center">
+            <BiSolidCategory className="mr-2" style={{ color: '#6945c5' }} />
+            Total Products <IoMdArrowDropright className="text-purple-600" /> {totalProductCount}
+          </h1>
+
+          {searchQuery && urlSearchQuery &&
+            <>
+              <IoMdArrowDropright className="text-purple-600 text-2xl" />
+              <button
+                title="Clear Search"
+                onClick={() => handleClearSearch()}
+                className="cursor-pointer flex items-center gap-1 bg-purple-600 hover:bg-purple-700 text-white font-semibold py-1.5 px-4 rounded shadow duration-100 active:scale-95"
+              >
+                Clear Search
+                <GiBroom/>
+              </button>
+            </>
+          }
+
+        </div>
+
+
+
+
+        <div className="relative flex">
+          <input
+            type="text"
+            title="Search For Product"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Search for Products"
+            className="w-full py-2.5 px-5 pr-12 rounded-lg border border-black shadow-sm transition-all duration-200 hover:shadow-md"
+          />
+          <button
+            title="Search"
+            type="submit"
+            onClick={() => handleSearch()}
+            className="cursor-pointer absolute right-0 top-1/2 transform -translate-y-1/2 h-full px-4 text-white bg-purple-600 hover:bg-purple-700 rounded-r-lg   transition-colors duration-200 flex items-center justify-center"
+          >
+            <FiSearch className="w-5 h-5" />
+          </button>
+
+        </div>
+
+
       </div>
 
       {isPageLoading ?
