@@ -264,5 +264,52 @@ const getProductByCategory = async (req, res) => {
     }
 }
 
+const getProductByCategoryAndSubCategory = async (req, res) => {
+    try {
 
-export { addProduct, getProduct, updateProduct, getProductByCategory }
+        const { categoryId, subCategoryId, } = req.body;
+        const page = req.query?.page || 1;
+        const limit = req.query?.limit || 10;
+
+        if (!categoryId || !subCategoryId) {
+            return res
+                .status(400)
+                .json(new ApiError(400, "Category and Subcategory Id Is Missing"))
+        }
+
+        const skip = (page - 1) * limit
+
+        const query = {
+            category: { $in: categoryId },
+            subCategory: { $in: subCategoryId }
+        }
+
+        const [product, totalProductCount] = await Promise.all([
+            ProductModel.find(query)
+                .sort({ createdAt: -1 })
+                .skip(skip)
+                .limit(limit),
+            ProductModel.countDocuments(query)
+        ])
+
+        return res.json(new ApiResponse(
+            200,
+            {
+                totalProductCount,
+                totalPages: Math.ceil(totalProductCount / limit),
+                product,
+            },
+            "Prduct Fetched Suucessfully"
+        ))
+
+    } catch (error) {
+        console.log("get Product By Category And Sub Category Error: ", error)
+        return res
+            .status(500)
+            .json(new ApiError(500, error.message || "get Product By Category And Sub Category Error:"))
+    }
+}
+
+
+
+export { addProduct, getProduct, updateProduct, getProductByCategory, getProductByCategoryAndSubCategory }
