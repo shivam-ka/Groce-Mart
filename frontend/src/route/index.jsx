@@ -1,6 +1,6 @@
 import { createBrowserRouter } from "react-router-dom"
 import App from "../App"
-import { ErrorPage, ForgotPassword, Home, Login, Register, UserDashboard, Address, Category, SubCategory, UploadProduct, Product, ProductPageList, ProductDisplayPage } from "../pages"
+import { ErrorPage, ForgotPassword, Home, Login, Register, UserDashboard, Address, Category, SubCategory, UploadProduct, Product, ProductListPage, ProductDisplayPage } from "../pages"
 import AdminProtractor from "../layout/AdminProtractor"
 
 
@@ -59,7 +59,7 @@ const router = createBrowserRouter([
                 children: [
                     {
                         path: ":subCategory",
-                        element: <ProductPageList/>
+                        element: <ProductListPage/>
                     }
                 ]
             },
