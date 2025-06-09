@@ -1,6 +1,6 @@
 import { createBrowserRouter } from "react-router-dom"
 import App from "../App"
-import { ErrorPage, ForgotPassword, Home, Login, Register, UserDashboard, Address, Category, SubCategory, UploadProduct, Product, ProductPageList } from "../pages"
+import { ErrorPage, ForgotPassword, Home, Login, Register, UserDashboard, Address, Category, SubCategory, UploadProduct, Product, ProductPageList, ProductDisplayPage } from "../pages"
 import AdminProtractor from "../layout/AdminProtractor"
 
 
@@ -62,6 +62,10 @@ const router = createBrowserRouter([
                         element: <ProductPageList/>
                     }
                 ]
+            },
+            {
+                path: "product/:product",
+                element: <ProductDisplayPage />
             }
         ],
         errorElement: <ErrorPage />

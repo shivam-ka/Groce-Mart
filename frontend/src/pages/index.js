@@ -10,6 +10,7 @@ import Product from "./Admin/Products"
 import SubCategory from "./Admin/SubCategory"
 import UploadProduct from "./Admin/UploadProducts"
 import ProductPageList from "./ProductPageList";
+import ProductDisplayPage from "./ProductDisplayPage";
 
 
 export {
@@ -24,5 +25,6 @@ export {
     Product,
     SubCategory,
     UploadProduct,
-    ProductPageList
+    ProductPageList,
+    ProductDisplayPage
 }

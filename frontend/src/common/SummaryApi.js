@@ -85,6 +85,10 @@ const summarApi = {
         updateProduct: {
             url: '/api/v1/product/update-product',
             method: 'put'
+        },
+        getPorductByCategory: {
+            url: 'api/v1/product/get-product-by-category',
+            method: 'get'
         }
     }
 }

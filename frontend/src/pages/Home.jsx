@@ -1,5 +1,5 @@
 import { useSelector } from 'react-redux'
-import { PreHomeCategory } from '../components'
+import { PreHomeCategory, ProductByCategory } from '../components'
 import { motion } from "framer-motion";
 import { asstes } from '../assets/assets';
 import { Link } from 'react-router-dom';
@@ -47,8 +47,8 @@ const Home = () => {
               >
                 {/* Image Container - Fixed Square Aspect Ratio */}
                 <div className="aspect-square w-full flex items-center justify-center rounded-t-lg bg-gradient-to-b from-purple-100 to-white overflow-hidden">
-                  <img
-                    className="object-contain w-full h-full max-w-[90%] max-h-[100%] mix-blend-multiply rounded-lg duration-200 hover:scale-105"
+                  <motion.img
+                    className="object-contain w-full h-full max-w-[90%] max-h-[100%] mix-blend-multiply rounded-lg transition-all hover:scale-105"
                     src={item.image}
                     alt={item.name}
                     loading="lazy"
@@ -69,6 +69,11 @@ const Home = () => {
             </Link>
           ))}
         </div>
+      }
+      {
+        allCategory.map((cat, index) => (
+          <ProductByCategory key={cat._id} categoryId={cat?._id} categoryName={cat?.name} />
+        ))
       }
 
     </div>
