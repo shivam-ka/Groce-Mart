@@ -1,5 +1,5 @@
 import { Router } from "express"
-import { addProduct, getProduct, updateProduct } from "../controllers/product.controller.js";
+import { addProduct, getProduct, getProductByCategory, updateProduct } from "../controllers/product.controller.js";
 import upload from "../middlewares/multer.middleware.js";
 import { authUser } from "../middlewares/auth.middleware.js";
 
@@ -28,6 +28,7 @@ productRouter.put(
     updateProduct
 )
 
-productRouter.post('/get-product', authUser, getProduct)
+productRouter.post('/get-product', getProduct)
+productRouter.get('/get-product-by-category/:categoryId', getProductByCategory)
 
 export default productRouter

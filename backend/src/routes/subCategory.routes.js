@@ -6,7 +6,7 @@ import { addSubCategory, getAllSubCategory, removeSubCategory, updateSubCategory
 const subCategoryRouter = Router();
 
 subCategoryRouter.post('/add-subcategory', authUser, upload.single('image'), addSubCategory)
-subCategoryRouter.post('/get-allsubcategory', authUser, getAllSubCategory)
+subCategoryRouter.post('/get-allsubcategory', getAllSubCategory)
 subCategoryRouter.put('/update-subcategory', authUser, upload.single('image'), updateSubCategory)
 subCategoryRouter.delete('/remove-subcategory', authUser, removeSubCategory)
 

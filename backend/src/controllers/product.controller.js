@@ -235,5 +235,34 @@ const updateProduct = async (req, res) => {
     }
 }
 
+const getProductByCategory = async (req, res) => {
+    try {
 
-export { addProduct, getProduct, updateProduct }
+        const { categoryId } = req.params;
+
+        if (!categoryId) {
+            return res
+                .status(400)
+                .json(new ApiError(400, "Category Id Is Missing"))
+        }
+
+        const product = await ProductModel.find({
+            category: { $in: categoryId }
+        }).limit(15)
+
+        return res.json(new ApiResponse(
+            200,
+            product,
+            "Product by Category fetched Successfully"
+        ))
+
+    } catch (error) {
+        console.log("get Product By Category Error: ", error)
+        return res
+            .status(500)
+            .json(new ApiError(500, error.message || "get Product By Category Error:"))
+    }
+}
+
+
+export { addProduct, getProduct, updateProduct, getProductByCategory }

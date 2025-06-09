@@ -40,15 +40,15 @@ const Home = () => {
             <Link
               key={item._id}
               to={ProductListPageUrl(item)}
-            // onClick={() => ProductListPageUrl(item)}
+              className="flex flex-col h-full" // Added h-full to Link
             >
               <motion.div
-                className="flex flex-col rounded-lg bg-white border border-gray-500 shadow-xs hover:shadow-sm transition-all cursor-pointer"
+                className="flex flex-col rounded-lg bg-white border border-gray-500 shadow-xs hover:shadow-sm transition-all cursor-pointer h-full" // Added h-full
               >
                 {/* Image Container - Fixed Square Aspect Ratio */}
-                <div className="aspect-square w-full flex items-center justify-center rounded-lg bg-gradient-to-b from-purple-100 to-white ">
+                <div className="aspect-square w-full flex items-center justify-center rounded-t-lg bg-gradient-to-b from-purple-100 to-white overflow-hidden">
                   <img
-                    className="object-contain w-[90%] h-[90%] mix-blend-multiply rounded-lg duration-200 hover:scale-105"
+                    className="object-contain w-full h-full max-w-[90%] max-h-[100%] mix-blend-multiply rounded-lg duration-200 hover:scale-105"
                     src={item.image}
                     alt={item.name}
                     loading="lazy"
@@ -67,7 +67,6 @@ const Home = () => {
                 </div>
               </motion.div>
             </Link>
-
           ))}
         </div>
       }
