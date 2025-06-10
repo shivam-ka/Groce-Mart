@@ -14,6 +14,7 @@ const ProductContainer = ({ product }) => {
 
     return (
         <Link
+            onClick={() => window.scrollTo(0, 0)}
             className='h-fit m-0'
             key={product._id}
             to={fetchUrl(product)}>

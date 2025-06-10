@@ -10,7 +10,7 @@ import PreProduct from './PreLoader/PreProduct';
 import PreHeading from './PreLoader/PreHeading';
 import { Link } from 'react-router-dom';
 
-const ProductByCategory = ({ categoryId, categoryName, }) => {
+const ProductByCategory = ({ categoryId, categoryName, navigateTo }) => {
 
     const [data, setData] = useState([])
     const [isLoading, setIsLoading] = useState(false)
@@ -54,10 +54,15 @@ const ProductByCategory = ({ categoryId, categoryName, }) => {
                         <h1 className="text-lg sm:text-xl font-semibold text-black">
                             {categoryName}
                         </h1>
-                        <span className="flex items-center text-sm sm:text-lg text-red-600 cursor-pointer">
-                            See All
-                            <FiChevronRight className='text-xl' />
-                        </span>
+                        <Link
+                            onClick={() => window.scrollTo(0, 0)}
+                            to={navigateTo}>
+                            <span className="flex items-center text-sm sm:text-lg text-red-600 cursor-pointer">
+                                See All
+                                <FiChevronRight className='text-xl' />
+                            </span>
+                        </Link>
+
                     </div>)
             }
 

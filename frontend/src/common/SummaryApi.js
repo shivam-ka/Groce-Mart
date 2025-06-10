@@ -1,4 +1,4 @@
-export const baseUrl = 'http://localhost:3000' // import.meta.env.BASE_URL 
+export const baseUrl = import.meta.env.VITE_BASE_URL
 
 const summarApi = {
     register: {
@@ -90,9 +90,13 @@ const summarApi = {
             url: 'api/v1/product/get-product-by-category',
             method: 'get'
         },
-        getPorductByCatAndSubCat:{
+        getPorductByCatAndSubCat: {
             url: 'api/v1/product/get-product-by-cat-and-subcat',
             method: 'post'
+        },
+        getProductDetails: {
+            url: 'api/v1/product/get-product-details',
+            method: 'get'
         }
     }
 }

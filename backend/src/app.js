@@ -20,6 +20,10 @@ app.use(express.urlencoded({ extended: true, limit: "16kb" }));
 app.use(cookieParser());
 app.use(morgan());
 
+app.get('/', (req, res) => {
+    res.json('working')
+})
+
 // import router 
 import userRouter from "./routes/user.routes.js"
 import categoryRouter from "./routes/category.routes.js"

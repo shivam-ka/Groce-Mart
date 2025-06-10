@@ -77,7 +77,7 @@ const Home = () => {
       }
       {
         allCategory.map((cat, index) => (
-          <ProductByCategory key={cat._id} categoryId={cat?._id} categoryName={cat?.name} />
+          <ProductByCategory key={cat._id} categoryId={cat?._id} categoryName={cat?.name} navigateTo={ProductListPageUrl(cat)} />
         ))
       }
 
