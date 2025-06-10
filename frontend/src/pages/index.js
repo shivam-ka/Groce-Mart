@@ -11,7 +11,7 @@ import SubCategory from "./Admin/SubCategory"
 import UploadProduct from "./Admin/UploadProducts"
 import ProductListPage from "./ProductListPage";
 import ProductDisplayPage from "./ProductDisplayPage";
-
+import ProductContainer from "../components/ProductContainer";
 
 export {
     ErrorPage,
@@ -26,5 +26,6 @@ export {
     SubCategory,
     UploadProduct,
     ProductListPage,
-    ProductDisplayPage
+    ProductDisplayPage,
+    ProductContainer
 }

@@ -236,7 +236,8 @@ const Products = () => {
       }
 
       {/* current page and next page */}
-      {productData[0] && <div className="flex items-center p-4 pb-0 text-purple-700 justify-center gap-4 sm:gap-6 ">
+      {productData[0] && 
+      <div className="flex items-center p-4 pb-0 text-purple-700 justify-center gap-4 sm:gap-6 ">
         {currentPage === 1 ?
           <div
             className='cursor-no-drop flex gap-1 items-center px-2 py-1 text-gray-700 duration-300 rounded-lg border border-white' >

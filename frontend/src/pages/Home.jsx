@@ -12,16 +12,20 @@ const Home = () => {
 
   const ProductListPageUrl = (category) => {
 
-    const categoryName = (category.name).replaceAll(' ', '-').replaceAll(',', '')
+    const categoryName = (category.name).replaceAll(' ', '+').replaceAll(',', '')
 
-    const subCategory = allSubCategory.filter(item =>
-      item.category.some(cat => cat === category._id)
-    );
+    const subCategory = allSubCategory.find(sub => {
+      const filterData = sub.category.some(c => {
+        return c == category._id
+      })
 
-    const subCategory_id = subCategory.map(item => item._id)
-    const url = `${categoryName}/${subCategory_id.map(item => item)}`
+      return filterData ? true : null
+    })
 
-    return url.replaceAll(',', '-')
+    const subCategoryId = subCategory !== undefined ? subCategory._id : ''
+
+    const url = `${categoryName}-${category._id}/${subCategoryId}`
+    return url
   }
 
 
@@ -38,6 +42,7 @@ const Home = () => {
         <div className="grid grid-cols-4 xs:grid-cols-5 sm:grid-cols-6 md:grid-cols-7 lg:grid-cols-8 gap-2 sm:gap-3">
           {allCategory.map((item) => (
             <Link
+              onClick={window.scrollTo({ top: 0 })}
               key={item._id}
               to={ProductListPageUrl(item)}
               className="flex flex-col h-full" // Added h-full to Link

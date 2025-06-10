@@ -62,16 +62,14 @@ const ProductByCategory = ({ categoryId, categoryName, }) => {
             }
 
             {/* Products Grid */}
-            {isLoading ?
-                <PreProduct />
-                :
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 2xl:grid-cols-6 gap-4">
-                    {data[0] && data.map((product) => (
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 2xl:grid-cols-6 gap-4">
+                {isLoading ? <PreProduct Length={6} /> :
+
+                    data.map((product) => (
                         <Link
                             key={product._id}
                             to={fetchUrl(product)}>
                             <motion.div
-                                onClick={() => console.log(product._id)}
                                 key={product._id}
                                 initial={{ opacity: 0, scale: 0.95 }}
                                 animate={{ opacity: 1, scale: 1 }}
@@ -145,9 +143,11 @@ const ProductByCategory = ({ categoryId, categoryName, }) => {
                             </motion.div>
                         </Link>
 
-                    ))}
-                </div>
-            }
+                    ))
+
+                }
+            </div>
+
         </div>
 
     )

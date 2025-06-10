@@ -89,6 +89,10 @@ const summarApi = {
         getPorductByCategory: {
             url: 'api/v1/product/get-product-by-category',
             method: 'get'
+        },
+        getPorductByCatAndSubCat:{
+            url: 'api/v1/product/get-product-by-cat-and-subcat',
+            method: 'post'
         }
     }
 }
