@@ -310,6 +310,33 @@ const getProductByCategoryAndSubCategory = async (req, res) => {
     }
 }
 
+const getProductDetails = async (req, res) => {
+    try {
+
+        const productId = req.params?.productId
+
+        if (!productId) {
+            return res
+                .status(400)
+                .json(new ApiError(400, "Product Id Is Missing"))
+        }
+
+        const product = await ProductModel.findById(productId)
+        return res.json(new ApiResponse(
+            200,
+            product,
+            "Product Fetched Successfully"
+        ))
+
+    } catch (error) {
+        console.log("get Product Details Error: ", error)
+        return res
+            .status(500)
+            .json(new ApiError(500, error.message || "get Product Details Error:"))
+    }
+}
 
 
-export { addProduct, getProduct, updateProduct, getProductByCategory, getProductByCategoryAndSubCategory }
+
+
+export { addProduct, getProduct, updateProduct, getProductByCategory, getProductByCategoryAndSubCategory, getProductDetails }

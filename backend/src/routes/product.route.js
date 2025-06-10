@@ -1,5 +1,5 @@
 import { Router } from "express"
-import { addProduct, getProduct, getProductByCategory, getProductByCategoryAndSubCategory, updateProduct } from "../controllers/product.controller.js";
+import { addProduct, getProduct, getProductByCategory, getProductByCategoryAndSubCategory, getProductDetails, updateProduct } from "../controllers/product.controller.js";
 import upload from "../middlewares/multer.middleware.js";
 import { authUser } from "../middlewares/auth.middleware.js";
 
@@ -31,5 +31,6 @@ productRouter.put(
 productRouter.post('/get-product', getProduct)
 productRouter.get('/get-product-by-category/:categoryId', getProductByCategory)
 productRouter.post('/get-product-by-cat-and-subcat', getProductByCategoryAndSubCategory)
+productRouter.get('/get-product-details/:productId', getProductDetails)
 
 export default productRouter

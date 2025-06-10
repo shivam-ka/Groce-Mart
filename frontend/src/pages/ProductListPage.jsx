@@ -89,7 +89,7 @@ const ProductListPage = () => {
             <Link
               to={getSubCategoryUrl(subCat)}
               key={subCat._id}
-              className={`flex flex-col md:flex-row items-center gap-4 p-1 md:p-3 hover:bg-purple-50 rounded-lg transition-colors duration-200 ${subCategoryId === subCat._id ? 'bg-purple-100' : ''}`}
+              className={`flex flex-col md:flex-row items-center gap-4 p-1 md:p-3 hover:bg-purple-50 rounded-lg transition-colors duration-200 border-purple-600 ${subCategoryId === subCat._id ? 'border bg-purple-100' : ''}`}
               onClick={() => getSubCategoryUrl(subCat)}
             >
               {/* Larger square image (uncropped) */}
