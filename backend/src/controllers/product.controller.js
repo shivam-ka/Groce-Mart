@@ -7,13 +7,14 @@ import { deleteOnCloudinary, uploadOnCloudinary } from "../utils/Cloudinary.js";
 const addProduct = async (req, res) => {
     try {
         const { name, category, subCategory, unit, unit_quantity, stock, price, discount, description, } = req.body;
+        console.log(category, subCategory)
 
         const image1 = req.files?.image1 && req.files.image1[0];
         const image2 = req.files?.image2 && req.files.image2[0];
         const image3 = req.files?.image3 && req.files.image3[0];
         const image4 = req.files?.image4 && req.files.image4[0];
 
-        if ([name, category[0], subCategory[0], unit, unit_quantity, stock, price, discount, description].some((field) => field === '')) {
+        if ([name, category[0], unit, unit_quantity, stock, price, discount, description].some((field) => field === '')) {
             return res
                 .status(400)
                 .json(new ApiError(
@@ -135,7 +136,7 @@ const updateProduct = async (req, res) => {
                 ))
         }
 
-        if ([name, category[0], subCategory[0], unit, unit_quantity, stock, price, discount, description].some((field) => field === '')) {
+        if ([name, category[0], unit, unit_quantity, stock, price, discount, description].some((field) => field === '')) {
             return res
                 .status(400)
                 .json(new ApiError(
@@ -188,7 +189,7 @@ const updateProduct = async (req, res) => {
                 }
             )
 
-            return res.jons(
+            return res.json(
                 new ApiResponse(
                     200,
                     updatedProduct,
@@ -336,7 +337,56 @@ const getProductDetails = async (req, res) => {
     }
 }
 
+const deleteProduct = async (req, res) => {
+    try {
+
+        const productId = req.params?.productId;
+
+        if (!productId) {
+            return res
+                .status(400)
+                .json(new ApiError(
+                    400,
+                    "invalid Credentials"
+                ))
+        }
+
+        const product = await ProductModel.findById(productId)
+
+        if (!product) {
+            return res
+                .status(404)
+                .json(new ApiError(
+                    404,
+                    "Porduct not Found"
+                ))
+        }
+
+        await Promise.all(
+            product.images?.map(async (item) => {
+                if (item) {
+                    const publicId = item.match(/\/upload\/(?:v\d+\/)?([^\.\/]+)(?=\.\w+$)/)[1]
+                    await deleteOnCloudinary(publicId)
+                }
+            })
+        )
+
+        await ProductModel.findByIdAndDelete(product._id)
+
+        return res.json(new ApiResponse(
+            200,
+            {},
+            "Product deleted successfully"
+        ))
 
 
+    } catch (error) {
+        console.log("Delete Product Error: ", error)
+        return res
+            .status(500)
+            .json(new ApiError(500, error.message || "Delete Product Error"))
+    }
+}
 
-export { addProduct, getProduct, updateProduct, getProductByCategory, getProductByCategoryAndSubCategory, getProductDetails }
+
+export { addProduct, getProduct, updateProduct, getProductByCategory, getProductByCategoryAndSubCategory, getProductDetails, deleteProduct }

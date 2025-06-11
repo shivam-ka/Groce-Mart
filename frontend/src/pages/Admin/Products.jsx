@@ -1,10 +1,10 @@
 import toast from "react-hot-toast"
 import Axios from '../../Utils/Axios'
 import summarApi from '../../common/SummaryApi'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { PreCategory } from '../../components'
 import { motion, AnimatePresence } from 'framer-motion';
-import {  Link, useNavigate, useSearchParams } from 'react-router-dom'
+import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import ErrorPage from "../ErrorPage"
 
 // Icons
@@ -14,6 +14,7 @@ import { FaEdit, FaTrash } from 'react-icons/fa'
 import { IoIosArrowBack, IoIosArrowForward, IoMdArrowDropright } from "react-icons/io";
 import { GiBroom } from "react-icons/gi";
 import { MdSearchOff } from "react-icons/md"
+import { useSelector } from "react-redux"
 
 const Products = () => {
 
@@ -103,11 +104,259 @@ const Products = () => {
     getSearchQuery()
   }, [searchParams])
 
+
+  const primaryColor = '#6945c5'
+
+  const dropdownRef = useRef(null);
+  const subDropdownRef = useRef(null);
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(false)
+  const [isSubOpen, setIsSubOpen] = useState(false)
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [categories, setCategories] = useState([]);
+  const [allSubCategories, setallSubCategories] = useState([])
+  const units = ["KG", "GM", "LTR", "ML", "PC", "PACKET", "BOX", "METER", "CM"];
+
+  const [newProduct, setNewProduct] = useState({
+    name: '',
+    images: Array(4).fill({ file: null, preview: null }),
+    category: [],
+    subCategory: [],
+    unit: '',
+    unit_quantity: '',
+    stock: '',
+    price: '',
+    discount: '',
+    description: "",
+    publish: true
+  });
+
+
+
+  // All Form Handler 
+  const handleDragOver = (e) => {
+    e.preventDefault();
+  };
+
+  const handleDrop = (e, index) => {
+    e.preventDefault();
+    const file = e.dataTransfer.files[0];
+    if (file && file.type.startsWith('image/')) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const updatedImages = [...newProduct.images];
+        updatedImages[index] = {
+          file: file,
+          preview: reader.result
+        };
+        setNewProduct({ ...newProduct, images: updatedImages });
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleImageUpload = (e, index) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const updatedImages = [...newProduct.images];
+        updatedImages[index] = {
+          file: file,
+          preview: reader.result
+        };
+        setNewProduct({ ...newProduct, images: updatedImages });
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const removeImage = (index) => {
+    const updatedImages = [...newProduct.images];
+    updatedImages[index] = { file: null, preview: null };
+    setNewProduct({ ...newProduct, images: updatedImages });
+  };
+
+  const resetForm = () => {
+    setNewProduct({
+      name: '',
+      images: Array(4).fill({ file: null, preview: null }),
+      category: [],
+      subCategory: [],
+      unit: [],
+      stock: '',
+      price: '',
+      discount: '',
+      description: "",
+      publish: true
+    });
+    setIsModalOpen(false);
+    setIsEditMode(false);
+  };
+
+  const handleSelect = (item) => {
+    if (newProduct.category?.find(cat => cat._id === item._id)) {
+      handleRemoveCategory(item._id)
+    }
+    else {
+      setNewProduct({ ...newProduct, category: [...newProduct.category, item] })
+    }
+
+  }
+
+  const handleSelectSub = (item) => {
+
+    if (newProduct.subCategory?.find(cat => cat._id === item._id)) {
+      handleRemoveSubCategory(item._id)
+    }
+    else {
+      setNewProduct({ ...newProduct, subCategory: [...newProduct.subCategory, item] })
+    }
+
+  }
+
+  const handleRemoveCategory = (id) => {
+    const category = newProduct.category.filter((item) => item._id !== id)
+    setNewProduct({ ...newProduct, category: category })
+  };
+
+  const handleRemoveSubCategory = (id) => {
+    const subCategory = newProduct.subCategory.filter((item) => item._id !== id)
+    setNewProduct({ ...newProduct, subCategory: subCategory })
+  };
+
+  // Validate Product Before adding
+  const validateProduct = () => {
+    let isValid = true;
+
+    if (!newProduct.name.trim() || newProduct.name.length < 3) {
+      return toast.error("Enter Valid Product Name"),
+        isValid = false;
+
+    }
+
+    if (!newProduct.images.some(img => img.file !== null)) {
+      return toast.error('Select At least one image'),
+        isValid = false;
+    }
+
+    if (newProduct.category.length === 0) {
+      return toast.error('Select at least one category'),
+        isValid = false;
+    }
+
+    if (!newProduct.unit) {
+      return toast.error('Select Product Unit'),
+        isValid = false;
+    }
+
+    if (!newProduct.unit_quantity) {
+      return toast.error('Enter Product Unit Quantity'),
+        isValid = false;
+    }
+
+    if (!newProduct.price || isNaN(newProduct.price)) {
+      return toast.error('Enter Product Price'),
+        isValid = false;
+    }
+    else if (Number(newProduct.price) <= 0) {
+      return toast.error('Enter Valid Product Price'),
+        isValid = false;
+    }
+
+    if (newProduct.discount && isNaN(newProduct.discount)) {
+      return toast.error('Discount must be a number'),
+        isValid = false;
+    }
+    else if (newProduct.discount && Number(newProduct.discount) < 0) {
+      return toast.error('Enter Valid Product Discount'),
+        isValid = false;
+    }
+
+    return isValid;
+  };
+
+  // Product Handler
+  const handleAddProduct = async (e) => {
+
+    e.preventDefault();
+    setIsLoading(true)
+    const formData = new FormData
+    formData.append('name', newProduct.name)
+    formData.append('unit', newProduct.unit)
+    formData.append('unit_quantity', newProduct.unit_quantity)
+    formData.append('stock', newProduct.stock)
+    formData.append('price', newProduct.price)
+    formData.append('discount', newProduct.discount)
+    formData.append('description', newProduct.description)
+    formData.append('publish', newProduct.publish)
+
+    const images = newProduct.images.map((item, index) => { return item.file })
+    images.forEach((img, index) => { formData.append(`image${index + 1}`, img) });
+
+    // Category Id and formData
+    const categoryId = newProduct.category.map((item) => item._id)
+    categoryId.forEach(cat => { formData.append('category', cat) });
+
+    // Sub Category Id and formData
+    const SubCategoryId = newProduct.subCategory.map((item) => item._id)
+    SubCategoryId.forEach(subCat => { formData.append('subCategory', subCat) });
+
+    const validate = validateProduct();
+
+    try {
+
+      if (validate) {
+        const response = await Axios({
+          ...summarApi.product.addProduct, data: formData
+        })
+        console.log(response)
+
+        if (response.data.success) {
+          toast.success(response.data.message)
+          resetForm()
+          setIsModalOpen(false)
+        }
+      }
+
+
+    } catch (error) {
+      console.log(error)
+      toast.error(error.response.data.message)
+    }
+
+    setIsLoading(false)
+
+  };
+
+  const allCategory = useSelector(state => state.product.allCategory);
+  const allSubCategory = useSelector(state => state.product.allSubCategory);
+
+  useEffect(() => {
+    setCategories(allCategory)
+  }, [allCategory])
+
+  useEffect(() => {
+    setallSubCategories(allSubCategory)
+  }, [allSubCategory])
+
+  useEffect(() => {
+    if (isModalOpen) {
+      document.querySelector('body').style.overflowY = 'hidden'
+    } else {
+      document.querySelector('body').style.overflowY = 'scroll'
+    }
+  }, [isModalOpen])
+
   if (pageNumber && totalPages && pageNumber > totalPages) {
     return <div>
       <ErrorPage navigateTo="?page=1" />
     </div>
   }
+
+
 
   return (
     <div className="min-h-screen bg-gray-50 p-4 md:p-6">
@@ -236,46 +485,46 @@ const Products = () => {
       }
 
       {/* current page and next page */}
-      {productData[0] && 
-      <div className="flex items-center p-4 pb-0 text-purple-700 justify-center gap-4 sm:gap-6 ">
-        {currentPage === 1 ?
-          <div
-            className='cursor-no-drop flex gap-1 items-center px-2 py-1 text-gray-700 duration-300 rounded-lg border border-white' >
-            <IoIosArrowBack />
-            Previous
-          </div>
-          :
-          <Link
-            onClick={() => handlePreviusPage()}
-            to={`?page=${currentPage - 1}`}
-            title='Previous Page'
-            className='flex gap-1 items-center px-2 py-1 duration-300 rounded-lg border border-white hover:border-purple-600 hover:bg-purple-100'>
+      {productData[0] &&
+        <div className="flex items-center p-4 pb-0 text-purple-700 justify-center gap-4 sm:gap-6 ">
+          {currentPage === 1 ?
+            <div
+              className='cursor-no-drop flex gap-1 items-center px-2 py-1 text-gray-700 duration-300 rounded-lg border border-white' >
+              <IoIosArrowBack />
+              Previous
+            </div>
+            :
+            <Link
+              onClick={() => handlePreviusPage()}
+              to={`?page=${currentPage - 1}`}
+              title='Previous Page'
+              className='flex gap-1 items-center px-2 py-1 duration-300 rounded-lg border border-white hover:border-purple-600 hover:bg-purple-100'>
 
-            <IoIosArrowBack />
-            Previous
-          </Link>
-        }
+              <IoIosArrowBack />
+              Previous
+            </Link>
+          }
 
-        <span> {currentPage} / {totalPages} </span>
+          <span> {currentPage} / {totalPages} </span>
 
-        {currentPage === totalPages ?
-          <div
-            className='cursor-no-drop flex gap-1 items-center px-2 py-1 text-gray-700 duration-300 rounded-lg border border-white' >
-            Next
-            <IoIosArrowForward />
-          </div>
-          :
-          <Link
-            onClick={() => handleNextPage()}
-            to={`?page=${currentPage + 1}`}
-            title='Next Page'
-            className='flex gap-1 items-center px-2 py-1 duration-300 rounded-lg border border-white hover:border-purple-600 hover:bg-purple-100'>
-            Next
-            <IoIosArrowForward />
-          </Link>
-        }
+          {currentPage === totalPages ?
+            <div
+              className='cursor-no-drop flex gap-1 items-center px-2 py-1 text-gray-700 duration-300 rounded-lg border border-white' >
+              Next
+              <IoIosArrowForward />
+            </div>
+            :
+            <Link
+              onClick={() => handleNextPage()}
+              to={`?page=${currentPage + 1}`}
+              title='Next Page'
+              className='flex gap-1 items-center px-2 py-1 duration-300 rounded-lg border border-white hover:border-purple-600 hover:bg-purple-100'>
+              Next
+              <IoIosArrowForward />
+            </Link>
+          }
 
-      </div>}
+        </div>}
 
     </div>
   )

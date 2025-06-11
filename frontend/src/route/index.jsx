@@ -42,15 +42,15 @@ const router = createBrowserRouter([
                     },
                     {
                         path: 'sub-category',
-                        element: <AdminProtractor> <SubCategory /> </AdminProtractor> 
+                        element: <AdminProtractor> <SubCategory /> </AdminProtractor>
                     },
                     {
                         path: 'upload-product',
-                        element: <UploadProduct />
+                        element: <AdminProtractor> <UploadProduct /> </AdminProtractor>
                     },
                     {
                         path: 'product',
-                        element: <Product />
+                        element: <AdminProtractor> <Product /> </AdminProtractor>
                     },
                 ]
             },
@@ -59,7 +59,7 @@ const router = createBrowserRouter([
                 children: [
                     {
                         path: ":subCategory",
-                        element: <ProductListPage/>
+                        element: <ProductListPage />
                     }
                 ]
             },
