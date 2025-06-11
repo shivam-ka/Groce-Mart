@@ -72,6 +72,7 @@ const ProductByCategory = ({ categoryId, categoryName, navigateTo }) => {
 
                     data.map((product) => (
                         <Link
+                            onClick={() => window.scrollTo(0, 0)}
                             key={product._id}
                             to={fetchUrl(product)}>
                             <motion.div

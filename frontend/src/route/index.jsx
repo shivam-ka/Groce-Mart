@@ -1,6 +1,6 @@
 import { createBrowserRouter } from "react-router-dom"
 import App from "../App"
-import { ErrorPage, ForgotPassword, Home, Login, Register, UserDashboard, Address, Category, SubCategory, UploadProduct, ProductListPage, ProductDisplayPage } from "../pages"
+import { ErrorPage, ForgotPassword, Home, Login, Register, UserDashboard, Address, Category, SubCategory, UploadProduct, ProductListPage, ProductDisplayPage, SearchPage } from "../pages"
 import AdminProtractor from "../layout/AdminProtractor"
 
 
@@ -12,6 +12,10 @@ const router = createBrowserRouter([
             {
                 path: '',
                 element: <Home />
+            },
+            {
+                path: 'search',
+                element: <SearchPage />
             },
             {
                 path: "login",

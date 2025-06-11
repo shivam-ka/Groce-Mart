@@ -9,6 +9,7 @@ import Axios from "../../Utils/Axios";
 import summarApi from "../../common/SummaryApi";
 import ButtonLoading from "../../components/ButtonLoading";
 import CustomToast from "../../components/Toast/CustomToast";
+import { Link } from "react-router-dom";
 
 // Icons
 import { FiSearch } from 'react-icons/fi'
@@ -312,6 +313,7 @@ const UploadProducts = () => {
 
         if (response.data.success) {
           CustomToast.success(response.data.message)
+          fetchProductData()
           resetForm()
           setIsModalOpen(false)
         }

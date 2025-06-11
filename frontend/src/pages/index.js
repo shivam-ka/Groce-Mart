@@ -12,6 +12,7 @@ import UploadProduct from "./Admin/UploadProducts"
 import ProductListPage from "./ProductListPage";
 import ProductDisplayPage from "./ProductDisplayPage";
 import ProductContainer from "../components/ProductContainer";
+import SearchPage from "./SearchPage";
 
 export {
     ErrorPage,
@@ -27,5 +28,6 @@ export {
     UploadProduct,
     ProductListPage,
     ProductDisplayPage,
-    ProductContainer
+    ProductContainer,
+    SearchPage
 }
