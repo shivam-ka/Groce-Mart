@@ -62,7 +62,7 @@ const UploadProducts = () => {
     unit_quantity: '',
     stock: '',
     price: '',
-    discount: '',
+    discount: 0,
     description: "",
     publish: true
   });
@@ -192,7 +192,7 @@ const UploadProducts = () => {
       unit_quantity: product.unit_quantity || '',
       stock: product.stock || '',
       price: product.price || '',
-      discount: product.discount || '',
+      discount: product.discount || 0,
       description: product.description || "",
       publish: product.publish !== false
     });
@@ -228,28 +228,28 @@ const UploadProducts = () => {
     let isValid = true;
 
     if (!newProduct.name.trim() || newProduct.name.length < 3) {
-      return toast.error("Enter Valid Product Name"),
+      return CustomToast.error("Enter Valid Product Name"),
         isValid = false;
 
     }
 
     if (!newProduct.images.some(img => img.file !== null)) {
-      return toast.error('Select At least one image'),
+      return CustomToast.error('Select At least one image'),
         isValid = false;
     }
 
     if (newProduct.category.length === 0) {
-      return toast.error('Select at least one category'),
+      return CustomToast.error('Select at least one category'),
         isValid = false;
     }
 
     if (!newProduct.unit) {
-      return toast.error('Select Product Unit'),
+      return CustomToast.error('Select Product Unit'),
         isValid = false;
     }
 
     if (!newProduct.unit_quantity) {
-      return toast.error('Enter Product Unit Quantity'),
+      return CustomToast.error('Enter Product Unit Quantity'),
         isValid = false;
     }
 
@@ -258,16 +258,16 @@ const UploadProducts = () => {
         isValid = false;
     }
     else if (Number(newProduct.price) <= 0) {
-      return toast.error('Enter Valid Product Price'),
+      return CustomToast.error('Enter Valid Product Price'),
         isValid = false;
     }
 
     if (newProduct.discount && isNaN(newProduct.discount)) {
-      return toast.error('Discount must be a number'),
+      return CustomToast.error('Discount must be a number'),
         isValid = false;
     }
     else if (newProduct.discount && Number(newProduct.discount) < 0) {
-      return toast.error('Enter Valid Product Discount'),
+      return CustomToast.error('Enter Valid Product Discount'),
         isValid = false;
     }
 
@@ -308,10 +308,10 @@ const UploadProducts = () => {
         const response = await Axios({
           ...summarApi.product.addProduct, data: formData
         })
-        console.log(response)
+
 
         if (response.data.success) {
-          toast.success(response.data.message)
+          CustomToast.success(response.data.message)
           resetForm()
           setIsModalOpen(false)
         }
@@ -376,14 +376,17 @@ const UploadProducts = () => {
       const response = await Axios({
         ...summarApi.product.updateProduct, data: formData
       })
-      if (response.data.succes) {
+      if (response.data.success) {
+        CustomToast.success(response.data.message)
         fetchProductData()
       }
-      console.log(response)
+
     } catch (error) {
       console.log(error)
     }
     setIsLoading(false)
+    setIsModalOpen(false)
+    setIsEditMode(false)
   }
 
   const handleNextPage = () => {
@@ -480,8 +483,6 @@ const UploadProducts = () => {
           Add Product
         </motion.button>
       </div>
-      <button onClick={() => CustomToast.error('Your action was completed successfully!')}>Show Toast</button>
-
 
       <AnimatePresence>
         {isModalOpen && (

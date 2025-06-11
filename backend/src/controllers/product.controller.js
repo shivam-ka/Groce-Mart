@@ -217,7 +217,7 @@ const updateProduct = async (req, res) => {
                 }
             )
 
-            return res.jons(
+            return res.json(
                 new ApiResponse(
                     200,
                     updatedProduct,
