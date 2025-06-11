@@ -97,6 +97,10 @@ const summarApi = {
         getProductDetails: {
             url: 'api/v1/product/get-product-details',
             method: 'get'
+        },
+        deleteProduct: {
+            url: 'api/v1/product/delete-product',
+            method: 'delete'
         }
     }
 }

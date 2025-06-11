@@ -13,7 +13,7 @@ import CustomToast from "../../components/Toast/CustomToast";
 // Icons
 import { FiSearch } from 'react-icons/fi'
 import { BiSolidCategory } from 'react-icons/bi'
-import { FaEdit, FaTrash } from 'react-icons/fa'
+import { FaBan, FaEdit, FaTrash } from 'react-icons/fa'
 import { IoIosArrowBack, IoIosArrowForward, IoMdArrowDropright } from "react-icons/io";
 import { GiBroom } from "react-icons/gi";
 import { MdSearchOff } from "react-icons/md"
@@ -42,8 +42,14 @@ const UploadProducts = () => {
   const [isSubOpen, setIsSubOpen] = useState(false)
   const [isEditMode, setIsEditMode] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [categories, setCategories] = useState([]);
   const [allSubCategories, setallSubCategories] = useState([])
+  const [productToDelete, setProductToDelete] = useState({
+    id: '',
+    name: '',
+    preview: ''
+  })
   const units = ["KG", "GM", "LTR", "ML", "PC", "PACKET", "BOX", "METER", "CM"];
 
   const [newProduct, setNewProduct] = useState({
@@ -203,6 +209,20 @@ const UploadProducts = () => {
     setNewProduct({ ...newProduct, subCategory: subCategory })
   };
 
+  const confirmDelete = (product) => {
+    setProductToDelete({
+      id: product._id,
+      name: product.name,
+      preview: product.images[0]
+    })
+    setShowDeleteConfirm(true);
+  }
+
+  const cancelDelete = () => {
+    setShowDeleteConfirm(false);
+    setProductToDelete(null);
+  };
+
   // Validate Product Before adding
   const validateProduct = () => {
     let isValid = true;
@@ -326,6 +346,27 @@ const UploadProducts = () => {
       toast.error(error.response.data.message)
     }
     setIsPageLoading(false)
+  };
+
+  const handleDelete = async () => {
+    setIsLoading(true)
+    try {
+      const response = await Axios({
+        url: `${summarApi.product.deleteProduct.url}/${productToDelete.id}`,
+        method: summarApi.product.deleteProduct.method
+      })
+      console.log(response)
+
+      if (response.data.success) {
+        toast.success(response.data.message)
+        fetchProductData()
+        cancelDelete()
+      }
+
+    } catch (error) {
+      console.log(error)
+    }
+    setIsLoading(false)
   }
 
   const updateProduct = async () => {
@@ -975,7 +1016,8 @@ const UploadProducts = () => {
                 </div>
 
                 <button
-                  title='Remove Category'
+                  onClick={() => confirmDelete(pro)}
+                  title='Remove Product'
                   className="cursor-pointer absolute top-0 text-[13px] md:text-sm right-0 px-3 md:px-6 py-2 rounded-b-xs text-white font-medium flex items-center bg-red-500 hover:bg-red-600"
                 >
                   <FaTrash className='mr-1.5' />
@@ -1027,6 +1069,61 @@ const UploadProducts = () => {
           }
 
         </div>}
+
+      <AnimatePresence>
+        {showDeleteConfirm && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 backdrop-blur-md bg-opacity-50 flex items-center justify-center p-4 z-50"
+          >
+            <motion.div
+              initial={{ scale: 0.9 }}
+              animate={{ scale: 1 }}
+              exit={{ scale: 0.9 }}
+              className="bg-white rounded-xl border p-6 w-full max-w-md"
+            >
+              <div className="text-center">
+                <div className='py-3 border rounded-sm border-dashed' >
+                  <img src={productToDelete.preview} className='w-32 m-auto' alt="" />
+                  <p>{productToDelete.name}</p>
+                </div>
+
+                <h3 className="text-xl font-bold text-gray-800 my-2">Delete Category</h3>
+                <p className="text-gray-600 mb-6">Are you sure you want to delete this category? <span className='text-red-500'>This action cannot be undone.</span> </p>
+
+                <div className="flex justify-center space-x-4">
+                  <button
+                    onClick={cancelDelete}
+                    className="cursor-pointer px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 flex items-center"
+                  >
+                    <FaBan className="mr-2" />
+                    Cancel
+                  </button>
+                  <button
+                    disabled={isLoading}
+                    onClick={handleDelete}
+                    className="cursor-pointer px-6 py-2 rounded-lg text-white font-medium flex items-center bg-red-500 hover:bg-red-600"
+                  >
+                    {isLoading ?
+                      <>
+                        <ButtonLoading />
+                        removing...
+                      </>
+                      :
+                      <>
+                        <FaTrash className="mr-2" />
+                        Delete
+                      </>}
+
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };
