@@ -1,29 +1,11 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import {
-  FiSearch,
-  FiUser, FiLogIn, FiLogOut,
-
-} from 'react-icons/fi';
-import {
-  FaUser,
-  FaMapMarkerAlt,
-  FaClipboardList,
-  FaSignOutAlt,
-  FaShoppingCart,
-  FaLayerGroup,
-  FaUpload,
-  FaBox
-} from 'react-icons/fa'
-
-import {
-  MdOutlineShoppingCart
-} from "react-icons/md";
-
+import { FiSearch, FiUser, FiLogIn, FiLogOut } from 'react-icons/fi';
+import { FaUser, FaMapMarkerAlt, FaClipboardList, FaSignOutAlt, FaShoppingCart, FaLayerGroup, FaBox, FaUpload } from 'react-icons/fa';
+import { MdOutlineShoppingCart } from "react-icons/md";
 import { BiSolidCategory } from "react-icons/bi";
-
 import { asstes } from '../assets/assets';
-import { Link, useNavigate } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom";
 import { useSelector } from 'react-redux';
 import Axios from '../Utils/Axios';
 import summarApi from '../common/SummaryApi';
@@ -35,31 +17,29 @@ const Nav = () => {
   const profileMenuRef = useRef(null);
   const searchInputRef = useRef(null);
   const navigate = useNavigate();
-  const user = useSelector((state) => state.user)
+  const user = useSelector((state) => state.user);
 
   const handleLogout = async (navigateTo) => {
     try {
-      setIsProfileMenuOpen(false)
+      setIsProfileMenuOpen(false);
       const response = await Axios({
         ...summarApi.logOut
-      })
+      });
 
       if (response.data.success) {
-        window.location.href = navigateTo
-        localStorage.removeItem('accessToken')
-        localStorage.removeItem('refreshToken')
+        window.location.href = navigateTo;
+        localStorage.removeItem('accessToken');
+        localStorage.removeItem('refreshToken');
       }
-
     } catch (error) {
       console.log(error.message);
     }
   };
 
   const profileMenuHandler = (navigateTo) => {
-    setIsProfileMenuOpen(false)
-    navigate(navigateTo)
-  }
-
+    setIsProfileMenuOpen(false);
+    navigate(navigateTo);
+  };
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -76,7 +56,6 @@ const Nav = () => {
     const handleResize = () => {
       setWindowWidth(window.innerWidth);
       if (window.innerWidth > 768) {
-
         setIsSearchExpanded(false);
       }
     };
@@ -93,15 +72,23 @@ const Nav = () => {
   };
 
   return (
-    <nav className="bg-white  shadow-md sticky border border-gray-500 top-0 z-50">
-      <div className="mx-auto lg:px-16 px-4 py-2 bg-linear-to-b from-white to-purple-100">
-        <div className="flex gap-2 justify-between items-center ">
-          <Link title='Groce Mart Home' to='/' className='flex items-center gap-2'>
-            <img className='w-12 md:w-16' src={asstes.logo} alt="" />
-            <h1 className='hidden lg:block text-2xl font-bold' >Groce Mart</h1>
-            <p title='Adimin Panel' className='text-purple-700 font-bold' > {user.role === "ADMIN" ? "(" + user.role + ")" : ""}</p>
+    <nav className="bg-white shadow-xl sticky top-0 z-50 border-b border-purple-400">
+      <div className="mx-auto px-2 sm:px-6 lg:px-8">
+        <div className="flex justify-between h-20 items-center">
+          {/* Logo Section */}
+          <Link to='/' className='flex items-center gap-3'>
+            <img className='w-12 h-12' src={asstes.logo} alt="Groce Mart Logo" />
+            <div className="flex items-center">
+              <h1 className='hidden lg:block text-2xl font-bold text-gray-900'>Groce Mart</h1>
+              {user.role === "ADMIN" && (
+                <span className="hidden sm:block ml-2 px-2.5 py-1 text-xs font-medium bg-purple-100 text-purple-800 rounded-full">
+                  ADMIN
+                </span>
+              )}
+            </div>
           </Link>
 
+          {/* Search Bar */}
           <motion.div
             initial={{ opacity: 0, width: 0 }}
             animate={{
@@ -109,44 +96,59 @@ const Nav = () => {
               opacity: windowWidth < 640 && !isSearchExpanded ? 0 : 1
             }}
             transition={{ duration: 0.3 }}
-            className={`flex justify-center transition-all duration-200 ${windowWidth < 640 ? 'mx-2' : 'flex-1'}`}
+            className={`flex justify-center ${windowWidth < 640 ? 'mx-2' : 'flex-1 max-w-2xl mx-6'}`}
           >
-            <div className="relative flex items-center w-full max-w-xl">
-              <input
-                ref={searchInputRef}
-                type="text"
-                placeholder="Search"
-                className="w-full py-2 px-4 placeholder:text-black border border-gray-700 rounded-l-full focus:outline-none focus:border-purple-700"
-                onFocus={() => windowWidth < 640 && setIsSearchExpanded(true)}
-                onBlur={() => windowWidth < 640 && !searchInputRef.current.value && setIsSearchExpanded(false)}
-              />
-              <button title='Search' className="cursor-pointer bg-[#6945c5] hover:bg-[#54389c] px-5 py-2.5 border border-l-0 border-gray-700 rounded-r-full">
-                <FiSearch className="h-5 w-5 text-white" />
-              </button>
+            <div className="relative w-full">
+              <div className="flex items-center">
+                <input
+                  ref={searchInputRef}
+                  type="text"
+                  placeholder="Search products..."
+                  className="w-full py-3 pl-5 pr-12 text-sm  text-black placeholder-gray-700 bg-gray-50 rounded-lg border border-gray-600 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  onFocus={() => windowWidth < 640 && setIsSearchExpanded(true)}
+                  onBlur={() => windowWidth < 640 && !searchInputRef.current.value && setIsSearchExpanded(false)}
+                />
+                <button className="absolute right-0 top-0 h-full px-4 flex items-center justify-center bg-purple-600 text-white rounded-r-lg hover:bg-purple-700 transition-colors">
+                  <FiSearch className="h-5 w-5" />
+                </button>
+              </div>
             </div>
           </motion.div>
 
-          <div className="flex items-center space-x-3">
+          {/* Action Icons */}
+          <div className="flex items-center gap-1.5 sm:gap-6">
             {windowWidth < 640 && !isSearchExpanded && (
-              <button onClick={toggleSearch} className="p-2 rounded-full hover:bg-[#6945c5] text-black hover:text-white">
-                <FiSearch className="h-5 w-5 " />
+              <button
+                onClick={toggleSearch}
+                className="p-2 text-gray-800 hover:text-purple-600 transition-colors"
+                aria-label="Search"
+              >
+                <FiSearch className="h-6 w-6" />
               </button>
             )}
 
             {!isSearchExpanded && (
-              <button title='Go To Cart' className="cursor-pointer p-2 relative">
-                <MdOutlineShoppingCart className="h-7 w-7 text-black" />
-                <span className="absolute top-0 right-0 bg-red-600 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">3</span>
+              <button
+                className="cursor-pointer p-2 relative text-gray-800 hover:text-purple-600 transition-colors"
+                aria-label="Cart"
+              >
+                <MdOutlineShoppingCart className="h-7 w-7" />
+                <span className="absolute -top-1 -right-1 bg-purple-600 text-white text-xs rounded-full h-6 w-6 flex items-center justify-center font-medium">
+                  3
+                </span>
               </button>
             )}
 
+            {/* Enhanced Profile Menu */}
             <div className="relative" ref={profileMenuRef}>
               <button
-                title='Open Profile Menu'
                 onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
-                className="cursor-pointer flex items-center justify-center p-1.5 rounded-full bg-[#6945c5] text-white hover:bg-[#54389c]"
+                className="cursor-pointer flex items-center justify-center p-1 rounded-full focus:outline-none transition-all"
+                aria-label="User menu"
               >
-                <FiUser className="h-6 w-6 text-white" />
+                <div className={`h-10 w-10 rounded-full flex items-center justify-center text-white transition-all ${isProfileMenuOpen ? 'bg-purple-700' : 'bg-purple-600 hover:bg-purple-700'}`}>
+                  <FiUser className="h-5 w-5" />
+                </div>
               </button>
 
               <AnimatePresence>
@@ -233,10 +235,10 @@ const Nav = () => {
                   </motion.ul>
                 )}
               </AnimatePresence>
+
             </div>
           </div>
         </div>
-
       </div>
     </nav>
   );
