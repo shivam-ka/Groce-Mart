@@ -21,7 +21,7 @@ app.use(cookieParser());
 app.use(morgan());
 
 app.get('/', (req, res) => {
-    res.json('working')
+    res.json(process.env.CORS_ORIGIN)
 })
 
 // import router 
