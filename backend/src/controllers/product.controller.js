@@ -388,5 +388,47 @@ const deleteProduct = async (req, res) => {
     }
 }
 
+const searchProduct = async (req, res) => {
+    try {
 
-export { addProduct, getProduct, updateProduct, getProductByCategory, getProductByCategoryAndSubCategory, getProductDetails, deleteProduct }
+        const search = req.query?.search
+        const page = req.query?.page || 1
+        const limit = req.query?.limit || 10
+
+        const skip = (page - 1) * limit
+
+        const query = search ? {
+            $text: {
+                $search: search
+            }
+        } : {}
+
+        const [product, totalProductCount] = await Promise.all([
+            ProductModel.find(query)
+                .sort({ createdAt: -1 })
+                .skip(skip)
+                .limit(limit)
+                .populate('category subCategory'),
+            ProductModel.countDocuments(query)
+        ])
+
+        return res.json(new ApiResponse(
+            200,
+            {
+                totalProductCount,
+                totalPages: Math.ceil(totalProductCount / limit),
+                product,
+            },
+            "Prduct Fetched Suucessfully"
+        ))
+
+    } catch (error) {
+        console.log("Search Product Error: ", error)
+        return res
+            .status(500)
+            .json(new ApiError(500, error.message || "Search Product Error"))
+    }
+}
+
+
+export { addProduct, getProduct, updateProduct, getProductByCategory, getProductByCategoryAndSubCategory, getProductDetails, deleteProduct, searchProduct }

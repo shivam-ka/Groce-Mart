@@ -98,9 +98,10 @@ const Nav = () => {
             transition={{ duration: 0.3 }}
             className={`flex justify-center ${windowWidth < 640 ? 'mx-2' : 'flex-1 max-w-2xl mx-6'}`}
           >
-            <div className="relative w-full">
+            <div onClick={() => navigate('/search')} className="relative w-full">
               <div className="flex items-center">
                 <input
+                  title='Search for Products'
                   ref={searchInputRef}
                   type="text"
                   placeholder="Search products..."
@@ -108,7 +109,7 @@ const Nav = () => {
                   onFocus={() => windowWidth < 640 && setIsSearchExpanded(true)}
                   onBlur={() => windowWidth < 640 && !searchInputRef.current.value && setIsSearchExpanded(false)}
                 />
-                <button className="absolute right-0 top-0 h-full px-4 flex items-center justify-center bg-purple-600 text-white rounded-r-lg hover:bg-purple-700 transition-colors">
+                <button title='Search' className="cursor-pointer absolute right-0 top-0 h-full px-4 flex items-center justify-center bg-purple-600 text-white rounded-r-lg hover:bg-purple-700 transition-colors">
                   <FiSearch className="h-5 w-5" />
                 </button>
               </div>
