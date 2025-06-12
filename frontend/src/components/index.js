@@ -8,5 +8,6 @@ import ProductByCategory from "./ProductByCategory";
 import PreProduct from "./PreLoader/PreProduct";
 import PreHeading from "./PreLoader/PreHeading";
 import PreProductDisplay from "./PreLoader/PreProductDisplay";
+import ProductContainer from "./ProductContainer";
 
-export { Navbar, Footer, ButtonLoading, PreSubCategory, PreCategory, PreHomeCategory, ProductByCategory, PreProduct, PreHeading, PreProductDisplay }
+export { Navbar, Footer, ButtonLoading, PreSubCategory, PreCategory, PreHomeCategory, ProductByCategory, PreProduct, PreHeading, PreProductDisplay, ProductContainer }

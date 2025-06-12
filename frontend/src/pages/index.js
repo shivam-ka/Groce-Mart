@@ -13,6 +13,7 @@ import ProductListPage from "./ProductListPage";
 import ProductDisplayPage from "./ProductDisplayPage";
 import ProductContainer from "../components/ProductContainer";
 import SearchPage from "./SearchPage";
+import NoProductFound from "../components/NoProductFound";
 
 export {
     ErrorPage,
@@ -29,5 +30,6 @@ export {
     ProductListPage,
     ProductDisplayPage,
     ProductContainer,
-    SearchPage
+    SearchPage,
+    NoProductFound
 }

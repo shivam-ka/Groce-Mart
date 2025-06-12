@@ -415,6 +415,7 @@ const searchProduct = async (req, res) => {
         return res.json(new ApiResponse(
             200,
             {
+                page,
                 totalProductCount,
                 totalPages: Math.ceil(totalProductCount / limit),
                 product,

@@ -1,14 +1,16 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { asstes } from '../assets/assets';
+import { Link, useNavigate, useLocation } from "react-router-dom";
+import { useSelector } from 'react-redux';
+import Axios from '../Utils/Axios';
+import summarApi from '../common/SummaryApi';
+
+// Icons
 import { FiSearch, FiUser, FiLogIn, FiLogOut } from 'react-icons/fi';
 import { FaUser, FaMapMarkerAlt, FaClipboardList, FaSignOutAlt, FaShoppingCart, FaLayerGroup, FaBox, FaUpload } from 'react-icons/fa';
 import { MdOutlineShoppingCart } from "react-icons/md";
 import { BiSolidCategory } from "react-icons/bi";
-import { asstes } from '../assets/assets';
-import { Link, useNavigate } from "react-router-dom";
-import { useSelector } from 'react-redux';
-import Axios from '../Utils/Axios';
-import summarApi from '../common/SummaryApi';
 
 const Nav = () => {
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
@@ -16,8 +18,25 @@ const Nav = () => {
   const [windowWidth, setWindowWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 1024);
   const profileMenuRef = useRef(null);
   const searchInputRef = useRef(null);
+  const [searchQuery, setSearchQuery] = useState('')
   const navigate = useNavigate();
   const user = useSelector((state) => state.user);
+
+  const location = useLocation();
+  const query = location.search.split('=').slice(-1).toLocaleString().replaceAll('+', ' ')
+
+  const handleSearchInput = async (e) => {
+    setSearchQuery(e.target.value)
+  }
+
+  const handleNavigateSearch = async () => {
+    const query = searchQuery.replaceAll(' ', '+')
+    navigate(`/search?query=${query}`)
+  }
+
+  useEffect(() => {
+    setSearchQuery(query)
+  }, [])
 
   const handleLogout = async (navigateTo) => {
     try {
@@ -98,18 +117,21 @@ const Nav = () => {
             transition={{ duration: 0.3 }}
             className={`flex justify-center ${windowWidth < 640 ? 'mx-2' : 'flex-1 max-w-2xl mx-6'}`}
           >
-            <div onClick={() => navigate('/search')} className="relative w-full">
+            <div className="relative w-full">
               <div className="flex items-center">
                 <input
+                  onClick={() => location.pathname !== '/search' && navigate('/search')}
+                  value={searchQuery}
+                  onChange={(e) => handleSearchInput(e)}
                   title='Search for Products'
                   ref={searchInputRef}
                   type="text"
                   placeholder="Search products..."
-                  className="w-full py-3 pl-5 pr-12 text-sm  text-black placeholder-gray-700 bg-gray-50 rounded-lg border border-gray-600 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  className="w-full py-3 pl-5 pr-12 text-sm text-black placeholder-gray-700 bg-gray-50 rounded-lg border border-gray-600 focus:border-transparent"
                   onFocus={() => windowWidth < 640 && setIsSearchExpanded(true)}
                   onBlur={() => windowWidth < 640 && !searchInputRef.current.value && setIsSearchExpanded(false)}
                 />
-                <button title='Search' className="cursor-pointer absolute right-0 top-0 h-full px-4 flex items-center justify-center bg-purple-600 text-white rounded-r-lg hover:bg-purple-700 transition-colors">
+                <button onClick={() => handleNavigateSearch()} title='Search' className="cursor-pointer absolute right-0 top-0 h-full px-4 flex items-center justify-center bg-purple-600 text-white rounded-r-lg hover:bg-purple-700 transition-colors">
                   <FiSearch className="h-5 w-5" />
                 </button>
               </div>

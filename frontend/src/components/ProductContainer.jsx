@@ -30,7 +30,7 @@ const ProductContainer = ({ product }) => {
                 {/* Product Image - Uncropped */}
                 <div className="relative h-40 w-full border-b border-purple-300 flex items-center justify-center bg-purple-50 ">
                     <img
-                        src={product.images[0]}
+                        src={product?.images[0]}
                         alt={product.name}
                         className="h-full object-contain p-0.5"
                         style={{ maxWidth: "100%" }}
