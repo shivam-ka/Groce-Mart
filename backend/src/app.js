@@ -29,10 +29,12 @@ import userRouter from "./routes/user.routes.js"
 import categoryRouter from "./routes/category.routes.js"
 import subCategoryRouter from "./routes/subCategory.routes.js"
 import productRouter from "./routes/product.route.js"
+import cartRouter from "./routes/cart.routes.js"
 
 app.use('/api/v1/users', userRouter)
 app.use('/api/v1/category', categoryRouter)
 app.use('/api/v1/subcategory', subCategoryRouter)
 app.use('/api/v1/product', productRouter)
+app.use('/api/v1/cart', cartRouter)
 
 export { app }

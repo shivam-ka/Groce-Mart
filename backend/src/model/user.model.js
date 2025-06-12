@@ -59,7 +59,7 @@ const userSchema = new mongoose.Schema({
         }
     ],
 
-    shopin_Cart: [
+    shoping_Cart: [
         {
             type: mongoose.Schema.ObjectId,
             ref: "cartProduct"
