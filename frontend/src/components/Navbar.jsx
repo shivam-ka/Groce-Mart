@@ -31,7 +31,9 @@ const Nav = () => {
 
   const handleNavigateSearch = async () => {
     const query = searchQuery.replaceAll(' ', '+')
-    navigate(`/search?query=${query}`)
+    if (query) {
+      navigate(`/search?query=${query}`)
+    }
   }
 
   useEffect(() => {
