@@ -27,6 +27,7 @@ const SearchPage = () => {
 
 
     const searchProduct = async () => {
+        setIsLoading(true)
         try {
 
             const response = await Axios({
@@ -48,6 +49,7 @@ const SearchPage = () => {
         } catch (error) {
             console.log(error)
         }
+        setIsLoading(false)
     }
 
     const handleFetchMore = async () => {
