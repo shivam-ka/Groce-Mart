@@ -107,4 +107,44 @@ const getCartItem = async (req, res) => {
     }
 }
 
-export { addToCart, getCartItem }
+const updateCartItemQuantity = async (req, res) => {
+    try {
+
+        const cartProductId = req.params?.cartProductId
+        const quantity = req.params?.quantity || 1
+
+        if (!cartProductId) {
+            return res
+                .status(402)
+                .json(new ApiError(
+                    402,
+                    "Provide cartProductId"
+                ))
+        }
+
+        const updateQuantity = await CartPorductModel.updateOne(
+            {
+                _id: cartProductId
+            },
+            {
+                quantity
+            }
+        )
+
+        return res
+            .status(200)
+            .json(new ApiResponse(
+                200,
+                {},
+                "Item Quantity Updated"
+            ))
+
+    } catch (error) {
+        console.log("update CartItem Quantity Error: ", error)
+        return res
+            .status(500)
+            .json(new ApiError(500, error.message || "update CartItem Quantity Error"))
+    }
+}
+
+export { addToCart, getCartItem, updateCartItemQuantity }
