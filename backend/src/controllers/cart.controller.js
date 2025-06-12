@@ -79,4 +79,28 @@ const addToCart = async (req, res) => {
     }
 }
 
-export { addToCart }
+const getCartItem = async (req, res) => {
+    try {
+
+        const cartItem = await CartPorductModel
+            .findOne({ userId: req.user._id })
+            .populate({
+                path: 'productId',
+                model: 'Product'
+            })
+
+        return res.json(new ApiResponse(
+            200,
+            cartItem,
+            "Cart Fetched Successfully"
+        ))
+
+    } catch (error) {
+        console.log("Get Cart Item Error: ", error)
+        return res
+            .status(500)
+            .json(new ApiError(500, error.message || "Get Cart Item Error"))
+    }
+}
+
+export { addToCart, getCartItem }
