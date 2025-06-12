@@ -7,8 +7,11 @@ import { errorToast, successToast } from '../Utils/ShowToast';
 import Axios from '../Utils/Axios';
 import summarApi from '../common/SummaryApi';
 import ButtonLoading from './ButtonLoading';
+import { useGlobalContext } from '../provider/GlobalProvider';
 
 const ProductContainer = ({ product }) => {
+
+    const { fetchCartItem } = useGlobalContext()
 
     const [isLoading, setIsLoading] = useState(false)
 
@@ -28,7 +31,7 @@ const ProductContainer = ({ product }) => {
                 method: summarApi.cart.addToCart.method
             })
             if (response.data.success) {
-
+                fetchCartItem()
             }
         } catch (error) {
             console.log(error)

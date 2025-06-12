@@ -30,14 +30,6 @@ const addToCart = async (req, res) => {
                 ))
         }
 
-        const newCartItem = new CartPorductModel({
-            quantity,
-            productId,
-            userId: req.user._id
-        })
-
-        const cartItem = await newCartItem.save();
-
         const productInCart = await CartPorductModel.findOne(
             {
                 userId: req.user._id,
@@ -54,22 +46,32 @@ const addToCart = async (req, res) => {
                 ))
         }
 
+        const newCartItem = new CartPorductModel({
+            quantity,
+            productId,
+            userId: req.user._id
+        })
+
+        const cartItem = await newCartItem.save();
+
         await userModel.updateOne(
             {
                 _id: req.user._id
             },
             {
                 $push: {
-                    shoping_Cart: cartItem._id
+                    shoping_Cart: cartItem
                 }
             }
         )
 
-        return res.json(new ApiResponse(
-            200,
-            cartItem,
-            "Item Added Successfully"
-        ))
+        return res
+            .status(200)
+            .json(new ApiResponse(
+                200,
+                cartItem,
+                "Item Added Successfully"
+            ))
 
     } catch (error) {
         console.log("Add to Error: ", error)
@@ -83,17 +85,19 @@ const getCartItem = async (req, res) => {
     try {
 
         const cartItem = await CartPorductModel
-            .findOne({ userId: req.user._id })
+            .find({ userId: req.user._id })
             .populate({
                 path: 'productId',
                 model: 'Product'
             })
 
-        return res.json(new ApiResponse(
-            200,
-            cartItem,
-            "Cart Fetched Successfully"
-        ))
+        return res
+            .status(200)
+            .json(new ApiResponse(
+                200,
+                cartItem,
+                "Cart Fetched Successfully"
+            ))
 
     } catch (error) {
         console.log("Get Cart Item Error: ", error)

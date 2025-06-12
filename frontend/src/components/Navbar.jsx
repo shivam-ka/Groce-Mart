@@ -19,8 +19,19 @@ const Nav = () => {
   const profileMenuRef = useRef(null);
   const searchInputRef = useRef(null);
   const [searchQuery, setSearchQuery] = useState('')
+  const [cartQuantity, setCartQuantity] = useState(0)
   const navigate = useNavigate();
-  const user = useSelector((state) => state.user);
+
+  const user = useSelector(state => state.user);
+  const cartItem = useSelector(state => state.cartItem.cart);
+
+  useEffect(() => {
+    const qty = cartItem.reduce((prev, item) => {
+      return prev + item.quantity
+    }, 0)
+    setCartQuantity(qty)
+  }, [cartItem])
+
 
   const location = useLocation();
   const query = location.search.split('=').slice(-1).toLocaleString().replaceAll('+', ' ')
@@ -158,9 +169,11 @@ const Nav = () => {
                 aria-label="Cart"
               >
                 <MdOutlineShoppingCart className="h-7 w-7" />
-                <span className="absolute -top-1 -right-1 bg-purple-600 text-white text-xs rounded-full h-6 w-6 flex items-center justify-center font-medium">
-                  3
-                </span>
+                {cartQuantity &&
+                  <span className="absolute -top-1 -right-1 bg-purple-600 text-white text-xs rounded-full h-6 w-6 flex items-center justify-center font-medium">
+                    {cartQuantity}
+                  </span>
+                }
               </button>
             )}
 

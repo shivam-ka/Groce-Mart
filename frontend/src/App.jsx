@@ -8,9 +8,11 @@ import { setUserDetails } from '../store/userSlice'
 import { setAllCategory, setAllSubCategory, setIsCategoryLoading } from '../store/productSlice'
 import summarApi from './common/SummaryApi'
 import Axios from './Utils/Axios'
+import { handleAddItemCart } from '../store/cartproduct'
+import GlobalProvider from './provider/GlobalProvider'
 
 const App = () => {
-  const dispatch = useDispatch(setIsCategoryLoading(true))
+  const dispatch = useDispatch()
 
   const fetchUserHandler = async () => {
     const userData = await fetchUser()
@@ -56,14 +58,14 @@ const App = () => {
   }, [])
 
   return (
-    <>
+    <GlobalProvider>
       <Toaster position='top-right' />
       <Navbar />
       <main>
         <Outlet />
       </main>
       <Footer />
-    </>
+    </GlobalProvider>
   )
 }
 
