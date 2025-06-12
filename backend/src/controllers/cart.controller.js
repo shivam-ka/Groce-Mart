@@ -1,4 +1,5 @@
 import CartPorductModel from "../model/cartproduct.model.js"
+import ProductModel from "../model/product.model.js"
 import userModel from "../model/user.model.js"
 import { ApiError } from "../utils/ApiError.js"
 import { ApiResponse } from "../utils/ApiResponse.js"
@@ -15,6 +16,17 @@ const addToCart = async (req, res) => {
                 .json(new ApiError(
                     402,
                     "Provide ProductId"
+                ))
+        }
+
+        const product = await ProductModel.findById(productId)
+
+        if (!product) {
+            return res
+                .status(400)
+                .json(new ApiError(
+                    400,
+                    "Iinvalid Credentials"
                 ))
         }
 

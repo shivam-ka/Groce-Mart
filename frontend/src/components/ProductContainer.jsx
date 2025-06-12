@@ -1,15 +1,41 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { FiShoppingCart, FiChevronRight } from "react-icons/fi";
 import { FaFire, FaMotorcycle, } from "react-icons/fa";
 import { Link } from 'react-router-dom';
 import { motion } from "framer-motion"
-
+import { errorToast, successToast } from '../Utils/ShowToast';
+import Axios from '../Utils/Axios';
+import summarApi from '../common/SummaryApi';
+import ButtonLoading from './ButtonLoading';
 
 const ProductContainer = ({ product }) => {
+
+    const [isLoading, setIsLoading] = useState(false)
 
     const fetchUrl = (product) => {
         const url = `/product/${product.name}-${product._id}`.replaceAll(" ", "-")
         return url.replaceAll(",", "")
+    }
+
+    const handleAddToCart = async (e) => {
+        e.stopPropagation();
+        e.preventDefault();
+        setIsLoading(true)
+
+        try {
+            const response = await Axios({
+                url: `${summarApi.cart.addToCart.url}/${product._id}/1`,
+                method: summarApi.cart.addToCart.method
+            })
+            if (response.data.success) {
+
+            }
+        } catch (error) {
+            console.log(error)
+            errorToast(error)
+        }
+
+        setIsLoading(false)
     }
 
     return (
@@ -63,7 +89,7 @@ const ProductContainer = ({ product }) => {
                     </div>
 
                     {/* Price and Add to Cart */}
-                    <div className="flex items-center justify-between">
+                    <div className="flex flex-col gap-1.5 sm:items-center justify-between sm:flex-row">
                         <div>
                             {product.discount > 0 ? (
                                 <div className="flex items-baseline">
@@ -82,11 +108,21 @@ const ProductContainer = ({ product }) => {
                         </div>
 
                         <motion.button
-                            whileTap={{ scale: 0.9 }}
-                            className="bg-purple-600 hover:bg-purple-700 text-white text-[13px] px-3 py-1.5 rounded-lg flex items-center transition-colors"
-                        >
-                            <FiShoppingCart className="mr-1" size={12} />
-                            Add
+                            onClick={handleAddToCart}
+                            whileTap={{ scale: 0.98 }}
+                            className="cursor-pointer bg-purple-600 hover:bg-purple-700 text-white text-[13px] px-3 py-1.5 rounded-lg flex items-center justify-center transition-colors"
+                        >{isLoading
+                            ?
+                            <>
+                                <ButtonLoading /> Adding...
+                            </>
+                            :
+                            <>
+                                <FiShoppingCart className="mr-1" size={12} />
+                                Add
+                            </>
+                            }
+
                         </motion.button>
                     </div>
                 </div>

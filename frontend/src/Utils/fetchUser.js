@@ -1,15 +1,19 @@
 import summarApi from "../common/SummaryApi"
 import Axios from "./Axios"
 
-const fetchUser = async () => {
-    try {
-        const response = await Axios({
-            ...summarApi.getCurrentUser
-        })
+const accessToken = localStorage.getItem('accessToken')
 
-        return response
-    } catch (error) {
-        console.log(error)
+const fetchUser = async () => {
+    if (accessToken) {
+        try {
+            const response = await Axios({
+                ...summarApi.getCurrentUser,
+            })
+
+            return response
+        } catch (error) {
+            console.log(error)
+        }
     }
 }
 

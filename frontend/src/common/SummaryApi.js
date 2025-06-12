@@ -106,6 +106,12 @@ const summarApi = {
             url: 'api/v1/product/search-product',
             method: 'get'
         }
+    },
+    cart: {
+        addToCart: {
+            url: 'api/v1/cart/add-to-cart',
+            method: 'post'
+        }
     }
 }
 
