@@ -38,6 +38,22 @@ const addToCart = async (req, res) => {
 
         const cartItem = await newCartItem.save();
 
+        const productInCart = await CartPorductModel.findOne(
+            {
+                userId: req.user._id,
+                productId
+            }
+        )
+
+        if (productInCart) {
+            return res
+                .status(400)
+                .json(new ApiError(
+                    400,
+                    "Product Already Exist in Cart"
+                ))
+        }
+
         await userModel.updateOne(
             {
                 _id: req.user._id
