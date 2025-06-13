@@ -72,18 +72,34 @@ const ProductContainer = ({ product }) => {
         const qnty = cartItemDetails?.quantity - 1
 
         try {
-            const response = await Axios({
-                url: `${summarApi.cart.updateQty.url}/${cartItemDetails?._id}/${qnty}`,
-                method: summarApi.cart.updateQty.method
-            })
-            console.log(response)
-            if (response.data.success) {
-                fetchCartItem()
+            if (qnty == 0) {
+                const response = await Axios({
+                    url: `${summarApi.cart.removeCartItem.url}/${cartItemDetails?._id}`,
+                    method: summarApi.cart.removeCartItem.method
+                })
+                if (response.data.success) {
+                    fetchCartItem()
+                }
+            } else {
+                const response = await Axios({
+                    url: `${summarApi.cart.updateQty.url}/${cartItemDetails?._id}/${qnty}`,
+                    method: summarApi.cart.updateQty.method
+                })
+                console.log(response)
+                if (response.data.success) {
+                    fetchCartItem()
+                }
             }
+
         } catch (error) {
             errorToast(error)
         }
+
     }
+
+
+
+
 
 
     useEffect(() => {

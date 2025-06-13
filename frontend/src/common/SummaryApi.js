@@ -119,6 +119,10 @@ const summarApi = {
         updateQty: {
             url: 'api/v1/cart/update-qty',
             method: 'put'
+        },
+        removeCartItem: {
+             url: 'api/v1/cart/remove-cart-product',
+            method: 'delete'
         }
     }
 }
