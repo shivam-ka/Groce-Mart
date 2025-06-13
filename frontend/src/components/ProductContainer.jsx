@@ -92,7 +92,6 @@ const ProductContainer = ({ product }) => {
 
         const pro = cartItem.find(item => item.productId._id === product._id)
         setCartItemDetails(pro)
-        console.log(cartItemDetails)
 
     }, [product, cartItem])
 

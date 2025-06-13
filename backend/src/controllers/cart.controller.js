@@ -12,9 +12,9 @@ const addToCart = async (req, res) => {
 
         if (!productId) {
             return res
-                .status(402)
+                .status(400)
                 .json(new ApiError(
-                    402,
+                    400,
                     "Provide ProductId"
                 ))
         }
@@ -115,9 +115,9 @@ const updateCartItemQuantity = async (req, res) => {
 
         if (!cartProductId) {
             return res
-                .status(402)
+                .status(400)
                 .json(new ApiError(
-                    402,
+                    400,
                     "Provide cartProductId"
                 ))
         }
@@ -147,4 +147,36 @@ const updateCartItemQuantity = async (req, res) => {
     }
 }
 
-export { addToCart, getCartItem, updateCartItemQuantity }
+const deleteCartItem = async (req, res) => {
+    try {
+
+        const cartPorductId = req.params?.cartPorductId
+
+        if (!cartPorductId) {
+            res
+                .status(400)
+                .json(new ApiError(
+                    400,
+                    "Provide Cart Product ID"
+                ))
+        }
+
+        await CartPorductModel.findByIdAndDelete(cartPorductId)
+
+        return res
+            .status(200)
+            .json(new ApiResponse(
+                200,
+                {},
+                "Item Remove Successfully"
+            ))
+
+    } catch (error) {
+        console.log("delete CartItem error: ", error)
+        return res
+            .status(500)
+            .json(new ApiError(500, error.message || "delete CartItem Error"))
+    }
+}
+
+export { addToCart, getCartItem, updateCartItemQuantity, deleteCartItem }
