@@ -13,8 +13,10 @@ const GlobalProvider = ({ children }) => {
 
     const cartItem = useSelector(state => state.cartItem.cart);
     const dispatch = useDispatch()
-    const [cartItemDetails, setcartItemDetails] = useState({})
+
     const [cartTotalAmount, setCartTotalAmount] = useState(0)
+    const [tAmountNoDis, setTAmountNoDis] = useState(0)
+    const [isCartOpen, setIsCartOpen] = useState(false)
 
     const getPriceAfterDiscount = (ogPrice, discount) => {
         const discountAmount = ogPrice * (discount / 100);
@@ -94,7 +96,12 @@ const GlobalProvider = ({ children }) => {
             return prev + (item.quantity * price)
         }, 0)
 
-        setCartTotalAmount(toatlAmount)
+        setCartTotalAmount(toatlAmount);
+
+        const totalAmountWithDis = cartItem?.reduce((prev, item) => {
+            return prev + (item.quantity * item?.productId?.price)
+        }, 0)
+        setTAmountNoDis(totalAmountWithDis)
 
     }, [cartItem])
 
@@ -104,10 +111,15 @@ const GlobalProvider = ({ children }) => {
 
 
     const value = {
+        cartItem,
         fetchCartItem,
         increaseQnty,
         decreaseQnty,
-        getPriceAfterDiscount
+        getPriceAfterDiscount,
+        cartTotalAmount,
+        tAmountNoDis,
+        isCartOpen,
+        setIsCartOpen,
     }
 
     return (

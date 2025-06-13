@@ -1,15 +1,27 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState } from 'react';
-import { FaShoppingCart, FaTimes } from 'react-icons/fa';
-import { FiChevronRight } from 'react-icons/fi';
+import { FaShippingFast, FaShoppingCart } from 'react-icons/fa';
+import { FiChevronRight, FiChevronsRight, FiMinus, FiPlus } from 'react-icons/fi';
 import { IoIosArrowBack } from "react-icons/io";
+import { useGlobalContext } from '../provider/GlobalProvider';
 
-const Cart = ({ isOpen, onClose, }) => {
+const Cart = ({ isOpen, onClose }) => {
+  const {
+    cartItem,
+    getPriceAfterDiscount,
+    cartTotalAmount,
+    tAmountNoDis,
+    increaseQnty,
+    decreaseQnty,
+  } = useGlobalContext();
 
-  const [cartItems, setCartItems] = useState([
-    { id: 1, name: 'Product 1', price: 19.99, quantity: 2, image: '/product1.jpg' },
-    // ... other cart items
-  ]);
+  // Calculate charges
+  const deliveryFee = 25
+  const handlingCharge = 10
+
+  const totalAmountNoDis = tAmountNoDis + deliveryFee + handlingCharge
+  const toatlAmount = cartTotalAmount
+  const savings = totalAmountNoDis - toatlAmount
 
   return (
     <AnimatePresence>
@@ -38,22 +50,24 @@ const Cart = ({ isOpen, onClose, }) => {
             {/* Header */}
             <div className="flex items-center justify-between p-4 border-b">
               <div className="flex items-center gap-1">
-                <IoIosArrowBack onClick={onClose} className="text-purple-600 text-xl" />
+                <IoIosArrowBack
+                  onClick={onClose}
+                  className="text-purple-600 text-xl cursor-pointer"
+                />
                 <h2 className="text-lg font-semibold">Your Cart</h2>
 
-                {cartItems.length > 0 && (
+                {cartItem.length > 0 && (
                   <span className="bg-purple-100 text-purple-800 text-xs ml-1 px-2 py-1 rounded-full">
-                    {cartItems.length} items
+                    {cartItem.length} items
                   </span>
                 )}
               </div>
               <FaShoppingCart className="text-purple-600 text-xl" />
-
             </div>
 
             {/* Content */}
-            <div className="flex-1 overflow-y-auto p-4">
-              {cartItems.length === 0 ? (
+            <div className="flex-1 overflow-y-scroll scrollbar-hide p-4">
+              {cartItem.length === 0 ? (
                 <div className="h-full flex flex-col items-center justify-center text-gray-500">
                   <FaShoppingCart className="text-4xl mb-4 opacity-30" />
                   <p className="text-lg">Your cart is empty</p>
@@ -66,62 +80,159 @@ const Cart = ({ isOpen, onClose, }) => {
                 </div>
               ) : (
                 <div className="space-y-4">
-                  {cartItems.map(item => (
-                    <div
-                      key={item._id}
-                      className="flex justify-between items-center p-3 bg-white rounded-lg shadow-sm border border-gray-100 hover:shadow-md transition-shadow"
-                    >
-                      {/* Left section - Product image and info */}
-                      <div className="flex items-center space-x-4">
-                        <img
-                          src={item.image}
-                          alt={item.name}
-                          className="w-16 h-16 object-cover rounded-md border border-gray-200"
-                        />
-                        <div>
-                          <p className="font-medium text-gray-800 line-clamp-1">{item.name}</p>
-                          <p className="text-sm text-gray-500">Qty: {item.quantity}</p>
-                        </div>
-                      </div>
+                  {/* Delivery time message */}
+                  <div className="flex items-center gap-3 border bg-purple-50 text-purple-800 p-3 px-4 rounded-lg text-base mb-4">
+                    <FaShippingFast className='text-xl' />
+                    Get delivery by 11 Min
+                  </div>
 
-                      {/* Right section - Actions and pricing */}
-                      <div className="flex items-center space-x-4">
-                        {/* Remove button */}
-                        <button className="p-1 text-red-500 hover:text-red-700 transition-colors">
-                          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                            <path fillRule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clipRule="evenodd" />
-                          </svg>
-                        </button>
+                  <motion.div
+                    className="bg-green-50 border border-green-400 rounded-lg p-3 text-center"
+                    initial={{ scale: 0.9, opacity: 0 }}
+                    animate={{
+                      scale: 1,
+                      opacity: 1,
+                      transition: { type: 'spring', stiffness: 300 }
+                    }}
+                    whileHover={{ scale: 1.02 }}
+                  >
+                    <motion.p
+                      className="text-green-700 font-medium"
+
+                    >
+                      You're saving ₹{savings.toFixed(2)}!
+                    </motion.p>
+                    <motion.div
+                      className="w-full bg-green-100 h-2 rounded-full mt-2 overflow-hidden"
+                      initial={{ width: 0 }}
+                      animate={{
+                        width: '100%',
+                        transition: { delay: 0.3, duration: 1 }
+                      }}
+                    >
+                      <motion.div
+                        className="h-full bg-green-500 rounded-full"
+                        initial={{ width: 0 }}
+                        animate={{
+                          width: '100%',
+                          transition: { delay: 0.6, duration: 1.5 }
+                        }}
+                      />
+                    </motion.div>
+                  </motion.div>
+                  <div className='bg-purple-50 py-2 px-1.5'>
+                    {cartItem.map(item => (
+                      <div
+                        key={item._id}
+                        className="flex gap-3 items-center py-1.5 px-2 pr-3 bg-white shadow-sm border border-gray-100 hover:shadow-md transition-shadow"
+                      >
+                        {/* Product image */}
+                        <div className="flex-shrink-0">
+                          <img
+                            src={item.productId.images[0]}
+                            alt={item.productId.name}
+                            className="w-14 h-14 object-contain rounded-md "
+                          />
+                        </div>
+
+                        {/* Product info and quantity controls */}
+                        <div className="flex-grow">
+                          <p className="font-medium text-sm text-gray-800 line-clamp-2">
+                            {item.productId.name}
+                          </p>
+
+                          <div className="flex items-center mt-2">
+                            <button
+                              onClick={(e) => decreaseQnty(e, item)}
+                              className="cursor-pointer w-6 h-6 flex items-center justify-center border border-purple-300 rounded-full hover:bg-purple-50 hover:border-purple-400 hover:text-purple-700 transition-colors duration-200 active:scale-95"
+                              aria-label="Decrease quantity"
+                            >
+                              <FiMinus className="text-sm" />
+                            </button>
+                            <span className="mx-1.5 text-base font-medium text-gray-800 min-w-[24px] text-center">
+                              {item.quantity}
+                            </span>
+                            <button
+                              onClick={(e) => increaseQnty(e, item)}
+                              className="cursor-pointer w-6 h-6 flex items-center justify-center border border-purple-300 rounded-full hover:bg-purple-50 hover:border-purple-400 hover:text-purple-700 transition-colors duration-200 active:scale-95"
+                              aria-label="Increase quantity"
+                            >
+                              <FiPlus className="text-sm" />
+                            </button>
+                          </div>
+                        </div>
 
                         {/* Pricing */}
-                        <div className="text-right">
-                          <p className="font-semibold text-gray-900">
-                            ${(item.price * item.quantity).toFixed(2)}
+                        <div className="flex-shrink-0 text-right">
+                          <p className="font-semibold text-black">
+                            ₹{(getPriceAfterDiscount(item.productId.price, item.productId.discount) * item.quantity).toFixed(2)}
                           </p>
-                          {item.originalPrice && (
-                            <p className="text-sm text-gray-400 line-through">
-                              ${(item.originalPrice * item.quantity).toFixed(2)}
-                            </p>
-                          )}
+                          <p className="text-xs text-gray-600 line-through">
+                            ₹{(item.productId.price * item.quantity).toFixed(2)}
+                          </p>
                         </div>
                       </div>
-                    </div>
-                  ))}
+                    ))}
+                  </div>
+
                 </div>
               )}
             </div>
 
-            {/* Footer */}
-            {cartItems.length > 0 && (
-              <div className="border-t p-4">
-                <div className="flex justify-between mb-4">
-                  <span className="font-medium">Subtotal</span>
-                  <span className="font-semibold">
-                    ${cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0).toFixed(2)}
-                  </span>
+            {/* Footer with bill summary */}
+            {cartItem.length > 0 && (
+              <div className="border-t p-4 space-y-3">
+                <div className="space-y-2">
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-600">Subtotal</span>
+                    <p>
+                      <span className='mr-2  text-gray-600 line-through'>₹{tAmountNoDis}</span>
+                      <span>₹{cartTotalAmount.toFixed(2)}</span>
+                    </p>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-600">Delivery Fee</span>
+                    <p>
+                      <span className='mr-2  text-gray-600 line-through'>₹25</span>
+                      <span>₹0</span>
+                    </p>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-600">Handling Charge</span>
+                    <p>
+                      <span className='mr-2  text-gray-600 line-through'>₹10</span>
+                      <span>₹0</span>
+                    </p>
+                  </div>
+
                 </div>
-                <button className="w-full py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors flex items-center justify-center gap-2">
-                  Checkout <FiChevronRight />
+
+                <div className="border-t pt-3">
+                  <div className="flex justify-between font-medium">
+                    <span>Total</span>
+                    <p>
+                      <span className='mr-2  text-gray-600 line-through' >₹{totalAmountNoDis.toFixed(2)}</span>
+                      <span>₹{toatlAmount.toFixed(2)}</span>
+                    </p>
+                  </div>
+                </div>
+
+                {/* Savings animation */}
+
+
+                <button
+                  className="cursor-pointer w-full py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors flex items-center justify-center gap-2 mt-4"
+                >
+                  Proceed to Checkout
+                  <motion.div
+                    animate={{
+                      x: [0, 4, 0],
+                      opacity: [0.8, 1, 0.8],
+                      transition: { repeat: Infinity, duration: 1.8, ease: "easeInOut" }
+                    }}
+                  >
+                    <FiChevronsRight className="h-6 w-6" />
+                  </motion.div>
                 </button>
               </div>
             )}
