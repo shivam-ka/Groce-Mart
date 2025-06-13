@@ -115,6 +115,10 @@ const summarApi = {
         getCartItem: {
             url: 'api/v1/cart/get-cart',
             method: 'get'
+        },
+        updateQty: {
+            url: 'api/v1/cart/update-qty',
+            method: 'put'
         }
     }
 }

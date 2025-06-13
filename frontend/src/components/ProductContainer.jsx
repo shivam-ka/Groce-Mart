@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { FiShoppingCart, FiChevronRight } from "react-icons/fi";
 import { FaFire, FaMotorcycle, } from "react-icons/fa";
 import { Link } from 'react-router-dom';
@@ -8,12 +8,16 @@ import Axios from '../Utils/Axios';
 import summarApi from '../common/SummaryApi';
 import ButtonLoading from './ButtonLoading';
 import { useGlobalContext } from '../provider/GlobalProvider';
+import { useSelector } from 'react-redux';
 
 const ProductContainer = ({ product }) => {
 
-    const { fetchCartItem } = useGlobalContext()
+    const cartItem = useSelector(state => state.cartItem.cart);
+    const { fetchCartItem } = useGlobalContext();
 
-    const [isLoading, setIsLoading] = useState(false)
+    const [isLoading, setIsLoading] = useState(false);
+    const [isAvailableInCart, setIsAvailableInCart] = useState(false)
+    const [cartItemDetails, setCartItemDetails] = useState({})
 
     const fetchUrl = (product) => {
         const url = `/product/${product.name}-${product._id}`.replaceAll(" ", "-")
@@ -40,6 +44,58 @@ const ProductContainer = ({ product }) => {
 
         setIsLoading(false)
     }
+
+    const increaseQnty = async (e) => {
+        e.stopPropagation();
+        e.preventDefault();
+
+        const qnty = cartItemDetails?.quantity + 1
+
+        try {
+            const response = await Axios({
+                url: `${summarApi.cart.updateQty.url}/${cartItemDetails?._id}/${qnty}`,
+                method: summarApi.cart.updateQty.method
+            })
+            console.log(response)
+            if (response.data.success) {
+                fetchCartItem()
+            }
+        } catch (error) {
+            errorToast(error)
+        }
+    }
+
+    const decreaseQnty = async (e) => {
+        e.stopPropagation();
+        e.preventDefault();
+
+        const qnty = cartItemDetails?.quantity - 1
+
+        try {
+            const response = await Axios({
+                url: `${summarApi.cart.updateQty.url}/${cartItemDetails?._id}/${qnty}`,
+                method: summarApi.cart.updateQty.method
+            })
+            console.log(response)
+            if (response.data.success) {
+                fetchCartItem()
+            }
+        } catch (error) {
+            errorToast(error)
+        }
+    }
+
+
+    useEffect(() => {
+        const checkingItem = cartItem.some((item) => item.productId._id === product._id)
+        setIsAvailableInCart(checkingItem)
+
+        const pro = cartItem.find(item => item.productId._id === product._id)
+        setCartItemDetails(pro)
+        console.log(cartItemDetails)
+
+    }, [product, cartItem])
+
 
     return (
         <Link
@@ -111,21 +167,38 @@ const ProductContainer = ({ product }) => {
                         </div>
 
                         <motion.button
-                            onClick={handleAddToCart}
+                            onClick={!isAvailableInCart ? handleAddToCart : undefined}
                             whileTap={{ scale: 0.98 }}
-                            className="cursor-pointer bg-purple-600 hover:bg-purple-700 text-white text-[13px] px-3 py-1.5 rounded-lg flex items-center justify-center transition-colors"
-                        >{isLoading
-                            ?
-                            <>
-                                <ButtonLoading /> Adding...
-                            </>
-                            :
-                            <>
-                                <FiShoppingCart className="mr-1" size={12} />
-                                Add
-                            </>
-                            }
-
+                            className={`cursor-pointer ${isAvailableInCart ? 'w-full' : ''} bg-purple-600 hover:bg-purple-700 text-white text-[13px] px-3 py-1.5 rounded-lg flex items-center justify-center transition-colors`}
+                        >
+                            {isLoading ? (
+                                <>
+                                    <ButtonLoading /> Adding...
+                                </>
+                            ) : isAvailableInCart ? (
+                                <div className="flex items-center justify-between w-full">
+                                    <span
+                                        onClick={decreaseQnty}
+                                        className="px-2 hover:bg-purple-500 rounded-l transition-colors"
+                                    >
+                                        -
+                                    </span>
+                                    <span className="px-2 min-w-[20px] text-center">
+                                        {cartItemDetails?.quantity}
+                                    </span>
+                                    <span
+                                        onClick={increaseQnty}
+                                        className="px-2 hover:bg-purple-500 rounded-r transition-colors"
+                                    >
+                                        +
+                                    </span>
+                                </div>
+                            ) : (
+                                <>
+                                    <FiShoppingCart className="mr-1" size={12} />
+                                    Add to Cart
+                                </>
+                            )}
                         </motion.button>
                     </div>
                 </div>

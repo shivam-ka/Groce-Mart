@@ -3,6 +3,7 @@ import Axios from "../Utils/Axios";
 import summarApi from "../common/SummaryApi";
 import { handleAddItemCart } from "../../store/cartproduct";
 import { useDispatch } from "react-redux";
+import { errorToast } from "../Utils/ShowToast";
 
 export const GlobalContext = createContext();
 
@@ -25,13 +26,28 @@ const GlobalProvider = ({ children }) => {
         }
     }
 
+    const updateCartQty = async (cartProductId, qty) => {
+        try {
+            const respone = await Axios({
+                url: `${summarApi.cart.updateQty}/${cartProductId}/${qty}`,
+                method: summarApi.cart.updateQty.method
+            })
+            if (respone.data.success) {
+                fetchCartItem()
+            }
+        } catch (error) {
+            errorToast(error)
+        }
+    }
+
     useEffect(() => {
         fetchCartItem()
     }, [])
 
 
     const value = {
-        fetchCartItem
+        fetchCartItem,
+        updateCartQty
     }
 
     return (
