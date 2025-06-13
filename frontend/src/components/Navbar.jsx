@@ -7,32 +7,23 @@ import Axios from '../Utils/Axios';
 import summarApi from '../common/SummaryApi';
 
 // Icons
-import { FiSearch, FiUser, FiLogIn, FiLogOut } from 'react-icons/fi';
+import { FiSearch, FiUser, FiLogIn, FiLogOut, FiChevronsRight } from 'react-icons/fi';
 import { FaUser, FaMapMarkerAlt, FaClipboardList, FaSignOutAlt, FaShoppingCart, FaLayerGroup, FaBox, FaUpload } from 'react-icons/fa';
-import { MdOutlineShoppingCart } from "react-icons/md";
 import { BiSolidCategory } from "react-icons/bi";
+import { Cart } from '../components/index';
 
 const Nav = () => {
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
-  const [isSearchExpanded, setIsSearchExpanded] = useState(false);
   const [windowWidth, setWindowWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 1024);
   const profileMenuRef = useRef(null);
   const searchInputRef = useRef(null);
   const [searchQuery, setSearchQuery] = useState('')
   const [cartQuantity, setCartQuantity] = useState(0)
+  const [isCartOpen, setIsCartOpen] = useState(false);
   const navigate = useNavigate();
 
   const user = useSelector(state => state.user);
   const cartItem = useSelector(state => state.cartItem.cart);
-
-  useEffect(() => {
-    const qty = cartItem.reduce((prev, item) => {
-      return prev + item.quantity
-    }, 0)
-    setCartQuantity(qty)
-  }, [cartItem])
-
-
   const location = useLocation();
   const query = location.search.split('=').slice(-1).toLocaleString().replaceAll('+', ' ')
 
@@ -46,10 +37,6 @@ const Nav = () => {
       navigate(`/search?query=${query}`)
     }
   }
-
-  useEffect(() => {
-    setSearchQuery(query)
-  }, [])
 
   const handleLogout = async (navigateTo) => {
     try {
@@ -74,6 +61,17 @@ const Nav = () => {
   };
 
   useEffect(() => {
+    const qty = cartItem.reduce((prev, item) => {
+      return prev + item.quantity
+    }, 0)
+    setCartQuantity(qty)
+  }, [cartItem])
+
+  useEffect(() => {
+    setSearchQuery(query)
+  }, [])
+
+  useEffect(() => {
     const handleClickOutside = (event) => {
       if (profileMenuRef.current && !profileMenuRef.current.contains(event.target)) {
         setIsProfileMenuOpen(false);
@@ -87,21 +85,20 @@ const Nav = () => {
   useEffect(() => {
     const handleResize = () => {
       setWindowWidth(window.innerWidth);
-      if (window.innerWidth > 768) {
-        setIsSearchExpanded(false);
-      }
     };
 
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  const toggleSearch = () => {
-    setIsSearchExpanded(!isSearchExpanded);
-    if (!isSearchExpanded && searchInputRef.current) {
-      setTimeout(() => searchInputRef.current.focus(), 100);
+  useEffect(() => {
+    if (isCartOpen) {
+      document.querySelector('body').style.overflowY = 'hidden'
+    } else {
+      document.querySelector('body').style.overflowY = 'scroll'
     }
-  };
+  }, [isCartOpen])
+
 
   return (
     <nav className="bg-white shadow-xl sticky top-0 z-50 border-b border-purple-400">
@@ -120,162 +117,223 @@ const Nav = () => {
             </div>
           </Link>
 
-          {/* Search Bar */}
-          <motion.div
-            initial={{ opacity: 0, width: 0 }}
-            animate={{
-              width: windowWidth < 640 && !isSearchExpanded ? 0 : '100%',
-              opacity: windowWidth < 640 && !isSearchExpanded ? 0 : 1
-            }}
-            transition={{ duration: 0.3 }}
-            className={`flex justify-center ${windowWidth < 640 ? 'mx-2' : 'flex-1 max-w-2xl mx-6'}`}
-          >
+
+          {/* Search Bar - Responsive sizing */}
+          <div className="flex-1 mx-2 sm:mx-6 lg:max-w-2xl">
             <div className="relative w-full">
               <div className="flex items-center">
                 <input
                   onClick={() => location.pathname !== '/search' && navigate('/search')}
                   value={searchQuery}
                   onChange={(e) => handleSearchInput(e)}
-                  title='Search for Products'
+                  title="Search for Products"
                   ref={searchInputRef}
                   type="text"
                   placeholder="Search products..."
-                  className="w-full py-3 pl-5 pr-12 text-sm text-black placeholder-gray-700 bg-gray-50 rounded-lg border border-gray-600 focus:border-transparent"
-                  onFocus={() => windowWidth < 640 && setIsSearchExpanded(true)}
-                  onBlur={() => windowWidth < 640 && !searchInputRef.current.value && setIsSearchExpanded(false)}
+                  className="w-full py-3 md:py-3 pl-5 pr-12 text-sm md:text-base text-black placeholder-gray-700 bg-gray-50 rounded-lg border-2 border-gray-600 focus:border-purple-600 outline-none"
                 />
-                <button onClick={() => handleNavigateSearch()} title='Search' className="cursor-pointer absolute right-0 top-0 h-full px-4 flex items-center justify-center bg-purple-600 text-white rounded-r-lg hover:bg-purple-700 transition-colors">
+                <button
+                  onClick={() => handleNavigateSearch()}
+                  title="Search"
+                  className="cursor-pointer absolute right-0 top-0 h-full px-4 flex items-center justify-center bg-purple-600 text-white rounded-r-lg hover:bg-purple-700 transition-colors"
+                >
                   <FiSearch className="h-5 w-5" />
                 </button>
               </div>
             </div>
-          </motion.div>
+          </div>
 
-          {/* Action Icons */}
-          <div className="flex items-center gap-1.5 sm:gap-6">
-            {windowWidth < 640 && !isSearchExpanded && (
-              <button
-                onClick={toggleSearch}
-                className="p-2 text-gray-800 hover:text-purple-600 transition-colors"
-                aria-label="Search"
+          {/* Desktop - Right side bottom */}
+          <AnimatePresence>
+            {windowWidth >= 640 && cartQuantity > 0 && (
+              <motion.div
+                className="fixed bottom-6 right-6 z-50"
+                initial={{ y: 50, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                exit={{ y: 50, opacity: 0 }}
+                transition={{ duration: 0.3, ease: "easeOut" }}
+                key="desktop-cart"
               >
-                <FiSearch className="h-6 w-6" />
-              </button>
-            )}
-
-            {!isSearchExpanded && (
-              <button
-                className="cursor-pointer p-2 relative text-gray-800 hover:text-purple-600 transition-colors"
-                aria-label="Cart"
-              >
-                <MdOutlineShoppingCart className="h-7 w-7" />
-                {cartQuantity &&
-                  <span className="absolute -top-1 -right-1 bg-purple-600 text-white text-xs rounded-full h-6 w-6 flex items-center justify-center font-medium">
-                    {cartQuantity}
-                  </span>
-                }
-              </button>
-            )}
-
-            {/* Enhanced Profile Menu */}
-            <div className="relative" ref={profileMenuRef}>
-              <button
-                onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
-                className="cursor-pointer flex items-center justify-center p-1 rounded-full focus:outline-none transition-all"
-                aria-label="User menu"
-              >
-                <div className={`h-10 w-10 rounded-full flex items-center justify-center text-white transition-all ${isProfileMenuOpen ? 'bg-purple-700' : 'bg-purple-600 hover:bg-purple-700'}`}>
-                  <FiUser className="h-5 w-5" />
-                </div>
-              </button>
-
-              <AnimatePresence>
-                {isProfileMenuOpen && (
-                  <motion.ul
-                    initial={{ opacity: 0, scale: 0.95 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.95 }}
-                    transition={{ duration: 0.2 }}
-                    className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg p-1 z-50 border border-gray-600 font-semibold"
+                <motion.button
+                  whileHover={{ scale: 1.03 }}
+                  whileTap={{ scale: 0.98 }}
+                  className={`flex items-center justify-center gap-2 text-white font-medium py-3 px-6 rounded-full shadow-lg ${cartQuantity > 0 ? 'bg-purple-600 hover:bg-purple-700' : 'bg-gray-600 hover:bg-gray-700'
+                    }`}
+                  onClick={() => setIsCartOpen(true)}
+                >
+                  <motion.div
+                    animate={cartQuantity > 0 ? {
+                      rotate: [-5, 5, -5],
+                      transition: { repeat: Infinity, duration: 2 }
+                    } : {}}
                   >
+                    <FaShoppingCart className="h-4 w-4" />
+                  </motion.div>
+                  <span className="font-semibold text-sm">View Cart</span>
+                  <motion.span
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    className="ml-1 bg-white text-purple-600 text-xs rounded-full h-5 w-5 flex items-center justify-center font-bold"
+                  >
+                    {cartQuantity}
+                  </motion.span>
+                </motion.button>
+              </motion.div>
+            )}
+          </AnimatePresence>
 
-                    {user._id ?
-                      (user.role === "ADMIN" ?
-                        <>
-                          <li onClick={() => profileMenuHandler('/dashboard/category')} className='cursor-pointer flex rounded-md items-center px-4 py-2 text-sm duration-200 text-black hover:bg-[#6945c5] hover:text-white active:bg-[#4b318c] '>
-                            <BiSolidCategory className='mr-3' />
-                            <p className='tracking-wide' >Category</p>
-                          </li>
-                          <li onClick={() => profileMenuHandler('/dashboard/sub-category')} className='cursor-pointer flex rounded-md items-center px-4 py-2 text-sm duration-200 text-black hover:bg-[#6945c5] hover:text-white active:bg-[#4b318c] '>
-                            <FaLayerGroup className='mr-3' />
-                            <p className='tracking-wide' >Sub category</p>
-                          </li>
-                          <li onClick={() => profileMenuHandler('/dashboard/upload-product')} className='cursor-pointer flex rounded-md items-center px-4 py-2 text-sm duration-200 text-black hover:bg-[#6945c5] hover:text-white active:bg-[#4b318c] '>
-                            <FaUpload className='mr-3' />
-                            <p className='tracking-wide' >Upload Product</p>
-                          </li>
-                          <li onClick={() => profileMenuHandler('/dashboard/product')} className='cursor-pointer flex rounded-md items-center px-4 py-2 text-sm duration-200 text-black hover:bg-[#6945c5] hover:text-white active:bg-[#4b318c] '>
-                            <FaBox className='mr-3' />
-                            <p className='tracking-wide' >Product</p>
-                          </li>
-                          <li onClick={() => profileMenuHandler('/dashboard/orders')} className='cursor-pointer flex rounded-md items-center px-4 py-2 text-sm duration-200 text-black hover:bg-[#6945c5] hover:text-white active:bg-[#4b318c] '>
-                            <FaClipboardList className='mr-3' />
-                            <p className='tracking-wide' >My Orders</p>
-                          </li>
+          {/* Mobile - Center bottom */}
+          <AnimatePresence>
+            {windowWidth < 640 && cartQuantity > 0 && (
+              <motion.div
+                className="fixed bottom-6 left-0 right-0 flex justify-center z-50 px-4"
+                initial={{ y: 50, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                exit={{ y: 50, opacity: 0 }}
+                transition={{ duration: 0.3, ease: "easeOut" }}
+                key="mobile-cart"
+              >
+                <motion.button
+                  whileHover={{ scale: 1.03 }}
+                  whileTap={{ scale: 0.98 }}
+                  className={`flex items-center justify-center gap-2 text-white font-medium py-3 px-6 rounded-full shadow-lg ${cartQuantity > 0 ? 'bg-purple-600 hover:bg-purple-700' : 'bg-gray-600 hover:bg-gray-700'
+                    }`}
+                  onClick={() => setIsCartOpen(true)}
+                >
+                  <motion.div
+                    animate={cartQuantity > 0 ? {
+                      rotate: [-5, 5, -5],
+                      transition: { repeat: Infinity, duration: 2 }
+                    } : {}}
+                  >
+                    <FaShoppingCart className="h-5 w-5" />
+                  </motion.div>
+                  <span className="font-semibold text-sm">View Cart</span>
+                  <motion.span
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    className="ml-1 bg-white text-purple-600 text-xs rounded-full h-5 w-5 flex items-center justify-center font-bold"
+                  >
+                    {cartQuantity}
+                  </motion.span>
+                  <motion.div
+                    animate={{
+                      x: [0, 4, 0],
+                      opacity: [0.8, 1, 0.8],
+                      transition: { repeat: Infinity, duration: 1.8, ease: "easeInOut" }
+                    }}
+                    className="ml-2"
+                  >
+                    <FiChevronsRight className="h-6 w-6" />
+                  </motion.div>
+                </motion.button>
+              </motion.div>
+            )}
+          </AnimatePresence>
 
-                          <hr className='mx-1.5 my-1 text-gray-500' />
+          {isCartOpen &&
+            <Cart
+              isOpen={isCartOpen}
+              onClose={() => setIsCartOpen(false)}
+            />
+          }
 
-                          <li onClick={() => handleLogout('/login')} className='cursor-pointer flex rounded-md items-center px-4 py-2 text-sm duration-200 text-black hover:bg-[#6945c5] hover:text-white active:bg-[#4b318c] '>
-                            <FaSignOutAlt className='mr-3' />
-                            <p className='tracking-wide' >Logout</p>
-                          </li>
-                        </>
-                        :
-                        <>
-                          <li onClick={() => profileMenuHandler('/dashboard')} className='cursor-pointer flex rounded-md items-center px-4 py-2 text-sm duration-200 text-black hover:bg-[#6945c5] hover:text-white active:bg-[#4b318c] '>
-                            <FaUser className='mr-3' />
-                            <p className='tracking-wide' >My Profile</p>
-                          </li>
-                          <li onClick={() => profileMenuHandler('/register')} className='cursor-pointer flex rounded-md items-center px-4 py-2 text-sm duration-200 text-black hover:bg-[#6945c5] hover:text-white active:bg-[#4b318c] '>
-                            <FaMapMarkerAlt className='mr-3' />
-                            <p className='tracking-wide' >Address</p>
-                          </li>
-                          <li onClick={() => profileMenuHandler('/register')} className='cursor-pointer flex rounded-md items-center px-4 py-2 text-sm duration-200 text-black hover:bg-[#6945c5] hover:text-white active:bg-[#4b318c] '>
-                            <FaClipboardList className='mr-3' />
-                            <p className='tracking-wide' >Orders</p>
-                          </li>
-                          <li onClick={() => profileMenuHandler('/register')} className='cursor-pointer flex rounded-md items-center px-4 py-2 text-sm duration-200 text-black hover:bg-[#6945c5] hover:text-white active:bg-[#4b318c] '>
-                            < FaShoppingCart className='mr-3' />
-                            <p className='tracking-wide' >Go To Cart</p>
-                          </li>
+          {/* Enhanced Profile Menu */}
+          <div className="relative" ref={profileMenuRef}>
+            <button
+              onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
+              className="cursor-pointer flex items-center justify-center p-1 rounded-full focus:outline-none transition-all"
+              aria-label="User menu"
+            >
+              <div className={`h-10 w-10 rounded-full flex items-center justify-center text-white transition-all ${isProfileMenuOpen ? 'bg-purple-700' : 'bg-purple-600 hover:bg-purple-700'}`}>
+                <FiUser className="h-5 w-5" />
+              </div>
+            </button>
 
-                          <hr className='mx-1.5 my-1 text-gray-500' />
-
-                          <li onClick={() => handleLogout('/login')} className='cursor-pointer flex rounded-md items-center px-4 py-2 text-sm duration-200 text-black hover:bg-[#6945c5] hover:text-white active:bg-[#4b318c] '>
-                            <FaSignOutAlt className='mr-3' />
-                            <p className='tracking-wide' >Logout</p>
-                          </li>
-                        </>)
-                      :
+            <AnimatePresence>
+              {isProfileMenuOpen && (
+                <motion.ul
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.95 }}
+                  transition={{ duration: 0.2 }}
+                  className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg p-1 z-50 border border-gray-600 font-semibold"
+                >
+                  {user._id ?
+                    (user.role === "ADMIN" ?
                       <>
-                        <li onClick={() => profileMenuHandler('/register')} className='cursor-pointer flex rounded-md items-center px-4 py-2 text-sm duration-200 text-black hover:bg-[#6945c5] hover:text-white active:bg-[#4b318c] '>
-                          <FiLogIn className='mr-3' />
-                          <p className='tracking-wide' >Register</p>
+                        <li onClick={() => profileMenuHandler('/dashboard/category')} className='cursor-pointer flex rounded-md items-center px-4 py-2 text-sm duration-200 text-black hover:bg-[#6945c5] hover:text-white active:bg-[#4b318c] '>
+                          <BiSolidCategory className='mr-3' />
+                          <p className='tracking-wide' >Category</p>
+                        </li>
+                        <li onClick={() => profileMenuHandler('/dashboard/sub-category')} className='cursor-pointer flex rounded-md items-center px-4 py-2 text-sm duration-200 text-black hover:bg-[#6945c5] hover:text-white active:bg-[#4b318c] '>
+                          <FaLayerGroup className='mr-3' />
+                          <p className='tracking-wide' >Sub category</p>
+                        </li>
+                        <li onClick={() => profileMenuHandler('/dashboard/upload-product')} className='cursor-pointer flex rounded-md items-center px-4 py-2 text-sm duration-200 text-black hover:bg-[#6945c5] hover:text-white active:bg-[#4b318c] '>
+                          <FaUpload className='mr-3' />
+                          <p className='tracking-wide' >Upload Product</p>
+                        </li>
+                        <li onClick={() => profileMenuHandler('/dashboard/product')} className='cursor-pointer flex rounded-md items-center px-4 py-2 text-sm duration-200 text-black hover:bg-[#6945c5] hover:text-white active:bg-[#4b318c] '>
+                          <FaBox className='mr-3' />
+                          <p className='tracking-wide' >Product</p>
+                        </li>
+                        <li onClick={() => profileMenuHandler('/dashboard/orders')} className='cursor-pointer flex rounded-md items-center px-4 py-2 text-sm duration-200 text-black hover:bg-[#6945c5] hover:text-white active:bg-[#4b318c] '>
+                          <FaClipboardList className='mr-3' />
+                          <p className='tracking-wide' >My Orders</p>
                         </li>
 
-                        <li onClick={() => profileMenuHandler('/login')} className='cursor-pointer flex rounded-md items-center px-4 py-2 text-sm duration-200 text-black hover:bg-[#6945c5] hover:text-white active:bg-[#4b318c]'>
-                          <FiLogOut className='mr-3' />
-                          <p className='tracking-wide' >Login</p>
+                        <hr className='mx-1.5 my-1 text-gray-500' />
+
+                        <li onClick={() => handleLogout('/login')} className='cursor-pointer flex rounded-md items-center px-4 py-2 text-sm duration-200 text-black hover:bg-[#6945c5] hover:text-white active:bg-[#4b318c] '>
+                          <FaSignOutAlt className='mr-3' />
+                          <p className='tracking-wide' >Logout</p>
                         </li>
                       </>
-                    }
+                      :
+                      <>
+                        <li onClick={() => profileMenuHandler('/dashboard')} className='cursor-pointer flex rounded-md items-center px-4 py-2 text-sm duration-200 text-black hover:bg-[#6945c5] hover:text-white active:bg-[#4b318c] '>
+                          <FaUser className='mr-3' />
+                          <p className='tracking-wide' >My Profile</p>
+                        </li>
+                        <li onClick={() => profileMenuHandler('/register')} className='cursor-pointer flex rounded-md items-center px-4 py-2 text-sm duration-200 text-black hover:bg-[#6945c5] hover:text-white active:bg-[#4b318c] '>
+                          <FaMapMarkerAlt className='mr-3' />
+                          <p className='tracking-wide' >Address</p>
+                        </li>
+                        <li onClick={() => profileMenuHandler('/register')} className='cursor-pointer flex rounded-md items-center px-4 py-2 text-sm duration-200 text-black hover:bg-[#6945c5] hover:text-white active:bg-[#4b318c] '>
+                          <FaClipboardList className='mr-3' />
+                          <p className='tracking-wide' >Orders</p>
+                        </li>
+                        <li onClick={() => profileMenuHandler('/register')} className='cursor-pointer flex rounded-md items-center px-4 py-2 text-sm duration-200 text-black hover:bg-[#6945c5] hover:text-white active:bg-[#4b318c] '>
+                          < FaShoppingCart className='mr-3' />
+                          <p className='tracking-wide' >Go To Cart</p>
+                        </li>
 
-                  </motion.ul>
-                )}
-              </AnimatePresence>
+                        <hr className='mx-1.5 my-1 text-gray-500' />
 
-            </div>
+                        <li onClick={() => handleLogout('/login')} className='cursor-pointer flex rounded-md items-center px-4 py-2 text-sm duration-200 text-black hover:bg-[#6945c5] hover:text-white active:bg-[#4b318c] '>
+                          <FaSignOutAlt className='mr-3' />
+                          <p className='tracking-wide' >Logout</p>
+                        </li>
+                      </>)
+                    :
+                    <>
+                      <li onClick={() => profileMenuHandler('/register')} className='cursor-pointer flex rounded-md items-center px-4 py-2 text-sm duration-200 text-black hover:bg-[#6945c5] hover:text-white active:bg-[#4b318c] '>
+                        <FiLogIn className='mr-3' />
+                        <p className='tracking-wide' >Register</p>
+                      </li>
+
+                      <li onClick={() => profileMenuHandler('/login')} className='cursor-pointer flex rounded-md items-center px-4 py-2 text-sm duration-200 text-black hover:bg-[#6945c5] hover:text-white active:bg-[#4b318c]'>
+                        <FiLogOut className='mr-3' />
+                        <p className='tracking-wide' >Login</p>
+                      </li>
+                    </>
+                  }
+                </motion.ul>
+              )}
+            </AnimatePresence>
           </div>
+
         </div>
       </div>
     </nav>

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { FiShoppingCart, FiChevronRight } from "react-icons/fi";
+import { FiShoppingCart, FiChevronRight, FiMinus, FiPlus } from "react-icons/fi";
 import { FaFire, FaMotorcycle, } from "react-icons/fa";
 import { Link } from 'react-router-dom';
 import { motion } from "framer-motion"
@@ -13,7 +13,7 @@ import { useSelector } from 'react-redux';
 const ProductContainer = ({ product }) => {
 
     const cartItem = useSelector(state => state.cartItem.cart);
-    const { fetchCartItem } = useGlobalContext();
+    const { fetchCartItem, increaseQnty, decreaseQnty, getPriceAfterDiscount } = useGlobalContext();
 
     const [isLoading, setIsLoading] = useState(false);
     const [isAvailableInCart, setIsAvailableInCart] = useState(false)
@@ -45,63 +45,6 @@ const ProductContainer = ({ product }) => {
         setIsLoading(false)
     }
 
-    const increaseQnty = async (e) => {
-        e.stopPropagation();
-        e.preventDefault();
-
-        const qnty = cartItemDetails?.quantity + 1
-
-        try {
-            const response = await Axios({
-                url: `${summarApi.cart.updateQty.url}/${cartItemDetails?._id}/${qnty}`,
-                method: summarApi.cart.updateQty.method
-            })
-            console.log(response)
-            if (response.data.success) {
-                fetchCartItem()
-            }
-        } catch (error) {
-            errorToast(error)
-        }
-    }
-
-    const decreaseQnty = async (e) => {
-        e.stopPropagation();
-        e.preventDefault();
-
-        const qnty = cartItemDetails?.quantity - 1
-
-        try {
-            if (qnty == 0) {
-                const response = await Axios({
-                    url: `${summarApi.cart.removeCartItem.url}/${cartItemDetails?._id}`,
-                    method: summarApi.cart.removeCartItem.method
-                })
-                if (response.data.success) {
-                    fetchCartItem()
-                }
-            } else {
-                const response = await Axios({
-                    url: `${summarApi.cart.updateQty.url}/${cartItemDetails?._id}/${qnty}`,
-                    method: summarApi.cart.updateQty.method
-                })
-                console.log(response)
-                if (response.data.success) {
-                    fetchCartItem()
-                }
-            }
-
-        } catch (error) {
-            errorToast(error)
-        }
-
-    }
-
-
-
-
-
-
     useEffect(() => {
         const checkingItem = cartItem.some((item) => item.productId._id === product._id)
         setIsAvailableInCart(checkingItem)
@@ -115,10 +58,10 @@ const ProductContainer = ({ product }) => {
     return (
         <Link
             onClick={() => window.scrollTo(0, 0)}
-            className='h-fit m-0'
+            className='h-fit m-0 block'
             key={product._id}
-            to={fetchUrl(product)}>
-
+            to={fetchUrl(product)}
+        >
             <motion.div
                 key={product._id}
                 initial={{ opacity: 0, scale: 0.95 }}
@@ -128,7 +71,7 @@ const ProductContainer = ({ product }) => {
                 className="cursor-pointer bg-white rounded-xl shadow-sm overflow-hidden border border-purple-300 hover:border-purple-400 transition-all duration-200"
             >
                 {/* Product Image - Uncropped */}
-                <div className="relative h-40 w-full border-b border-purple-300 flex items-center justify-center bg-purple-50 ">
+                <div className="relative h-40 w-full border-b border-purple-300 flex items-center justify-center bg-purple-50">
                     <img
                         src={product?.images[0]}
                         alt={product.name}
@@ -163,14 +106,14 @@ const ProductContainer = ({ product }) => {
                     </div>
 
                     {/* Price and Add to Cart */}
-                    <div className="flex flex-col gap-1.5 sm:items-center justify-between sm:flex-row">
+                    <div className="flex flex-col gap-2">
                         <div>
                             {product.discount > 0 ? (
-                                <div className="flex items-baseline">
+                                <div className="flex items-baseline gap-1">
                                     <span className="font-bold text-black text-sm">
-                                        ₹{(product.price * (1 - product.discount / 100)).toFixed(2)}
+                                        ₹{getPriceAfterDiscount(product.price, product.discount)}
                                     </span>
-                                    <span className="ml-1 text-xs text-gray-600 line-through">
+                                    <span className="text-xs text-gray-600 line-through">
                                         ₹{product.price.toFixed(2)}
                                     </span>
                                 </div>
@@ -181,40 +124,46 @@ const ProductContainer = ({ product }) => {
                             )}
                         </div>
 
-                        <motion.button
-                            onClick={!isAvailableInCart ? handleAddToCart : undefined}
-                            whileTap={{ scale: 0.98 }}
-                            className={`cursor-pointer ${isAvailableInCart ? 'w-full' : ''} bg-purple-600 hover:bg-purple-700 text-white text-[13px] px-3 py-1.5 rounded-lg flex items-center justify-center transition-colors`}
-                        >
-                            {isLoading ? (
-                                <>
-                                    <ButtonLoading /> Adding...
-                                </>
-                            ) : isAvailableInCart ? (
-                                <div className="flex items-center justify-between w-full">
-                                    <span
-                                        onClick={decreaseQnty}
-                                        className="px-2 hover:bg-purple-500 rounded-l transition-colors"
-                                    >
-                                        -
-                                    </span>
-                                    <span className="px-2 min-w-[20px] text-center">
-                                        {cartItemDetails?.quantity}
-                                    </span>
-                                    <span
-                                        onClick={increaseQnty}
-                                        className="px-2 hover:bg-purple-500 rounded-r transition-colors"
-                                    >
-                                        +
-                                    </span>
-                                </div>
-                            ) : (
-                                <>
-                                    <FiShoppingCart className="mr-1" size={12} />
-                                    Add to Cart
-                                </>
-                            )}
-                        </motion.button>
+                        {isAvailableInCart ? (
+                            <div className="flex items-center justify-between rounded-xl border border-purple-700">
+                                <motion.button
+                                    onClick={(e) => decreaseQnty(e, cartItemDetails)}
+                                    whileTap={{ scale: 0.95 }}
+                                    className="cursor-pointer rounded-l-xl w-8 h-8 flex items-center justify-center bg-purple-600  shadow-sm text-white hover:bg-purple-700 transition-colors"
+                                >
+                                    <FiMinus size={14} />
+                                </motion.button>
+
+                                <span className="text-sm sm:text-base font-medium text-gray-800 min-w-[24px] text-center">
+                                    {cartItemDetails?.quantity}
+                                </span>
+
+                                <motion.button
+                                    onClick={(e) => increaseQnty(e, cartItemDetails)}
+                                    whileTap={{ scale: 0.95 }}
+                                    className="cursor-pointer rounded-r-xl w-8 h-8 flex items-center justify-center bg-purple-600  shadow-sm text-white hover:bg-purple-700 transition-colors"
+                                >
+                                    <FiPlus size={14} />
+                                </motion.button>
+                            </div>
+                        ) : (
+                            <motion.button
+                                onClick={handleAddToCart}
+                                whileTap={{ scale: 0.98 }}
+                                className="w-full bg-purple-600 hover:bg-purple-700 text-white text-sm py-2 rounded-lg flex items-center justify-center gap-1 transition-colors"
+                            >
+                                {isLoading ? (
+                                    <>
+                                        <ButtonLoading /> Adding...
+                                    </>
+                                ) : (
+                                    <>
+                                        <FiShoppingCart size={14} />
+                                        Add to Cart
+                                    </>
+                                )}
+                            </motion.button>
+                        )}
                     </div>
                 </div>
             </motion.div>

@@ -31,5 +31,5 @@ export {
     ProductDisplayPage,
     ProductContainer,
     SearchPage,
-    NoProductFound
+    NoProductFound,
 }

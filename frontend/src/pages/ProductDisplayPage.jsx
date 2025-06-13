@@ -9,18 +9,37 @@ import { Helmet } from "react-helmet";
 import { FiShoppingCart, FiChevronLeft, FiChevronRight, FiStar } from 'react-icons/fi';
 import { FaFire, FaBolt } from 'react-icons/fa';
 import { PreProductDisplay } from '../components';
+import { useGlobalContext } from '../provider/GlobalProvider';
+import { useSelector } from 'react-redux';
 
 
 const ProductDisplayPage = () => {
+
+  const cartItem = useSelector(state => state.cartItem.cart);
+  const { fetchCartItem, increaseQnty, decreaseQnty } = useGlobalContext();
 
   const param = useParams();
   const productId = param?.product?.split('-')?.slice(-1)[0];
 
   const [isPageLoading, setIsPageLoading] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
   const [product, setProduct] = useState([]);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [quantity, setQuantity] = useState(1);
   const [showQuantityControls, setShowQuantityControls] = useState(false);
+  const [isAvailableInCart, setIsAvailableInCart] = useState(false)
+  const [cartItemDetails, setCartItemDetails] = useState({})
+
+
+  useEffect(() => {
+    const checkingItem = cartItem.some((item) => item.productId._id === product._id)
+    setIsAvailableInCart(checkingItem)
+
+    const pro = cartItem.find(item => item.productId._id === product._id)
+    setCartItemDetails(pro)
+
+  }, [product, cartItem])
+
 
   const controls = useAnimation();
   const sliderRef = useRef(null);
@@ -37,22 +56,25 @@ const ProductDisplayPage = () => {
     controls.start({ x: `-${prevIndex * 100}%` });
   };
 
-  const increaseQuantity = () => {
-    if (quantity < (product?.stock ?? 0)) {
-      setQuantity(quantity + 1);
-    }
-  };
 
-  const decreaseQuantity = () => {
-    if (quantity > 1) {
-      setQuantity(quantity - 1);
-    }
-  };
+  const handleAddToCart = async () => {
+    setIsLoading(true)
 
-  const handleAddToCart = () => {
-    setShowQuantityControls(true);
-    // Here you would typically also add the product to cart
-  };
+    try {
+      const response = await Axios({
+        url: `${summarApi.cart.addToCart.url}/${product._id}/1`,
+        method: summarApi.cart.addToCart.method
+      })
+      if (response.data.success) {
+        fetchCartItem()
+      }
+    } catch (error) {
+      console.log(error)
+      errorToast(error)
+    }
+
+    setIsLoading(false)
+  }
 
   const fetchProduct = async () => {
     setIsPageLoading(true)
@@ -253,26 +275,26 @@ const ProductDisplayPage = () => {
                   <div className="border-t border-b border-purple-100 py-4 space-y-4">
                     <div className="flex items-center gap-2">
                       <span className="text-gray-700 font-medium">Quantity:</span>
-                      {showQuantityControls ? (
+                      {isAvailableInCart ? (
                         <div className="flex items-center border border-purple-200 rounded-full bg-white">
                           <button
-                            onClick={decreaseQuantity}
+                            onClick={(e) => decreaseQnty(e, cartItemDetails)}
                             className="px-3 py-1 text-purple-700 hover:bg-purple-50 rounded-l-full transition-colors"
-                            disabled={quantity <= 1}
+
                           >
                             -
                           </button>
-                          <span className="px-4 py-1 text-center min-w-[40px]">{quantity}</span>
+                          <span className="px-4 py-1 text-center min-w-[40px]">{cartItemDetails?.quantity}</span>
                           <button
-                            onClick={increaseQuantity}
+                            onClick={(e) => increaseQnty(e, cartItemDetails)}
                             className="px-3 py-1 text-purple-700 hover:bg-purple-50 rounded-r-full transition-colors"
-                            disabled={quantity >= (product?.stock || 0)}
+                            disabled={cartItemDetails?.quantity >= (product?.stock || 0)}
                           >
                             +
                           </button>
                         </div>
                       ) : (
-                        <span className="px-4 py-1">{quantity}</span>
+                        <span className="px-4 py-1">{cartItemDetails?.quantity}</span>
                       )}
                     </div>
 
@@ -283,24 +305,24 @@ const ProductDisplayPage = () => {
                   </div>
 
                   <div className="flex space-x-4">
-                    {!showQuantityControls ? (
+                    {!isAvailableInCart ? (
                       <motion.button
                         whileHover={{ scale: 1.03 }}
                         whileTap={{ scale: 0.97 }}
                         onClick={handleAddToCart}
-                        className="flex-1 bg-purple-600 hover:bg-purple-700 text-white py-3 px-6 rounded-full font-medium flex items-center justify-center space-x-2 transition-all shadow-md hover:shadow-lg"
+                        className="cursor-pointer flex-1 bg-purple-600 hover:bg-purple-700 text-white py-3 px-6 rounded-full font-medium flex items-center justify-center space-x-2 transition-all shadow-md hover:shadow-lg"
                       >
                         <FiShoppingCart />
                         <span>Add to Cart</span>
                       </motion.button>
                     ) : (
                       <motion.button
-                        whileHover={{ scale: 1.03 }}
+
                         whileTap={{ scale: 0.97 }}
-                        className="flex-1 bg-green-600 hover:bg-green-700 text-white py-3 px-6 rounded-full font-medium flex items-center justify-center space-x-2 transition-all shadow-md hover:shadow-lg"
+                        className="cursor-pointer flex-1 bg-blue-600 hover:bg-blue-700 text-white py-3 px-6 rounded-full font-medium flex items-center justify-center space-x-2 transition-all shadow-md hover:shadow-lg"
                       >
                         <FiShoppingCart />
-                        <span>Added to Cart ({quantity})</span>
+                        <span>Go to Cart ({cartItemDetails?.quantity})</span>
                       </motion.button>
                     )}
                   </div>

@@ -1,8 +1,8 @@
-import { createContext, useContext, useEffect } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 import Axios from "../Utils/Axios";
 import summarApi from "../common/SummaryApi";
 import { handleAddItemCart } from "../../store/cartproduct";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { errorToast } from "../Utils/ShowToast";
 
 export const GlobalContext = createContext();
@@ -11,7 +11,16 @@ export const useGlobalContext = () => useContext(GlobalContext)
 
 const GlobalProvider = ({ children }) => {
 
+    const cartItem = useSelector(state => state.cartItem.cart);
     const dispatch = useDispatch()
+    const [cartItemDetails, setcartItemDetails] = useState({})
+    const [cartTotalAmount, setCartTotalAmount] = useState(0)
+
+    const getPriceAfterDiscount = (ogPrice, discount) => {
+        const discountAmount = ogPrice * (discount / 100);
+        const finalPrice = ogPrice - discountAmount;
+        return finalPrice.toFixed(2);
+    }
 
     const fetchCartItem = async () => {
         try {
@@ -26,19 +35,68 @@ const GlobalProvider = ({ children }) => {
         }
     }
 
-    const updateCartQty = async (cartProductId, qty) => {
+    const increaseQnty = async (e, cartItemDetails) => {
+        e.stopPropagation();
+        e.preventDefault();
+
+        const qnty = cartItemDetails?.quantity + 1
+
         try {
-            const respone = await Axios({
-                url: `${summarApi.cart.updateQty}/${cartProductId}/${qty}`,
+            const response = await Axios({
+                url: `${summarApi.cart.updateQty.url}/${cartItemDetails?._id}/${qnty}`,
                 method: summarApi.cart.updateQty.method
             })
-            if (respone.data.success) {
+            console.log(response)
+            if (response.data.success) {
                 fetchCartItem()
             }
         } catch (error) {
             errorToast(error)
         }
     }
+
+    const decreaseQnty = async (e, cartItemDetails) => {
+        e.stopPropagation();
+        e.preventDefault();
+
+        const qnty = cartItemDetails?.quantity - 1
+
+        try {
+            if (qnty == 0) {
+                const response = await Axios({
+                    url: `${summarApi.cart.removeCartItem.url}/${cartItemDetails?._id}`,
+                    method: summarApi.cart.removeCartItem.method
+                })
+                if (response.data.success) {
+                    fetchCartItem()
+                }
+            } else {
+                const response = await Axios({
+                    url: `${summarApi.cart.updateQty.url}/${cartItemDetails?._id}/${qnty}`,
+                    method: summarApi.cart.updateQty.method
+                })
+
+                if (response.data.success) {
+                    fetchCartItem()
+                }
+            }
+
+        } catch (error) {
+            errorToast(error)
+        }
+
+    }
+
+    useEffect(() => {
+        const toatlAmount = cartItem?.reduce((prev, item) => {
+            const price = getPriceAfterDiscount(item?.productId?.price, item?.productId?.discount)
+
+            return prev + (item.quantity * price)
+        }, 0)
+
+        setCartTotalAmount(toatlAmount)
+
+    }, [cartItem])
 
     useEffect(() => {
         fetchCartItem()
@@ -47,7 +105,9 @@ const GlobalProvider = ({ children }) => {
 
     const value = {
         fetchCartItem,
-        updateCartQty
+        increaseQnty,
+        decreaseQnty,
+        getPriceAfterDiscount
     }
 
     return (
