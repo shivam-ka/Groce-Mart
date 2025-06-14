@@ -6,7 +6,7 @@ import { motion, useAnimation } from 'framer-motion';
 import { Helmet } from "react-helmet";
 
 // icons
-import { FiShoppingCart, FiChevronLeft, FiChevronRight, FiStar } from 'react-icons/fi';
+import { FiShoppingCart, FiChevronLeft, FiChevronRight, FiStar, FiMinus, FiPlus } from 'react-icons/fi';
 import { FaFire, FaBolt } from 'react-icons/fa';
 import { PreProductDisplay } from '../components';
 import { useGlobalContext } from '../provider/GlobalProvider';
@@ -26,7 +26,6 @@ const ProductDisplayPage = () => {
   const [product, setProduct] = useState([]);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [quantity, setQuantity] = useState(1);
-  const [showQuantityControls, setShowQuantityControls] = useState(false);
   const [isAvailableInCart, setIsAvailableInCart] = useState(false)
   const [cartItemDetails, setCartItemDetails] = useState({})
 
@@ -108,7 +107,7 @@ const ProductDisplayPage = () => {
         <PreProductDisplay />
         :
 
-        <div className="min-h-screen px-4 sm:px-6 lg:px-8">
+        <div className="min-h-screen px-2 sm:px-6 lg:px-8">
           <div className="mx-auto max-w-7xl">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -201,7 +200,7 @@ const ProductDisplayPage = () => {
                             <img
                               src={img}
                               alt={`Thumbnail ${index + 1}`}
-                              className="w-full h-full object-cover"
+                              className="w-full object-cover"
                             />
                           </button>
                         ))}
@@ -211,13 +210,13 @@ const ProductDisplayPage = () => {
                 </div>
 
                 {/* Product Details */}
-                <div className="space-y-6">
+                <div className="space-y-4">
                   <motion.div
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ delay: 0.2 }}
                   >
-                    <h1 className="text-2xl font-bold text-black">
+                    <h1 className="text-xl md:text-2xl font-semibold text-black">
                       {product?.name || "Product Name"}
                     </h1>
                     <div className="text-lg text-gray-700">
@@ -272,32 +271,7 @@ const ProductDisplayPage = () => {
                     {product?.description || "Premium quality product description"}
                   </motion.p>
 
-                  <div className="border-t border-b border-purple-100 py-4 space-y-4">
-                    <div className="flex items-center gap-2">
-                      <span className="text-gray-700 font-medium">Quantity:</span>
-                      {isAvailableInCart ? (
-                        <div className="flex items-center border border-purple-200 rounded-full bg-white">
-                          <button
-                            onClick={(e) => decreaseQnty(e, cartItemDetails)}
-                            className="px-3 py-1 text-purple-700 hover:bg-purple-50 rounded-l-full transition-colors"
-
-                          >
-                            -
-                          </button>
-                          <span className="px-4 py-1 text-center min-w-[40px]">{cartItemDetails?.quantity}</span>
-                          <button
-                            onClick={(e) => increaseQnty(e, cartItemDetails)}
-                            className="px-3 py-1 text-purple-700 hover:bg-purple-50 rounded-r-full transition-colors"
-                            disabled={cartItemDetails?.quantity >= (product?.stock || 0)}
-                          >
-                            +
-                          </button>
-                        </div>
-                      ) : (
-                        <span className="px-4 py-1">{cartItemDetails?.quantity}</span>
-                      )}
-                    </div>
-
+                  <div className="border-t border-b border-purple-100 py-4">
                     <div className="flex items-center space-x-2 text-sm text-gray-600">
                       <div className="w-3 h-3 rounded-full bg-green-500"></div>
                       <span>Free shipping on orders over ₹200</span>
@@ -311,19 +285,39 @@ const ProductDisplayPage = () => {
                         whileTap={{ scale: 0.97 }}
                         onClick={handleAddToCart}
                         className="cursor-pointer flex-1 bg-purple-600 hover:bg-purple-700 text-white py-3 px-6 rounded-full font-medium flex items-center justify-center space-x-2 transition-all shadow-md hover:shadow-lg"
+                        disabled={isLoading}
                       >
-                        <FiShoppingCart />
-                        <span>Add to Cart</span>
+                        {isLoading ? (
+                          <span>Adding...</span>
+                        ) : (
+                          <>
+                            <FiShoppingCart />
+                            <span>Add to Cart</span>
+                          </>
+                        )}
                       </motion.button>
                     ) : (
-                      <motion.button
+                      <div className="w-1/3 flex items-center justify-between rounded-xl border border-purple-700">
+                        <motion.button
+                          onClick={(e) => decreaseQnty(e, cartItemDetails)}
+                          whileTap={{ scale: 0.95 }}
+                          className="cursor-pointer border rounded-l-xl w-9 h-9 flex items-center justify-center bg-purple-600  shadow-sm text-white hover:bg-purple-700 transition-colors"
+                        >
+                          <FiMinus size={16} />
+                        </motion.button>
 
-                        whileTap={{ scale: 0.97 }}
-                        className="cursor-pointer flex-1 bg-blue-600 hover:bg-blue-700 text-white py-3 px-6 rounded-full font-medium flex items-center justify-center space-x-2 transition-all shadow-md hover:shadow-lg"
-                      >
-                        <FiShoppingCart />
-                        <span>Go to Cart ({cartItemDetails?.quantity})</span>
-                      </motion.button>
+                        <span className="text-sm sm:text-base font-medium text-gray-800 min-w-[24px] text-center">
+                          {cartItemDetails?.quantity}
+                        </span>
+
+                        <motion.button
+                          onClick={(e) => increaseQnty(e, cartItemDetails)}
+                          whileTap={{ scale: 0.95 }}
+                          className="cursor-pointer border rounded-r-xl w-9 h-9 flex items-center justify-center bg-purple-600  shadow-sm text-white hover:bg-purple-700 transition-colors"
+                        >
+                          <FiPlus size={16} />
+                        </motion.button>
+                      </div>
                     )}
                   </div>
 

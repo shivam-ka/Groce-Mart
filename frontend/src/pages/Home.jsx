@@ -1,5 +1,5 @@
 import { useSelector } from 'react-redux'
-import { PreHomeCategory, ProductByCategory } from '../components'
+import { PreHeading, PreHomeCategory, PreProduct, ProductByCategory } from '../components'
 import { motion } from "framer-motion";
 import { asstes } from '../assets/assets';
 import { Link } from 'react-router-dom';
@@ -39,7 +39,7 @@ const Home = () => {
       {isCategoryLoading ?
         <PreHomeCategory />
         :
-        <div className="grid grid-cols-4 xs:grid-cols-5 sm:grid-cols-6 md:grid-cols-7 lg:grid-cols-8 gap-2 sm:gap-3">
+        <div className="grid grid-cols-4 gap-1.5 xs:grid-cols-5 sm:grid-cols-6 md:grid-cols-7 lg:grid-cols-8 sm:gap-2 md:gap-3">
           {allCategory.map((item) => (
             <Link
               onClick={window.scrollTo({ top: 0 })}
@@ -65,7 +65,7 @@ const Home = () => {
                 </div>
 
                 {/* Text Container */}
-                <div className="px-1 py-1.5 border-t border-purple-500 min-h-[40px] flex items-center justify-center">
+                <div className="px-1 py-1.5 border-t border-purple-800 min-h-[40px] flex items-center justify-center">
                   <p className="text-xs sm:text-sm text-black font-medium text-center line-clamp-2 leading-tight">
                     {item.name}
                   </p>
@@ -75,9 +75,18 @@ const Home = () => {
           ))}
         </div>
       }
-      {
+      {allCategory[0] ?
         allCategory.map((cat, index) => (
           <ProductByCategory key={cat._id} categoryId={cat?._id} categoryName={cat?.name} navigateTo={ProductListPageUrl(cat)} />
+        ))
+        :
+        Array(4).fill(null).map((_, index) => (
+          <div key={index} className="mx-auto px-2 py-6">
+            <PreHeading />
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 2xl:grid-cols-6 gap-4">
+              <PreProduct Length={6} />
+            </div>
+          </div>
         ))
       }
 

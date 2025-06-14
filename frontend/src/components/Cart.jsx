@@ -1,7 +1,7 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState } from 'react';
 import { FaShippingFast, FaShoppingCart } from 'react-icons/fa';
-import { FiChevronRight, FiChevronsRight, FiMinus, FiPlus } from 'react-icons/fi';
+import { FiChevronRight, FiChevronsRight, FiMinus, FiPlus,} from 'react-icons/fi';
 import { IoIosArrowBack } from "react-icons/io";
 import { useGlobalContext } from '../provider/GlobalProvider';
 
@@ -18,10 +18,35 @@ const Cart = ({ isOpen, onClose }) => {
   // Calculate charges
   const deliveryFee = 25
   const handlingCharge = 10
-
   const totalAmountNoDis = tAmountNoDis + deliveryFee + handlingCharge
   const toatlAmount = cartTotalAmount
   const savings = totalAmountNoDis - toatlAmount
+
+  // State for bill details visibility
+  const [showBillDetails, setShowBillDetails] = useState(false)
+  const [updatingItemId, setUpdatingItemId] = useState(null)
+
+  const handleIncreaseQnty = async (e, item) => {
+    setUpdatingItemId(item._id);
+    try {
+      await increaseQnty(e, item);
+    } catch (error) {
+      console.error("Error updating quantity:", error);
+    } finally {
+      setUpdatingItemId(null);
+    }
+  };
+
+  const handleDecreaseQnty = async (e, item) => {
+    setUpdatingItemId(item._id);
+    try {
+      await decreaseQnty(e, item);
+    } catch (error) {
+      console.error("Error updating quantity:", error);
+    } finally {
+      setUpdatingItemId(null);
+    }
+  };
 
   return (
     <AnimatePresence>
@@ -66,7 +91,7 @@ const Cart = ({ isOpen, onClose }) => {
             </div>
 
             {/* Content */}
-            <div className="flex-1 overflow-y-scroll scrollbar-hide p-4">
+            <div className="flex-1 overflow-y-scroll scrollbar-hide px-2 py-4 md:p-4 relative">
               {cartItem.length === 0 ? (
                 <div className="h-full flex flex-col items-center justify-center text-gray-500">
                   <FaShoppingCart className="text-4xl mb-4 opacity-30" />
@@ -98,7 +123,6 @@ const Cart = ({ isOpen, onClose }) => {
                   >
                     <motion.p
                       className="text-green-700 font-medium"
-
                     >
                       You're saving ₹{savings.toFixed(2)}!
                     </motion.p>
@@ -124,8 +148,25 @@ const Cart = ({ isOpen, onClose }) => {
                     {cartItem.map(item => (
                       <div
                         key={item._id}
-                        className="flex gap-3 items-center py-1.5 px-2 pr-3 bg-white shadow-sm border border-gray-100 hover:shadow-md transition-shadow"
+                        className="flex gap-3 items-center pt-1.5 pb-2.5 px-2 pr-3 bg-white shadow-sm border border-gray-100 hover:shadow-md transition-shadow relative"
                       >
+                        {updatingItemId === item._id && (
+                          <div className="absolute top-0 left-0 w-full h-0.5 bg-gray-200 rounded-full overflow-hidden">
+                            <motion.div
+                              className="h-full bg-purple-600 rounded-full"
+                              initial={{ x: '-100%' }}
+                              animate={{
+                                x: ['-100%', '100%', '-100%'],
+                                transition: {
+                                  repeat: Infinity,
+                                  duration: 3,
+                                  ease: "easeInOut"
+                                }
+                              }}
+                            />
+                          </div>
+                        )}
+
                         {/* Product image */}
                         <div className="flex-shrink-0">
                           <img
@@ -143,8 +184,12 @@ const Cart = ({ isOpen, onClose }) => {
 
                           <div className="flex items-center mt-2">
                             <button
-                              onClick={(e) => decreaseQnty(e, item)}
-                              className="cursor-pointer w-6 h-6 flex items-center justify-center border border-purple-300 rounded-full hover:bg-purple-50 hover:border-purple-400 hover:text-purple-700 transition-colors duration-200 active:scale-95"
+                              onClick={(e) => handleDecreaseQnty(e, item)}
+                              className={`cursor-pointer w-6 h-6 flex items-center justify-center border border-purple-300 rounded-full transition-colors duration-200 active:scale-95 ${updatingItemId
+                                ? 'bg-gray-100 text-gray-400'
+                                : 'hover:bg-purple-50 hover:border-purple-400 hover:text-purple-700'
+                                }`}
+                              disabled={!!updatingItemId}
                               aria-label="Decrease quantity"
                             >
                               <FiMinus className="text-sm" />
@@ -153,8 +198,12 @@ const Cart = ({ isOpen, onClose }) => {
                               {item.quantity}
                             </span>
                             <button
-                              onClick={(e) => increaseQnty(e, item)}
-                              className="cursor-pointer w-6 h-6 flex items-center justify-center border border-purple-300 rounded-full hover:bg-purple-50 hover:border-purple-400 hover:text-purple-700 transition-colors duration-200 active:scale-95"
+                              onClick={(e) => handleIncreaseQnty(e, item)}
+                              className={`cursor-pointer w-6 h-6 flex items-center justify-center border border-purple-300 rounded-full transition-colors duration-200 active:scale-95 ${updatingItemId
+                                ? 'bg-gray-100 text-gray-400'
+                                : 'hover:bg-purple-50 hover:border-purple-400 hover:text-purple-700'
+                                }`}
+                              disabled={!!updatingItemId}
                               aria-label="Increase quantity"
                             >
                               <FiPlus className="text-sm" />
@@ -164,7 +213,7 @@ const Cart = ({ isOpen, onClose }) => {
 
                         {/* Pricing */}
                         <div className="flex-shrink-0 text-right">
-                          <p className="font-semibold text-black">
+                          <p className="text-sm sm:text-base font-semibold text-black">
                             ₹{(getPriceAfterDiscount(item.productId.price, item.productId.discount) * item.quantity).toFixed(2)}
                           </p>
                           <p className="text-xs text-gray-600 line-through">
@@ -174,65 +223,104 @@ const Cart = ({ isOpen, onClose }) => {
                       </div>
                     ))}
                   </div>
-
                 </div>
               )}
             </div>
 
             {/* Footer with bill summary */}
             {cartItem.length > 0 && (
-              <div className="border-t p-4 space-y-3">
-                <div className="space-y-2">
-                  <div className="flex justify-between text-sm">
-                    <span className="text-gray-600">Subtotal</span>
-                    <p>
-                      <span className='mr-2  text-gray-600 line-through'>₹{tAmountNoDis}</span>
-                      <span>₹{cartTotalAmount.toFixed(2)}</span>
-                    </p>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-gray-600">Delivery Fee</span>
-                    <p>
-                      <span className='mr-2  text-gray-600 line-through'>₹25</span>
-                      <span>₹0</span>
-                    </p>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-gray-600">Handling Charge</span>
-                    <p>
-                      <span className='mr-2  text-gray-600 line-through'>₹10</span>
-                      <span>₹0</span>
-                    </p>
-                  </div>
+              <div className="border-t p-3 sm:p-4 space-y-3">
+                {/* Bill summary toggle */}
+                <button
+                  onClick={() => setShowBillDetails(!showBillDetails)}
+                  className="cursor-pointer flex items-center justify-between w-full text-left text-sm font-medium text-purple-700 hover:text-purple-900"
+                >
+                  <span>View Bill Details</span>
+                  {showBillDetails ? <FiChevronRight className='rotate-90 w-5 h-5' /> : <FiChevronRight className='w-5 h-5' />}
+                </button>
 
-                </div>
+                {/* Bill details panel */}
+                <AnimatePresence>
+                  {showBillDetails && (
+                    <motion.div
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{
+                        height: 'auto',
+                        opacity: 1,
+                        transition: {
+                          height: { type: 'spring', stiffness: 300, damping: 30 },
+                          opacity: { duration: 0.2 }
+                        }
+                      }}
+                      exit={{
+                        height: 0,
+                        opacity: 0,
+                        transition: {
+                          height: { duration: 0.3 },
+                          opacity: { duration: 0.1 }
+                        }
+                      }}
+                      className="overflow-hidden"
+                    >
+                      <div className="space-y-2 pt-2">
+                        <div className="flex justify-between text-sm">
+                          <span className="text-gray-600">Subtotal</span>
+                          <p>
+                            <span className='mr-2 text-gray-600 line-through'>₹{tAmountNoDis.toFixed(2)}</span>
+                            <span>₹{cartTotalAmount.toFixed(2)}</span>
+                          </p>
+                        </div>
+                        <div className="flex justify-between text-sm">
+                          <span className="text-gray-600">Delivery Fee</span>
+                          <p>
+                            <span className='mr-2 text-gray-600 line-through'>₹25</span>
+                            <span>₹0</span>
+                          </p>
+                        </div>
+                        <div className="flex justify-between text-sm">
+                          <span className="text-gray-600">Handling Charge</span>
+                          <p>
+                            <span className='mr-2 text-gray-600 line-through'>₹10</span>
+                            <span>₹0</span>
+                          </p>
+                        </div>
+                        <div className="flex justify-between text-sm text-green-600">
+                          <span>Total Savings</span>
+                          <span>₹{savings.toFixed(2)}</span>
+                        </div>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
 
+                {/* Total amount */}
                 <div className="border-t pt-3">
                   <div className="flex justify-between font-medium">
                     <span>Total</span>
                     <p>
-                      <span className='mr-2  text-gray-600 line-through' >₹{totalAmountNoDis.toFixed(2)}</span>
+                      <span className='mr-2 text-gray-600 line-through'>₹{totalAmountNoDis.toFixed(2)}</span>
                       <span>₹{toatlAmount.toFixed(2)}</span>
                     </p>
                   </div>
                 </div>
 
-                {/* Savings animation */}
-
-
+                {/* Checkout button */}
                 <button
                   className="cursor-pointer w-full py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors flex items-center justify-center gap-2 mt-4"
+                  disabled={!!updatingItemId}
                 >
-                  Proceed to Checkout
-                  <motion.div
-                    animate={{
-                      x: [0, 4, 0],
-                      opacity: [0.8, 1, 0.8],
-                      transition: { repeat: Infinity, duration: 1.8, ease: "easeInOut" }
-                    }}
-                  >
-                    <FiChevronsRight className="h-6 w-6" />
-                  </motion.div>
+                  <>
+                    Proceed to Checkout
+                    <motion.div
+                      animate={{
+                        x: [0, 4, 0],
+                        opacity: [0.8, 1, 0.8],
+                        transition: { repeat: Infinity, duration: 1.8, ease: "easeInOut" }
+                      }}
+                    >
+                      <FiChevronsRight className="h-6 w-6" />
+                    </motion.div>
+                  </>
                 </button>
               </div>
             )}

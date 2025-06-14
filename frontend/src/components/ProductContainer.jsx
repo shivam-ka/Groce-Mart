@@ -129,7 +129,7 @@ const ProductContainer = ({ product }) => {
                                 <motion.button
                                     onClick={(e) => decreaseQnty(e, cartItemDetails)}
                                     whileTap={{ scale: 0.95 }}
-                                    className="cursor-pointer rounded-l-xl w-8 h-8 flex items-center justify-center bg-purple-600  shadow-sm text-white hover:bg-purple-700 transition-colors"
+                                    className="cursor-pointer border rounded-l-xl w-8 h-8 flex items-center justify-center bg-purple-600  shadow-sm text-white hover:bg-purple-700 transition-colors"
                                 >
                                     <FiMinus size={14} />
                                 </motion.button>
@@ -141,7 +141,7 @@ const ProductContainer = ({ product }) => {
                                 <motion.button
                                     onClick={(e) => increaseQnty(e, cartItemDetails)}
                                     whileTap={{ scale: 0.95 }}
-                                    className="cursor-pointer rounded-r-xl w-8 h-8 flex items-center justify-center bg-purple-600  shadow-sm text-white hover:bg-purple-700 transition-colors"
+                                    className="cursor-pointer border rounded-r-xl w-8 h-8 flex items-center justify-center bg-purple-600  shadow-sm text-white hover:bg-purple-700 transition-colors"
                                 >
                                     <FiPlus size={14} />
                                 </motion.button>

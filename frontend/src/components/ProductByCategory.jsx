@@ -46,37 +46,29 @@ const ProductByCategory = ({ categoryId, categoryName, navigateTo }) => {
 
 
     return (
-        <div className="mx-auto px-2 py-6">
+        <div className="mx-auto md:px-2 py-6">
             {/* category heading  */}
-            {isLoading ?
-                <PreHeading />
-                : (data[0] &&
-                    <div className="flex items-center justify-between mb-4">
-                        <h1 className="text-lg sm:text-xl font-semibold text-black">
-                            {categoryName}
-                        </h1>
-                        <Link
-                            onClick={() => window.scrollTo(0, 0)}
-                            to={navigateTo}>
-                            <span className="flex items-center text-sm sm:text-lg text-red-600 cursor-pointer">
-                                See All
-                                <FiChevronRight className='text-xl' />
-                            </span>
-                        </Link>
+            {data[0] &&
+                <div className="flex items-center justify-between mb-4">
+                    <h1 className="text-base sm:text-xl font-semibold text-black">
+                        {categoryName}
+                    </h1>
+                    <Link
+                        onClick={() => window.scrollTo(0, 0)}
+                        to={navigateTo}>
+                        <span className="flex items-center text-sm sm:text-lg text-red-600 cursor-pointer">
+                            See All
+                            <FiChevronRight className='text-xl' />
+                        </span>
+                    </Link>
 
-                    </div>)
-            }
+                </div>}
 
             {/* Products Grid */}
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 2xl:grid-cols-6 gap-4">
-                {isLoading ? <PreProduct Length={6} /> :
-
-                    data.map((product) => (
-                        <ProductContainer key={product._id} product={product} />
-
-                    ))
-
-                }
+            <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 2xl:grid-cols-6 md:gap-4">
+                {data.map((product) => (
+                    <ProductContainer key={product._id} product={product} />
+                ))}
             </div>
 
         </div>

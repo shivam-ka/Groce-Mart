@@ -39,7 +39,7 @@ const GlobalProvider = ({ children }) => {
 
     const increaseQnty = async (e, cartItemDetails) => {
         e.stopPropagation();
-        e.preventDefault();
+        e.preventDefault()
 
         const qnty = cartItemDetails?.quantity + 1
 
@@ -86,7 +86,6 @@ const GlobalProvider = ({ children }) => {
         } catch (error) {
             errorToast(error)
         }
-
     }
 
     useEffect(() => {
@@ -120,6 +119,7 @@ const GlobalProvider = ({ children }) => {
         tAmountNoDis,
         isCartOpen,
         setIsCartOpen,
+      
     }
 
     return (
