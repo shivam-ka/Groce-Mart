@@ -10,7 +10,7 @@ import { errorToast, infoToast, warningToast } from "../Utils/ShowToast";
 
 
 // Icons 
-import { FiEdit, FiTrash2, FiMapPin, FiPhone } from 'react-icons/fi';
+import { FiEdit, FiTrash2, } from 'react-icons/fi';
 import { FaPlus, FaTimes, FaCheck, FaUpload, FaMapMarkerAlt } from "react-icons/fa";
 import { BsThreeDots, } from "react-icons/bs";
 

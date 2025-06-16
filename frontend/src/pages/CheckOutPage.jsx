@@ -1,15 +1,15 @@
 import { motion, AnimatePresence } from "framer-motion";
 
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import { useGlobalContext } from "../provider/GlobalProvider";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
-import CartItemList from "../components/CartItemLIst";
-import AddressManagement from "../components/AddressManagement";
-import { ButtonLoading } from "../components";
+import { CartItemList, AddressManagement, ButtonLoading } from "../components/index";
+
+
 
 // Icons
-import {  FiCheckCircle, } from "react-icons/fi";
+import { FiCheckCircle, } from "react-icons/fi";
 import { HiCash } from "react-icons/hi";
 import { FaCreditCard } from "react-icons/fa";
 
@@ -166,7 +166,7 @@ const CheckOutPage = () => {
               {/* Place Order Button */}
               <div >
                 <button className="cursor-pointer w-full bg-purple-600 hover:bg-purple-700 text-white font-medium py-3 px-4 rounded-lg transition-colors duration-200 mt-6 flex items-center justify-center shadow-md hover:shadow-lg">
-                  <FaCreditCard  className="mr-2" />
+                  <FaCreditCard className="mr-2" />
                   Pay Online
                 </button>
                 <button className="cursor-pointer w-full bg-white hover:bg-purple-100 text-purple-600 border font-medium py-3 px-4 rounded-lg transition-colors duration-200 mt-3 flex items-center justify-center shadow-md hover:shadow-lg">
