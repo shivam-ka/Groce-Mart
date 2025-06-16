@@ -121,9 +121,28 @@ const summarApi = {
             method: 'put'
         },
         removeCartItem: {
-             url: 'api/v1/cart/remove-cart-product',
+            url: 'api/v1/cart/remove-cart-product',
             method: 'delete'
         }
+    },
+    address: {
+        addAddress: {
+            url: 'api/v1/address/add-address',
+            method: 'post'
+        },
+        getAddress: {
+            url: 'api/v1/address/get-address',
+            method: 'get'
+        },
+        updateAddress: {
+            url: 'api/v1/address/update-address',
+            method: 'put'
+        },
+        deleteAddress: {
+            url: 'api/v1/address/delete',
+            method: 'delete'
+        }
+
     }
 }
 

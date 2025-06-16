@@ -75,12 +75,14 @@ const updateAddress = async (req, res) => {
     try {
         const { addressId, address_line, city, state, pincode, mobile } = req.body;
 
-        if ([addressId, address_line, city, state, pincode, mobile].some(field => field.trim() === '')) {
+        if ([addressId, address_line, city, state, pincode, mobile].some(field =>
+            (field?.toString()?.trim() ?? '') === ''
+        )) {
             return res
                 .status(400)
                 .json(new ApiError(
                     400,
-                    "All Field Are Required",
+                    "All fields are required",
                 ))
         }
 
