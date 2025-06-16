@@ -70,4 +70,49 @@ const getAddress = async (req, res) => {
     }
 }
 
-export { addAddress, getAddress }
+const updateAddress = async (req, res) => {
+    try {
+        const { addressId, address_line, city, state, pincode, mobile } = req.body;
+
+        if ([addressId, address_line, city, state, pincode, mobile].some(field => field.trim() === '')) {
+            return res
+                .status(400)
+                .json(new ApiError(
+                    400,
+                    "All Field Are Required",
+                ))
+        }
+
+        const updateAddress = await AddressModel.findByIdAndUpdate(
+            addressId,
+            {
+                $set: {
+                    address_line,
+                    city,
+                    state,
+                    pincode,
+                    mobile
+                }
+            },
+            {
+                new: true
+            }
+        )
+
+        return res
+            .status(200)
+            .json(new ApiResponse(
+                200,
+                updateAddress,
+                "Address Update Successfully"
+            ))
+
+    } catch (error) {
+        console.log("update Address error: ", error)
+        return res
+            .status(500)
+            .json(new ApiError(500, error.message || "update Address Error"))
+    }
+}
+
+export { addAddress, getAddress, updateAddress }
