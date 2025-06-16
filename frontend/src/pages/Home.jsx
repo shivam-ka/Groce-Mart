@@ -45,7 +45,7 @@ const Home = () => {
         {isCategoryLoading ?
           <PreHomeCategory />
           :
-          <div className="grid grid-cols-5 gap-1.5 xs:grid-cols-5 sm:grid-cols-6 md:grid-cols-7 lg:grid-cols-9 sm:gap-2 md:gap-3">
+          <div className="grid grid-cols-4 gap-1.5 xs:grid-cols-5 sm:grid-cols-6 md:grid-cols-7 lg:grid-cols-9 sm:gap-2 md:gap-3">
             {allCategory.map((item) => (
               <Link
                 onClick={window.scrollTo({ top: 0 })}
@@ -96,7 +96,7 @@ const Home = () => {
           Array(4).fill(null).map((_, index) => (
             <div key={index} className="mx-auto px-2 py-6">
               <PreHeading />
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 2xl:grid-cols-6 gap-4">
+              <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 2xl:grid-cols-6 md:gap-4">
                 <PreProduct Length={6} />
               </div>
             </div>

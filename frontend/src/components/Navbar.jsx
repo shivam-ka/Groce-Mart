@@ -102,11 +102,11 @@ const Nav = () => {
 
   return (
     <nav className="bg-white shadow-xl sticky top-0 z-50 border-b border-purple-400">
-      <div className="mx-auto px-2 sm:px-6 lg:px-8">
+      <div className="mx-auto px-0.5 sm:px-6 lg:px-8">
         <div className="flex justify-between h-20 items-center">
           {/* Logo Section */}
-          <Link to='/' className='flex items-center gap-3'>
-            <img className='w-12 h-12' src={asstes.logo} alt="Groce Mart Logo" />
+          <Link to='/' className='flex items-center gap-0 md:gap-3'>
+            <img className='ml-0.5 w-9 h-9 md:w-12 md:h-12' src={asstes.logo} alt="Groce Mart Logo" />
             <div className="flex items-center">
               <h1 className='hidden lg:block text-2xl font-bold text-gray-900'>Groce Mart</h1>
               {user.role === "ADMIN" && (

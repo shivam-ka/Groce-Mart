@@ -112,7 +112,7 @@ const CheckOutPage = () => {
                   }}
                   className="overflow-hidden"
                 >
-                  <div className="space-y-3 pt-4">
+                  <div className="px-2 space-y-1.5 sm:space-y-3 pt-4">
                     {/* Subtotal */}
                     <div className="flex justify-between">
                       <span className="text-sm sm:text-base text-gray-600">Subtotal</span>

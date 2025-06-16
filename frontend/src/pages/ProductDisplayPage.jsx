@@ -266,7 +266,7 @@ const ProductDisplayPage = () => {
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ delay: 0.4 }}
-                    className="text-gray-700 leading-relaxed"
+                    className="text-gray-700 leading-relaxed text-sm sm:text-base"
                   >
                     {product?.description || "Premium quality product description"}
                   </motion.p>

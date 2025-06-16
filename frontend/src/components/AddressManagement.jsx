@@ -253,7 +253,7 @@ const AddressManagement = () => {
 
                 <div className="bg-white rounded-xl shadow-sm px-2 py-4 md:p-6 sticky top-8">
 
-                    <div className="flex items-center justify-between  bg-white ">
+                    <div className="flex items-center justify-between bg-white px-1 md:px-0">
                         <h2 className="text-lg md:text-xl font-semibold text-gray-800 flex items-center gap-2">
                             <FaMapMarkerAlt className="text-gray-600" />
                             <span>Addresses</span>
@@ -266,7 +266,7 @@ const AddressManagement = () => {
                                 }
                                 setIsModalOpen(true)
                             }}
-                            className="cursor-pointer flex items-center text-sm md:text-base gap-2 px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-md transition-colors duration-200 "
+                            className="cursor-pointer flex items-center text-sm md:text-base gap-2 px-3 py-1.5  md:px-4 md:py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-md transition-colors duration-200 "
                         >
                             <FaPlus className="text-xs md:text-sm" />
                             <span>Add New</span>
@@ -329,7 +329,7 @@ const AddressManagement = () => {
 
                                 <div className="flex flex-col sm:flex-row gap-5">
                                     {/* Address content */}
-                                    <div className="flex-1 space-y-0.5 md:space-y-1">
+                                    <div className="flex-1 space-y-0 md:space-y-1">
                                         <div className="flex items-center gap-1">
 
                                             <h3 className="text-base md:text-lg font-semibold text-gray-900">{user.name}</h3>

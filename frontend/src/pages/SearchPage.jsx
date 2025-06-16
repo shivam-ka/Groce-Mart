@@ -19,7 +19,7 @@ const SearchPage = () => {
 
     const [isLoading, setIsLoading] = useState(false)
     const [searchQueary, setSearchQueary] = useState('')
-    const [limit, setLimit] = useState(10)
+    const [limit, setLimit] = useState(12)
     const [currentPage, setCurrentPage] = useState(1)
     const [totalPages, setTotalPages] = useState(1)
     const [products, setProducts] = useState([])
@@ -75,7 +75,7 @@ const SearchPage = () => {
                 <NoProductFound query={query} />
             }
 
-            {query && products[0] && <div className='flex items-center gap-1 py-2 sm:py-4 text-base'>
+            {query && products[0] && <div className='flex items-center gap-0 md:gap-1 py-2 sm:py-4 text-xs md:text-base'>
 
                 <Link to='/' > Home </Link>
 
@@ -95,7 +95,7 @@ const SearchPage = () => {
             >
 
 
-                <div className='py-6 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 2xl:grid-cols-6 gap-4'>
+                <div className='py-6 grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 2xl:grid-cols-6 md:gap-4'>
                     {isLoading ?
                         <PreProduct Length={10} />
 
