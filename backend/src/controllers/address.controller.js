@@ -42,11 +42,32 @@ const addAddress = async (req, res) => {
             ))
 
     } catch (error) {
-        console.log("delete CartItem error: ", error)
+        console.log("add Address error: ", error)
         return res
             .status(500)
-            .json(new ApiError(500, error.message || "delete CartItem Error"))
+            .json(new ApiError(500, error.message || "Add Address Error"))
     }
 }
 
-export { addAddress }
+const getAddress = async (req, res) => {
+    try {
+
+        const address = await AddressModel.find({ userId: req.user?._id })
+
+        return res
+            .status(200)
+            .json(new ApiResponse(
+                200,
+                address,
+                "Address Fetched Successfully"
+            ))
+
+    } catch (error) {
+        console.log("Get Address error: ", error)
+        return res
+            .status(500)
+            .json(new ApiError(500, error.message || "Get Address Error"))
+    }
+}
+
+export { addAddress, getAddress }
