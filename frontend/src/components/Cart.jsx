@@ -6,7 +6,7 @@ import { IoIosArrowBack } from "react-icons/io";
 import { useGlobalContext } from '../provider/GlobalProvider';
 import { useSelector } from 'react-redux';
 import { useNavigate } from "react-router-dom"
-import CartItemList from './CartItemLIst';
+import { CartItemList } from './index';
 
 const Cart = ({ isOpen, onClose }) => {
   const {
