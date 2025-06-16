@@ -6,7 +6,16 @@ import { ApiResponse } from "../utils/ApiResponse.js"
 const addAddress = async (req, res) => {
     try {
 
-        const { address_line, city, state, pincode, mobile } = req.body
+        const { address_line, city, state, pincode, mobile } = req.body;
+
+        if ([address_line, city, state, pincode, mobile].some(field => field.trim() === '')) {
+            return res
+                .status(400)
+                .json(new ApiError(
+                    400,
+                    "All Field Are Required",
+                ))
+        }
 
         const createAddress = new AddressModel({
             address_line,
