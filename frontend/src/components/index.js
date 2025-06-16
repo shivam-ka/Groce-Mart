@@ -10,7 +10,7 @@ import PreHeading from "./PreLoader/PreHeading";
 import PreProductDisplay from "./PreLoader/PreProductDisplay";
 import ProductContainer from "./ProductContainer";
 import Cart from "./Cart";
-import CartItemList from "./CartItemLIst";
+import CartItemList from "./CartItemList";
 import AddressManagement from "./AddressManagement";
 
 export { Navbar, Footer, ButtonLoading, PreSubCategory, PreCategory, PreHomeCategory, ProductByCategory, PreProduct, PreHeading, PreProductDisplay, ProductContainer, Cart, CartItemList, AddressManagement }
