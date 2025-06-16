@@ -1,3 +1,4 @@
+import mongoose from "mongoose"
 import AddressModel from "../model/address.model.js"
 import userModel from "../model/user.model.js"
 import { ApiError } from "../utils/ApiError.js"
@@ -115,4 +116,39 @@ const updateAddress = async (req, res) => {
     }
 }
 
-export { addAddress, getAddress, updateAddress }
+const deleteAddress = async (req, res) => {
+    try {
+
+        const addressId = req.params?.addressId
+
+        await AddressModel.findByIdAndDelete(addressId)
+
+        await userModel.findByIdAndUpdate(
+            req.user?._id,
+            {
+                $pull: {
+                    address_details: new mongoose.Types.ObjectId(addressId)
+                }
+            },
+            {
+                new: true
+            }
+        )
+
+        return res
+            .status(200)
+            .json(new ApiResponse(
+                200,
+                {},
+                "Address Delete Successfully"
+            ))
+
+    } catch (error) {
+        console.log("delete Address error: ", error)
+        return res
+            .status(500)
+            .json(new ApiError(500, error.message || "delete Address Error"))
+    }
+}
+
+export { addAddress, getAddress, updateAddress, deleteAddress }
