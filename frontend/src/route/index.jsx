@@ -1,6 +1,6 @@
 import { createBrowserRouter } from "react-router-dom"
 import App from "../App"
-import { ErrorPage, ForgotPassword, Home, Login, Register, UserDashboard, Address, Category, SubCategory, UploadProduct, ProductListPage, ProductDisplayPage, SearchPage } from "../pages"
+import { ErrorPage, ForgotPassword, Home, Login, Register, UserDashboard, Address, Category, SubCategory, UploadProduct, ProductListPage, ProductDisplayPage, SearchPage, CheckOutPage } from "../pages"
 import AdminProtractor from "../layout/AdminProtractor"
 
 
@@ -28,6 +28,10 @@ const router = createBrowserRouter([
             {
                 path: 'forgot-password',
                 element: <ForgotPassword />
+            },
+            {
+                path: '/checkout',
+                element: <CheckOutPage />
             },
             {
                 path: 'dashboard',

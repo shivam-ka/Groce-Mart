@@ -145,7 +145,7 @@ const Nav = () => {
 
           {/* Desktop - Right side bottom */}
           <AnimatePresence>
-            {windowWidth >= 640 && cartQuantity > 0 && (
+            {windowWidth >= 640 && location.pathname != '/checkout' && cartQuantity > 0 && (
               <motion.div
                 className="fixed bottom-6 right-6 z-50"
                 initial={{ y: 50, opacity: 0 }}
@@ -184,7 +184,7 @@ const Nav = () => {
 
           {/* Mobile - Center bottom */}
           <AnimatePresence>
-            {windowWidth < 640 && cartQuantity > 0 && (
+            {windowWidth < 640 && location.pathname != '/checkout' && cartQuantity > 0 && (
               <motion.div
                 className="fixed bottom-6 left-0 right-0 flex justify-center z-50 px-4"
                 initial={{ y: 50, opacity: 0 }}

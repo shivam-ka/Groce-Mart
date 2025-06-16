@@ -8,4 +8,13 @@ const errorToast = (err) => {
     CustomToast.error(err.response.data.message)
 }
 
-export { successToast, errorToast } 
+const warningToast = (msg) => {
+    CustomToast.warning(msg)
+}
+
+
+const infoToast = (msg) => {
+    CustomToast.info(msg)
+}
+
+export { successToast, errorToast, warningToast, infoToast } 

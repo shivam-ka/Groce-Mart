@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react'
 import { FiShoppingCart, FiChevronRight, FiMinus, FiPlus } from "react-icons/fi";
 import { FaFire, FaMotorcycle, } from "react-icons/fa";
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { motion } from "framer-motion"
-import { errorToast, successToast } from '../Utils/ShowToast';
+import { warningToast, errorToast, successToast, infoToast } from '../Utils/ShowToast';
 import Axios from '../Utils/Axios';
 import summarApi from '../common/SummaryApi';
 import ButtonLoading from './ButtonLoading';
@@ -13,8 +13,10 @@ import { useSelector } from 'react-redux';
 const ProductContainer = ({ product }) => {
 
     const cartItem = useSelector(state => state.cartItem.cart);
-    const { fetchCartItem, increaseQnty, decreaseQnty, getPriceAfterDiscount } = useGlobalContext();
+    const { fetchCartItem, increaseQnty, decreaseQnty, getPriceAfterDiscount } = useGlobalContext()
+    const user = useSelector(state => state.user)
 
+    const navigate = useNavigate()
     const [isLoading, setIsLoading] = useState(false);
     const [isAvailableInCart, setIsAvailableInCart] = useState(false)
     const [cartItemDetails, setCartItemDetails] = useState({})
@@ -27,6 +29,12 @@ const ProductContainer = ({ product }) => {
     const handleAddToCart = async (e) => {
         e.stopPropagation();
         e.preventDefault();
+
+        if (!user?._id) {
+            window.scrollTo(0, 0)
+            navigate('/login')
+            return infoToast('Please log in to add items to your cart.')
+        }
         setIsLoading(true)
 
         try {

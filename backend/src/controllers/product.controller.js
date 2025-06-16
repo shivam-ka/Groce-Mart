@@ -14,7 +14,7 @@ const addProduct = async (req, res) => {
         const image3 = req.files?.image3 && req.files.image3[0];
         const image4 = req.files?.image4 && req.files.image4[0];
 
-        if ([name, category[0], unit, unit_quantity, stock, price, discount, description].some((field) => field === '')) {
+        if ([name, category[0], unit, unit_quantity, stock, price, discount,].some((field) => field === '')) {
             return res
                 .status(400)
                 .json(new ApiError(
@@ -136,7 +136,7 @@ const updateProduct = async (req, res) => {
                 ))
         }
 
-        if ([name, category[0], unit, unit_quantity, stock, price, discount, description].some((field) => field === '')) {
+        if ([name, category[0], unit, unit_quantity, stock, price, discount,].some((field) => field === '')) {
             return res
                 .status(400)
                 .json(new ApiError(

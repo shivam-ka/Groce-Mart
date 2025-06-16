@@ -1,26 +1,32 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState } from 'react';
 import { FaShippingFast, FaShoppingCart } from 'react-icons/fa';
-import { FiChevronRight, FiChevronsRight, FiMinus, FiPlus,} from 'react-icons/fi';
+import { FiChevronRight, FiChevronsRight, FiMinus, FiPlus, } from 'react-icons/fi';
 import { IoIosArrowBack } from "react-icons/io";
 import { useGlobalContext } from '../provider/GlobalProvider';
+import { useSelector } from 'react-redux';
+import { useNavigate } from "react-router-dom"
 
 const Cart = ({ isOpen, onClose }) => {
   const {
     cartItem,
     getPriceAfterDiscount,
     cartTotalAmount,
-    tAmountNoDis,
+    cartTotalAmountNoDis,
     increaseQnty,
     decreaseQnty,
   } = useGlobalContext();
 
+  const navigate = useNavigate()
+
+  const user = useSelector(state => state.user)
+  console.log(user)
+
   // Calculate charges
   const deliveryFee = 25
   const handlingCharge = 10
-  const totalAmountNoDis = tAmountNoDis + deliveryFee + handlingCharge
-  const toatlAmount = cartTotalAmount
-  const savings = totalAmountNoDis - toatlAmount
+  const grossTotalBeforeDiscount = cartTotalAmountNoDis + deliveryFee + handlingCharge
+  const savings = grossTotalBeforeDiscount - cartTotalAmount
 
   // State for bill details visibility
   const [showBillDetails, setShowBillDetails] = useState(false)
@@ -266,7 +272,7 @@ const Cart = ({ isOpen, onClose }) => {
                         <div className="flex justify-between text-sm">
                           <span className="text-gray-600">Subtotal</span>
                           <p>
-                            <span className='mr-2 text-gray-600 line-through'>₹{tAmountNoDis.toFixed(2)}</span>
+                            <span className='mr-2 text-gray-600 line-through'>₹{cartTotalAmountNoDis.toFixed(2)}</span>
                             <span>₹{cartTotalAmount.toFixed(2)}</span>
                           </p>
                         </div>
@@ -298,14 +304,15 @@ const Cart = ({ isOpen, onClose }) => {
                   <div className="flex justify-between font-medium">
                     <span>Total</span>
                     <p>
-                      <span className='mr-2 text-gray-600 line-through'>₹{totalAmountNoDis.toFixed(2)}</span>
-                      <span>₹{toatlAmount.toFixed(2)}</span>
+                      <span className='mr-2 text-gray-600 line-through'>₹{grossTotalBeforeDiscount.toFixed(2)}</span>
+                      <span>₹{cartTotalAmount.toFixed(2)}</span>
                     </p>
                   </div>
                 </div>
 
                 {/* Checkout button */}
                 <button
+                  onClick={() => (onClose(), navigate('/checkout'))}
                   className="cursor-pointer w-full py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors flex items-center justify-center gap-2 mt-4"
                   disabled={!!updatingItemId}
                 >
