@@ -18,6 +18,7 @@ const GlobalProvider = ({ children }) => {
     const [cartTotalAmount, setCartTotalAmount] = useState(0)
     const [cartTotalAmountNoDis, setCartTotalAmountNoDis] = useState(0)
     const [isCartOpen, setIsCartOpen] = useState(false)
+    const [selectedAddress, setSelectedAddress] = useState('')
 
     const getPriceAfterDiscount = (ogPrice, discount) => {
         const discountAmount = ogPrice * (discount / 100);
@@ -137,8 +138,9 @@ const GlobalProvider = ({ children }) => {
         cartTotalAmountNoDis,
         isCartOpen,
         setIsCartOpen,
-        fetchAddress
-
+        fetchAddress,
+        selectedAddress,
+        setSelectedAddress
     }
 
     return (

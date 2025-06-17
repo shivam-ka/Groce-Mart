@@ -1,11 +1,9 @@
 import { motion, AnimatePresence } from "framer-motion";
-
 import { useState } from "react";
 import { useGlobalContext } from "../provider/GlobalProvider";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { CartItemList, AddressManagement, ButtonLoading } from "../components/index";
-
 
 
 // Icons
@@ -23,12 +21,12 @@ const CheckOutPage = () => {
     cartTotalAmountNoDis,
     increaseQnty,
     decreaseQnty,
+    selectedAddress,
   } = useGlobalContext();
 
 
   const user = useSelector(state => state.user)
   const navigate = useNavigate()
-
 
 
   // Calculate charges
@@ -69,7 +67,7 @@ const CheckOutPage = () => {
       <main className="mx-auto px-2 py-4 md:px-4 md:py-8">
         <div className="flex flex-col lg:grid grid-cols-2 gap-4">
           {/* Left Section - Checkout Steps */}
-          <AddressManagement />
+          <AddressManagement data />
 
           {/* Right Section - Order Summary */}
           <motion.div

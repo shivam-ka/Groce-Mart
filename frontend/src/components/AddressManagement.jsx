@@ -13,12 +13,13 @@ import { errorToast, infoToast, warningToast } from "../Utils/ShowToast";
 import { FiEdit, FiTrash2, } from 'react-icons/fi';
 import { FaPlus, FaTimes, FaCheck, FaUpload, FaMapMarkerAlt } from "react-icons/fa";
 import { BsThreeDots, } from "react-icons/bs";
+import { MdAddLocationAlt } from "react-icons/md";
 
 
+const AddressManagement = ({ data }) => {
 
-const AddressManagement = () => {
 
-    const { fetchAddress } = useGlobalContext();
+    const { fetchAddress, selectedAddress, setSelectedAddress } = useGlobalContext();
 
     const user = useSelector(state => state.user)
     const navigate = useNavigate()
@@ -30,7 +31,6 @@ const AddressManagement = () => {
     const [isOpen, setIsOpen] = useState('');
     const dropdownRef = useRef(null);
 
-    const [selectedAddress, setSelectedAddress] = useState(false)
     const [errors, setErrors] = useState({
         address_line: '',
         city: '',
@@ -268,7 +268,7 @@ const AddressManagement = () => {
                             }}
                             className="cursor-pointer flex items-center text-sm md:text-base gap-2 px-3 py-1.5  md:px-4 md:py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-md transition-colors duration-200 "
                         >
-                            <FaPlus className="text-xs md:text-sm" />
+                            <MdAddLocationAlt className="text-xs md:text-sm" />
                             <span>Add New</span>
                         </button>
                     </div>
@@ -386,7 +386,7 @@ const AddressManagement = () => {
                                 </button>
                             </div>
 
-                            <div className="space-y-4 h-[70vh] overflow-y-scroll scrollbar-hide">
+                            <div className="space-y-4 h-[60vh] md:h-[70vh] overflow-y-scroll scrollbar-hide">
                                 {/* Address Line */}
                                 <div>
                                     <label htmlFor="address_line" className="block text-sm font-medium text-gray-700 mb-1">
@@ -426,6 +426,7 @@ const AddressManagement = () => {
                                         <p className="mt-1 text-sm text-red-600">{errors.city}</p>
                                     )}
                                 </div>
+
 
                                 {/* State */}
                                 <div>
@@ -467,6 +468,8 @@ const AddressManagement = () => {
                                     )}
                                 </div>
 
+
+
                                 {/* Mobile */}
                                 <div>
                                     <label htmlFor="mobile" className="block text-sm font-medium text-gray-700 mb-1">
@@ -492,10 +495,10 @@ const AddressManagement = () => {
                                 </div>
                             </div>
 
-                            <div className="flex justify-end space-x-3">
+                            <div className="flex  justify-end mt-4 md:mt-0 space-x-3">
                                 <button
                                     onClick={() => handleResetform()}
-                                    className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
+                                    className="px-4 py-2 border border-black rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
                                 >
                                     Cancel
                                 </button>
@@ -513,7 +516,7 @@ const AddressManagement = () => {
                                             </>
                                         ) : (
                                             <>
-                                                <FaUpload className="mr-2" />
+                                                <MdAddLocationAlt className="mr-2" />
                                                 Add Address
                                             </>
                                         )}
