@@ -4,4 +4,16 @@
     <loc>https://grocemart.vercel.app/</loc>
     <lastmod>2024-01-01</lastmod>
   </url>
+   <url>
+    <loc>https://grocemart.vercel.app/product</loc>
+    <lastmod>2024-01-01</lastmod>
+  </url>
+  <url>
+    <loc>https://grocemart.vercel.app/checkout</loc>
+    <lastmod>2024-01-01</lastmod>
+  </url>
+   <url>
+    <loc>https://grocemart.vercel.app/dashboard</loc>
+    <lastmod>2024-01-01</lastmod>
+  </url>
 </urlset>

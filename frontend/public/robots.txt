@@ -1,4 +1,5 @@
 User-agent: *
 Allow: /
-Disallow: /admin*
+Disallow: /dashboard
+Disallow: /dashboard/
 Sitemap: https://grocemart.vercel.app/sitemap.xml
