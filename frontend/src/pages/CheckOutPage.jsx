@@ -10,6 +10,9 @@ import { CartItemList, AddressManagement, ButtonLoading } from "../components/in
 import { FiCheckCircle, } from "react-icons/fi";
 import { HiCash } from "react-icons/hi";
 import { FaCreditCard } from "react-icons/fa";
+import Axios from "../Utils/Axios";
+import summarApi from "../common/SummaryApi";
+import { infoToast, successToast } from "../Utils/ShowToast";
 
 
 const CheckOutPage = () => {
@@ -59,6 +62,32 @@ const CheckOutPage = () => {
     }
   };
 
+  const handleCashOrder = async (e) => {
+
+    if (!selectedAddress) {
+      return infoToast('Select Address To Place Order')
+    }
+
+    try {
+
+      const response = await Axios({
+        ...summarApi.order.cashOrder,
+        data: {
+          itemList: cartItem,
+          grossTotal: grossTotalBeforeDiscount,
+          cartTotalAmount: cartTotalAmountNoDis,
+          deliveryAddressId: selectedAddress
+        }
+      })
+
+      if (response.data.success) {
+        successToast(response.data.message)
+      }
+
+    } catch (error) {
+      console.log(error)
+    }
+  }
 
 
 
@@ -167,7 +196,9 @@ const CheckOutPage = () => {
                   <FaCreditCard className="mr-2" />
                   Pay Online
                 </button>
-                <button className="cursor-pointer w-full bg-white hover:bg-purple-100 text-purple-600 border font-medium py-3 px-4 rounded-lg transition-colors duration-200 mt-3 flex items-center justify-center shadow-md hover:shadow-lg">
+                <button
+                  onClick={(e) => handleCashOrder()}
+                  className="cursor-pointer w-full bg-white hover:bg-purple-100 text-purple-600 border font-medium py-3 px-4 rounded-lg transition-colors duration-200 mt-3 flex items-center justify-center shadow-md hover:shadow-lg">
                   <HiCash className="mr-2" />
                   Cash On Delivery
                 </button>

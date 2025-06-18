@@ -142,8 +142,15 @@ const summarApi = {
             url: 'api/v1/address/delete',
             method: 'delete'
         }
-
+    },
+    order: {
+        cashOrder: {
+            url: 'api/v1/order/cash-payment',
+            method: 'post'
+        }
     }
+
+
 }
 
 export default summarApi
