@@ -4,6 +4,7 @@ import { useGlobalContext } from "../provider/GlobalProvider";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { CartItemList, AddressManagement, ButtonLoading } from "../components/index";
+import { loadStripe } from '@stripe/stripe-js';
 
 
 // Icons
@@ -12,7 +13,7 @@ import { HiCash } from "react-icons/hi";
 import { FaCreditCard } from "react-icons/fa";
 import Axios from "../Utils/Axios";
 import summarApi from "../common/SummaryApi";
-import { infoToast, successToast } from "../Utils/ShowToast";
+import { errorToast, infoToast, successToast } from "../Utils/ShowToast";
 
 
 const CheckOutPage = () => {
@@ -31,6 +32,9 @@ const CheckOutPage = () => {
   const user = useSelector(state => state.user)
   const navigate = useNavigate()
 
+  const [updatingItemId, setUpdatingItemId] = useState(null)
+  const [isLoading, setIsLoading] = useState(false)
+  const [isStripeLoading, setIsStripeLoading] = useState(false)
 
   // Calculate charges
   const deliveryFee = 25
@@ -38,7 +42,6 @@ const CheckOutPage = () => {
   const grossTotalBeforeDiscount = cartTotalAmountNoDis + deliveryFee + handlingCharge
   const savings = grossTotalBeforeDiscount - cartTotalAmount
 
-  const [updatingItemId, setUpdatingItemId] = useState(null)
 
   const handleIncreaseQnty = async (e, item) => {
     setUpdatingItemId(item._id);
@@ -62,11 +65,13 @@ const CheckOutPage = () => {
     }
   };
 
-  const handleCashOrder = async (e) => {
+  const handleCashOrder = async () => {
 
     if (!selectedAddress) {
       return infoToast('Select Address To Place Order')
     }
+
+    setIsLoading(true)
 
     try {
 
@@ -86,10 +91,44 @@ const CheckOutPage = () => {
 
     } catch (error) {
       console.log(error)
+      errorToast(error)
     }
+
+    setIsLoading(false)
   }
 
+  const handleStripePayment = async () => {
 
+    if (!selectedAddress) {
+      return infoToast('Select Address To Place Order')
+    }
+    setIsStripeLoading(true)
+    try {
+
+      const stripePublicKey = import.meta.env.VITE_STRIPE_PUBLIC_KEY;
+
+      const stripePromise = await loadStripe(stripePublicKey)
+
+      const response = await Axios({
+        ...summarApi.order.stripePayment,
+        data: {
+          itemList: cartItem,
+          grossTotal: grossTotalBeforeDiscount,
+          cartTotalAmount: cartTotalAmountNoDis,
+          deliveryAddressId: selectedAddress
+        }
+      })
+
+
+      stripePromise.redirectToCheckout({ sessionId: response.data.id })
+
+    } catch (error) {
+      console.log(error)
+      // errorToast(error)
+    }
+
+    setIsStripeLoading(false)
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -192,15 +231,41 @@ const CheckOutPage = () => {
 
               {/* Place Order Button */}
               <div >
-                <button className="cursor-pointer w-full bg-purple-600 hover:bg-purple-700 text-white font-medium py-3 px-4 rounded-lg transition-colors duration-200 mt-6 flex items-center justify-center shadow-md hover:shadow-lg">
-                  <FaCreditCard className="mr-2" />
-                  Pay Online
+                <button
+                  disabled={isStripeLoading}
+                  onClick={() => handleStripePayment()}
+                  className="cursor-pointer w-full bg-purple-600 hover:bg-purple-700 text-white font-medium py-3 px-4 rounded-lg transition-colors duration-200 mt-6 flex items-center justify-center shadow-md hover:shadow-lg">
+
+                  {isStripeLoading ?
+                    <>
+                      <ButtonLoading />
+                      Please wait...
+                    </>
+                    :
+                    <>
+                      <FaCreditCard className="mr-2" />
+                      Pay Online
+                    </>
+                  }
+
                 </button>
                 <button
+                  disabled={isLoading}
                   onClick={(e) => handleCashOrder()}
                   className="cursor-pointer w-full bg-white hover:bg-purple-100 text-purple-600 border font-medium py-3 px-4 rounded-lg transition-colors duration-200 mt-3 flex items-center justify-center shadow-md hover:shadow-lg">
-                  <HiCash className="mr-2" />
-                  Cash On Delivery
+                  {isLoading ?
+                    <>
+                      <ButtonLoading />
+                      Please wait...
+                    </>
+                    :
+                    <>
+
+                      <HiCash className="mr-2" />
+                      Cash On Delivery
+                    </>
+                  }
+
                 </button>
               </div>
 

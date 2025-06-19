@@ -147,6 +147,10 @@ const summarApi = {
         cashOrder: {
             url: 'api/v1/order/cash-payment',
             method: 'post'
+        },
+        stripePayment: {
+             url: 'api/v1/order/stripe-payment',
+            method: 'post'
         }
     }
 
