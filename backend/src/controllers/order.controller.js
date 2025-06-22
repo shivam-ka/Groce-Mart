@@ -60,7 +60,7 @@ const cashPayment = async (req, res) => {
 
 const stripePayment = async (req, res) => {
     try {
-        const { itemList, grossTotal, cartTotalAmount, deliveryAddressId } = req.body;
+        const { itemList, deliveryAddressId } = req.body;
 
         const line_items = itemList.map(el => {
             return {
@@ -115,7 +115,6 @@ const getOrderProductItem = async (lineItems, userId, addressId, paymentId, paym
     if (lineItems?.data?.length) {
         for (const item of lineItems.data) {
             const product = await Stripe.products.retrieve(item.price.product)
-            console.log(product)
 
             const payLoad = {
                 userId: userId,
@@ -128,8 +127,8 @@ const getOrderProductItem = async (lineItems, userId, addressId, paymentId, paym
                 paymentId: paymentId,
                 payment_status: payment_status,
                 address: addressId,
-                subTotal: Number(product.amount_total / 100),
-                totalAmount: Number(product.amount_total / 100),
+                subTotal: Number(item.amount_total / 100),
+                totalAmount: Number(item.amount_total / 100),
             }
             productList.push(payLoad)
         }
@@ -138,35 +137,32 @@ const getOrderProductItem = async (lineItems, userId, addressId, paymentId, paym
     return productList
 }
 
-
 const webHookStripe = async (req, res) => {
     const event = req.body
     const endPointScesret = process.env.STRIPE_WEBHOOK_ENDPOINT_SECRECT
-
-    console.log("order")
 
     switch (event.type) {
         case 'checkout.session.completed':
 
             const session = event.data.object;
             const lineItems = await Stripe.checkout.sessions.listLineItems(session.id)
+
             const user_id = session.metadata.userId
             const orderProduct = await getOrderProductItem(
                 lineItems,
                 user_id,
                 session.metadata.addressId,
-                session.metadata.payment_intent,
+                session.payment_intent,
                 session.payment_status
             )
 
             const order = await OrderModel.insertMany(orderProduct)
-            console.log("order", order)
 
-            if (order) {
-                await userModel.findByIdAndUpdate({ _id: user_id }, {
+            if (order[0]) {
+                await userModel.findByIdAndUpdate(user_id, {
                     shoping_Cart: []
                 })
-                await CartPorductModel.deleteMany({ _id: user_id })
+                await CartPorductModel.deleteMany({ userId: user_id })
             }
 
             break;
