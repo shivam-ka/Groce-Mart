@@ -15,6 +15,7 @@ import ProductContainer from "../components/ProductContainer";
 import SearchPage from "./SearchPage";
 import NoProductFound from "../components/NoProductFound";
 import CheckOutPage from "./CheckOutPage";
+import Order from "./Dashboard/Order";
 
 export {
     ErrorPage,
@@ -33,5 +34,6 @@ export {
     ProductContainer,
     SearchPage,
     NoProductFound,
-    CheckOutPage
+    CheckOutPage,
+    Order
 }

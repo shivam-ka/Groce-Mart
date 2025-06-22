@@ -149,8 +149,12 @@ const summarApi = {
             method: 'post'
         },
         stripePayment: {
-             url: 'api/v1/order/stripe-payment',
+            url: 'api/v1/order/stripe-payment',
             method: 'post'
+        },
+        getOrderItems: {
+            url: 'api/v1/order/get-order-list',
+            method: 'get'
         }
     }
 

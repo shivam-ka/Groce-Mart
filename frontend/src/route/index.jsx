@@ -1,6 +1,6 @@
 import { createBrowserRouter } from "react-router-dom"
 import App from "../App"
-import { ErrorPage, ForgotPassword, Home, Login, Register, UserDashboard, Address, Category, SubCategory, UploadProduct, ProductListPage, ProductDisplayPage, SearchPage, CheckOutPage } from "../pages"
+import { ErrorPage, ForgotPassword, Home, Login, Register, UserDashboard, Address, Category, SubCategory, UploadProduct, ProductListPage, ProductDisplayPage, SearchPage, CheckOutPage, Order } from "../pages"
 import AdminProtractor from "../layout/AdminProtractor"
 
 
@@ -56,6 +56,10 @@ const router = createBrowserRouter([
                         path: 'upload-product',
                         element: <AdminProtractor> <UploadProduct /> </AdminProtractor>
                     },
+                    {
+                        path: 'orders',
+                        element: <Order />
+                    }
 
                 ]
             },

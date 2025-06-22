@@ -5,6 +5,7 @@ import { handleAddItemCart } from "../../store/cartproduct";
 import { useDispatch, useSelector } from "react-redux";
 import { errorToast } from "../Utils/ShowToast";
 import { handleAddAddress } from "../../store/addressSlice";
+import { setOrder } from "../../store/orderSlice";
 
 export const GlobalContext = createContext();
 
@@ -106,6 +107,20 @@ const GlobalProvider = ({ children }) => {
         }
     }
 
+    const fetchOrder = async () => {
+        try {
+            const response = await Axios({
+                ...summarApi.order.getOrderItems
+            })
+
+            if (response.data.success) {
+                dispatch(setOrder(response.data.data))
+            }
+        } catch (error) {
+            errorToast(error)
+        }
+    }
+
     useEffect(() => {
         const toatlAmount = cartItem?.reduce((prev, item) => {
             const price = getPriceAfterDiscount(item?.productId?.price, item?.productId?.discount)
@@ -125,6 +140,7 @@ const GlobalProvider = ({ children }) => {
     useEffect(() => {
         fetchCartItem()
         fetchAddress()
+        fetchOrder()
     }, [])
 
 
@@ -140,7 +156,8 @@ const GlobalProvider = ({ children }) => {
         setIsCartOpen,
         fetchAddress,
         selectedAddress,
-        setSelectedAddress
+        setSelectedAddress,
+        fetchOrder
     }
 
     return (
