@@ -56,7 +56,7 @@ const GlobalProvider = ({ children }) => {
                 fetchCartItem()
             }
         } catch (error) {
-            errorToast(error)
+
         }
     }
 
@@ -87,7 +87,7 @@ const GlobalProvider = ({ children }) => {
             }
 
         } catch (error) {
-            errorToast(error)
+
         }
     }
 
@@ -103,7 +103,7 @@ const GlobalProvider = ({ children }) => {
             }
 
         } catch (error) {
-            errorToast(error)
+
         }
     }
 
@@ -117,7 +117,7 @@ const GlobalProvider = ({ children }) => {
                 dispatch(setOrder(response.data.data))
             }
         } catch (error) {
-            errorToast(error)
+
         }
     }
 
