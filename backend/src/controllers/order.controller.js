@@ -173,5 +173,25 @@ const webHookStripe = async (req, res) => {
 
 }
 
+const getOrderDetais = async (req, res) => {
+    try {
 
-export { cashPayment, stripePayment, webHookStripe }
+        const orderList = await OrderModel
+            .find({ userId: req.user?._id })
+            .sort({ createdAt: -1 })
+
+        return res.status(200)
+            .json(new ApiResponse(
+                200,
+                orderList,
+                "Order Fetched Successfully"
+            ))
+
+    } catch (error) {
+        console.log("get Order Detais Error: ", error);
+        return res.status(500).json(new ApiError(500, error.message || "get Order Detais Error"));
+    }
+}
+
+
+export { cashPayment, stripePayment, webHookStripe, getOrderDetais }
