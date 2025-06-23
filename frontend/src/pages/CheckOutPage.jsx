@@ -100,6 +100,8 @@ const CheckOutPage = () => {
 
   const handleStripePayment = async () => {
 
+    return infoToast('online payment is not available')
+
     if (!selectedAddress) {
       return infoToast('Select Address To Place Order')
     }
