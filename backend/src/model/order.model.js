@@ -13,16 +13,15 @@ const orderSchema = new mongoose.Schema({
         unique: true,
     },
 
-    productId: {
-        type: mongoose.Schema.ObjectId,
-        ref: 'product'
-
-    },
-
-    product_details: {
+    product_details: [{
+        productId: {
+            type: mongoose.Schema.ObjectId,
+            ref: 'Product'
+        },
         name: String,
-        images: Array
-    },
+        images: Array,
+        price: String
+    }],
 
     paymentId: {
         type: String,

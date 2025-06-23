@@ -18,25 +18,35 @@ const cashPayment = async (req, res) => {
 
         const { itemList, grossTotal, cartTotalAmount, deliveryAddressId } = req.body;
 
+        const productData = []
 
-        const payLoad = itemList.map(el => {
-            return ({
-                userId: req.user?._id,
-                orderId: `ORD-${new mongoose.Types.ObjectId()}`,
+        itemList.map(el => {
+            const prod = {
                 productId: el.productId._id,
-                product_details: {
-                    name: el.productId.name,
-                    images: el.productId.images
-                },
-                paymentId: "",
-                payment_status: "CASH ON DELIVERY",
-                address: deliveryAddressId,
-                subTotal: grossTotal,
-                totalAmount: cartTotalAmount,
-            })
+                name: el.productId.name,
+                images: el.productId.images,
+                price: getPriceAfterDiscount(el.productId.price, el.productId.discount)
+            }
+
+            productData.push(prod)
         })
 
-        const generatedOrder = await OrderModel.insertMany(payLoad);
+
+        const payLoad = {
+            userId: req.user?._id,
+            orderId: `ORD-${new mongoose.Types.ObjectId()}`,
+            product_details: productData,
+            paymentId: "",
+            payment_status: "CASH ON DELIVERY",
+            address: deliveryAddressId,
+            subTotal: grossTotal,
+            totalAmount: cartTotalAmount
+        }
+
+
+        const generatedOrder = new OrderModel(payLoad);
+        await generatedOrder.save();
+
 
         await CartPorductModel.deleteMany({ userId: req.user?._id })
         await userModel.updateOne({ _id: req.user?._id }, { shoping_Cart: [] })
@@ -179,6 +189,11 @@ const getOrderDetais = async (req, res) => {
         const orderList = await OrderModel
             .find({ userId: req.user?._id })
             .sort({ createdAt: -1 })
+            .populate({
+                path: 'product_details.productId',
+                select: 'name images price description',
+                model: 'Product'
+            });
 
         return res.status(200)
             .json(new ApiResponse(

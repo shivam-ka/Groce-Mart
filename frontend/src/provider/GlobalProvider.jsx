@@ -32,6 +32,7 @@ const GlobalProvider = ({ children }) => {
             const response = await Axios({
                 ...summarApi.cart.getCartItem
             })
+            console.log(response)
             if (response.data.success) {
                 dispatch(handleAddItemCart(response.data.data))
             }
@@ -117,7 +118,7 @@ const GlobalProvider = ({ children }) => {
                 dispatch(setOrder(response.data.data))
             }
         } catch (error) {
-
+            console.log(error)
         }
     }
 

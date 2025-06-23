@@ -21,7 +21,7 @@ const Cart = ({ isOpen, onClose }) => {
   const navigate = useNavigate()
 
   const user = useSelector(state => state.user)
-  console.log(user)
+
 
   // Calculate charges
   const deliveryFee = 25
