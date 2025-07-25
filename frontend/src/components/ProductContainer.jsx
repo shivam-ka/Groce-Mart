@@ -85,6 +85,7 @@ const ProductContainer = ({ product }) => {
                         alt={product.name}
                         className="h-full object-contain p-0.5"
                         style={{ maxWidth: "100%" }}
+                        draggable={false}
                     />
                     {product.discount > 0 && (
                         <motion.div

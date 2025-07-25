@@ -3,169 +3,157 @@ import Axios from "../Utils/Axios";
 import summarApi from "../common/SummaryApi";
 import { handleAddItemCart } from "../../store/cartproduct";
 import { useDispatch, useSelector } from "react-redux";
-import { errorToast } from "../Utils/ShowToast";
 import { handleAddAddress } from "../../store/addressSlice";
 import { setOrder } from "../../store/orderSlice";
 
 export const GlobalContext = createContext();
 
-export const useGlobalContext = () => useContext(GlobalContext)
+export const useGlobalContext = () => useContext(GlobalContext);
 
 const GlobalProvider = ({ children }) => {
+  const cartItem = useSelector((state) => state.cartItem.cart);
+  const dispatch = useDispatch();
 
-    const cartItem = useSelector(state => state.cartItem.cart);
-    const dispatch = useDispatch()
+  const [cartTotalAmount, setCartTotalAmount] = useState(0);
+  const [cartTotalAmountNoDis, setCartTotalAmountNoDis] = useState(0);
+  const [isCartOpen, setIsCartOpen] = useState(false);
+  const [selectedAddress, setSelectedAddress] = useState("");
 
-    const [cartTotalAmount, setCartTotalAmount] = useState(0)
-    const [cartTotalAmountNoDis, setCartTotalAmountNoDis] = useState(0)
-    const [isCartOpen, setIsCartOpen] = useState(false)
-    const [selectedAddress, setSelectedAddress] = useState('')
+  const getPriceAfterDiscount = (ogPrice, discount) => {
+    const discountAmount = ogPrice * (discount / 100);
+    const finalPrice = ogPrice - discountAmount;
+    return finalPrice.toFixed(2);
+  };
 
-    const getPriceAfterDiscount = (ogPrice, discount) => {
-        const discountAmount = ogPrice * (discount / 100);
-        const finalPrice = ogPrice - discountAmount;
-        return finalPrice.toFixed(2);
+  const fetchCartItem = async () => {
+    try {
+      const response = await Axios({
+        ...summarApi.cart.getCartItem,
+      });
+
+      if (response.data.success) {
+        dispatch(handleAddItemCart(response.data.data));
+      }
+    } catch (error) {
+      console.log(error);
     }
+  };
 
-    const fetchCartItem = async () => {
-        try {
-            const response = await Axios({
-                ...summarApi.cart.getCartItem
-            })
-            console.log(response)
-            if (response.data.success) {
-                dispatch(handleAddItemCart(response.data.data))
-            }
-        } catch (error) {
-            console.log(error)
+  const increaseQnty = async (e, cartItemDetails) => {
+    e.stopPropagation();
+    e.preventDefault();
+
+    const qnty = cartItemDetails?.quantity + 1;
+
+    try {
+      const response = await Axios({
+        url: `${summarApi.cart.updateQty.url}/${cartItemDetails?._id}/${qnty}`,
+        method: summarApi.cart.updateQty.method,
+      });
+      console.log(response);
+      if (response.data.success) {
+        fetchCartItem();
+      }
+    } catch (error) {}
+  };
+
+  const decreaseQnty = async (e, cartItemDetails) => {
+    e.stopPropagation();
+    e.preventDefault();
+
+    const qnty = cartItemDetails?.quantity - 1;
+
+    try {
+      if (qnty == 0) {
+        const response = await Axios({
+          url: `${summarApi.cart.removeCartItem.url}/${cartItemDetails?._id}`,
+          method: summarApi.cart.removeCartItem.method,
+        });
+        if (response.data.success) {
+          fetchCartItem();
         }
-    }
+      } else {
+        const response = await Axios({
+          url: `${summarApi.cart.updateQty.url}/${cartItemDetails?._id}/${qnty}`,
+          method: summarApi.cart.updateQty.method,
+        });
 
-    const increaseQnty = async (e, cartItemDetails) => {
-        e.stopPropagation();
-        e.preventDefault()
-
-        const qnty = cartItemDetails?.quantity + 1
-
-        try {
-            const response = await Axios({
-                url: `${summarApi.cart.updateQty.url}/${cartItemDetails?._id}/${qnty}`,
-                method: summarApi.cart.updateQty.method
-            })
-            console.log(response)
-            if (response.data.success) {
-                fetchCartItem()
-            }
-        } catch (error) {
-
+        if (response.data.success) {
+          fetchCartItem();
         }
+      }
+    } catch (error) {}
+  };
+
+  const fetchAddress = async () => {
+    try {
+      const response = await Axios({
+        ...summarApi.address.getAddress,
+      });
+
+      if (response.data.success) {
+        dispatch(handleAddAddress(response.data.data));
+      }
+    } catch (error) {}
+  };
+
+  const fetchOrder = async () => {
+    try {
+      const response = await Axios({
+        ...summarApi.order.getOrderItems,
+      });
+
+      if (response.data.success) {
+        dispatch(setOrder(response.data.data));
+      }
+    } catch (error) {
+      console.log(error);
     }
+  };
 
-    const decreaseQnty = async (e, cartItemDetails) => {
-        e.stopPropagation();
-        e.preventDefault();
+  useEffect(() => {
+    const toatlAmount = cartItem?.reduce((prev, item) => {
+      const price = getPriceAfterDiscount(
+        item?.productId?.price,
+        item?.productId?.discount
+      );
 
-        const qnty = cartItemDetails?.quantity - 1
+      return prev + item.quantity * price;
+    }, 0);
 
-        try {
-            if (qnty == 0) {
-                const response = await Axios({
-                    url: `${summarApi.cart.removeCartItem.url}/${cartItemDetails?._id}`,
-                    method: summarApi.cart.removeCartItem.method
-                })
-                if (response.data.success) {
-                    fetchCartItem()
-                }
-            } else {
-                const response = await Axios({
-                    url: `${summarApi.cart.updateQty.url}/${cartItemDetails?._id}/${qnty}`,
-                    method: summarApi.cart.updateQty.method
-                })
+    setCartTotalAmount(toatlAmount);
 
-                if (response.data.success) {
-                    fetchCartItem()
-                }
-            }
+    const totalAmountWithDis = cartItem?.reduce((prev, item) => {
+      return prev + item.quantity * item?.productId?.price;
+    }, 0);
+    setCartTotalAmountNoDis(totalAmountWithDis);
+  }, [cartItem]);
 
-        } catch (error) {
+  useEffect(() => {
+    fetchCartItem();
+    fetchAddress();
+    fetchOrder();
+  }, []);
 
-        }
-    }
+  const value = {
+    cartItem,
+    fetchCartItem,
+    increaseQnty,
+    decreaseQnty,
+    getPriceAfterDiscount,
+    cartTotalAmount,
+    cartTotalAmountNoDis,
+    isCartOpen,
+    setIsCartOpen,
+    fetchAddress,
+    selectedAddress,
+    setSelectedAddress,
+    fetchOrder,
+  };
 
-    const fetchAddress = async () => {
-        try {
+  return (
+    <GlobalContext.Provider value={value}>{children}</GlobalContext.Provider>
+  );
+};
 
-            const response = await Axios({
-                ...summarApi.address.getAddress
-            })
-
-            if (response.data.success) {
-                dispatch(handleAddAddress(response.data.data))
-            }
-
-        } catch (error) {
-
-        }
-    }
-
-    const fetchOrder = async () => {
-        try {
-            const response = await Axios({
-                ...summarApi.order.getOrderItems
-            })
-
-            if (response.data.success) {
-                dispatch(setOrder(response.data.data))
-            }
-        } catch (error) {
-            console.log(error)
-        }
-    }
-
-    useEffect(() => {
-        const toatlAmount = cartItem?.reduce((prev, item) => {
-            const price = getPriceAfterDiscount(item?.productId?.price, item?.productId?.discount)
-
-            return prev + (item.quantity * price)
-        }, 0)
-
-        setCartTotalAmount(toatlAmount);
-
-        const totalAmountWithDis = cartItem?.reduce((prev, item) => {
-            return prev + (item.quantity * item?.productId?.price)
-        }, 0)
-        setCartTotalAmountNoDis(totalAmountWithDis)
-
-    }, [cartItem])
-
-    useEffect(() => {
-        fetchCartItem()
-        fetchAddress()
-        fetchOrder()
-    }, [])
-
-
-    const value = {
-        cartItem,
-        fetchCartItem,
-        increaseQnty,
-        decreaseQnty,
-        getPriceAfterDiscount,
-        cartTotalAmount,
-        cartTotalAmountNoDis,
-        isCartOpen,
-        setIsCartOpen,
-        fetchAddress,
-        selectedAddress,
-        setSelectedAddress,
-        fetchOrder
-    }
-
-    return (
-        <GlobalContext.Provider value={value} >
-            {children}
-        </GlobalContext.Provider>
-    )
-}
-
-export default GlobalProvider
+export default GlobalProvider;
